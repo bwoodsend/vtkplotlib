@@ -5,7 +5,8 @@ Created on Sat Jul 20 21:17:35 2019
 @author: Brénainn Woodsend
 
 
-one line to give the program's name and a brief idea of what it does.
+render_window.py
+Provides the render window of a figure.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -36,6 +37,15 @@ from vtk.util.numpy_support import (
 
 
 class VTKRenderer(object):
+    """This is a figure without all the extra methods attached. All Figure classes
+    with inherit from this. 
+    
+    This class handles creating and linking of:
+        self.renWin = The outer box/window (with the close button)
+        self.render = Shows the actual 2D image of the plot
+        self.iren = The interactor is incharge of responding to clicking on the plot
+        
+    """
     def __init__(self, window=None, window_interactor=None):
 
         # Create a renderwindow
@@ -71,22 +81,29 @@ class VTKRenderer(object):
         self.temp = []
         
         
-    def start(self, block=True):
+    def start(self, block=True, reset_camera=True):
+        """Internal use only."""
         # Enable user interface interactor
         # This needs to happen after some of the Qt stuff is done
         self.iren.Initialize()
         self.renWin.Render()
         self.renWin.SetWindowName(self.window_name)
+        
+        if reset_camera:
+            self.render.ResetCamera()
+        
         if block:
             self.iren.Start()
-            
+        
+        
     def update(self):
+        """Redraw the plot to reflect any new/altered plots."""
         self.renWin.Render()
         
-
         
     def add_actor(self, actor):
         self.render.AddActor(actor)
+        
         
     def remove_actor(self, actor):
         self.render.RemoveActor(actor)

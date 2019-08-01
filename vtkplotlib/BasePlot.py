@@ -5,7 +5,8 @@ Created on Sat Jul 20 23:46:41 2019
 @author: Brénainn Woodsend
 
 
-one line to give the program's name and a brief idea of what it does.
+BasePlot.py 
+Provides some base classes for plot objects
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -51,6 +52,11 @@ for dic in (colors.CSS4_COLORS, colors.TABLEAU_COLORS, colors.XKCD_COLORS):
 
 
 class BasePlot(object):
+    """A base class for all plots in vtkplotlib. This tries to handle all the
+    common steps involved in constructing and linking the vtk pipeline. Also
+    setter/getters for very generic attributes like color can go here.
+    """
+    
     def __init__(self, fig=None):
         self.fig = fig or gcf()
         
@@ -105,16 +111,40 @@ class BasePlot(object):
     def visable(self, x):
         self.actor.SetVisibility(x)
         
+    visable.__doc__ = """Shows (=True) / hides (=False) the plot object"""
+    
+    color.__doc__ = """Sets / gets the color of the plot object.
+    Accepts either:
+        any iterable of length 3 or 4 representing
+            (r, g, b) or (r, g, b, alpha)
+        where numbers are either floats from 0 to 1 or ints from 0 to 255.
         
+        Or a string color name. e.g "r" or "red". This uses matplotlib's 
+        named color libraries. See there or vtkplotlib.BasePlot.mpl_colors for
+        a full list of names.
+        
+        Return type is always a 3-tuple of floats (r, b, g). Use plot.opacity 
+        property to get the current opacity.
+    """
+    
+    opacity.__doc__ = """Set / get the translucency. 0 is invisible, 1 is solid."""
         
         
 class SourcedPlot(BasePlot):
+    """Bases plots that have a source. This source is an physical object that
+    must be converted into a tri-mesh surface before it can proceed further down
+    the pipeline. E.g a sphere or an arrow. The source provides it's own
+    conversion to triangles with source.GetOutputPort()."""
     def add_to_plot(self):
         super().add_to_plot()
         self.mapper.SetInputConnection(self.source.GetOutputPort())
         
         
 class ConstructedPlot(BasePlot):
+    """Bases plots that don't have a source. Rather have to be constructed 
+    manually into a vtk.vtkPolyData object (generic bucket class for storing
+    points/lines/surfaces ...).
+    """
     def __init__(self, fig=None):
         super().__init__(fig)
         self.poly_data = vtk.vtkPolyData()
@@ -129,11 +159,14 @@ class ConstructedPlot(BasePlot):
         
         
 def _iter_points(points):
+    """Fixes the array shape to (n, 3)."""
     points = np.asarray(points)
     return nuts_and_bolts.flatten_all_but_last(points)
 
 
 def _iter_colors(colors, shape):
+    """Check if colors is a single value or is to be iterated over. If it is 
+    single then creates a generator that yields that value repeatedly."""
     size = int(np.prod(shape))
     
     if colors is None:

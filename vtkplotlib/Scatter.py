@@ -5,7 +5,8 @@ Created on Sun Jul 21 00:51:34 2019
 @author: Brénainn Woodsend
 
 
-one line to give the program's name and a brief idea of what it does.
+Scatter.py
+Create a scatter plot using spheres.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -33,11 +34,11 @@ from vtk.util.numpy_support import (
 
 
 
-from vtkplotlib.BasePlot import SourcedPlot, _iter_colors, _iter_points
-from vtkplotlib.figures import gcf, show
+from vtkplotlib.BasePlot import SourcedPlot, _iter_colors, _iter_points, _iter_scalar
 
 
-class Point(SourcedPlot):
+class Sphere(SourcedPlot):
+    """Plot an individual sphere."""
     def __init__(self, point, color=None, opacity=None, radius=1., fig=None):
         super().__init__(fig)
         
@@ -84,9 +85,11 @@ def scatter(points, color=None, opacity=None, radius=1., fig=None):
     points = np.asarray(points)
     out = np.empty(points.shape[:-1], object)
     out_flat = out.ravel()
-    for (i, (xyz, c)) in enumerate(zip(_iter_points(points),
-                                         _iter_colors(color, points.shape[:-1]))):
-        out_flat[i] = Point(xyz, c, opacity, radius, fig)
+    for (i, (xyz, c, r)) in enumerate(zip(_iter_points(points),
+                                         _iter_colors(color, points.shape[:-1]),
+                                         _iter_scalar(radius, points.shape[:-1]))):
+        
+        out_flat[i] = Sphere(xyz, c, opacity, r, fig)
         
     return out
         
@@ -94,18 +97,22 @@ def scatter(points, color=None, opacity=None, radius=1., fig=None):
     
     
 if __name__ == "__main__":
+    import vtkplotlib as vpl
+    import time
     
+    points = np.random.uniform(-10, 10, (30, 3))
     
-#    fig = gcf()
+#    self = vpl.cursor(points[0])
+    self = scatter(points, color=points, radius=np.abs(points[:, 0]) ** .5)[0]
     
-    points = np.random.uniform(-10, 10, (10, 3))
-    
-    self = Cursor(points[0])
-#    self = scatter(points, color=points)[0]
-    
-    
+#    vpl.show(False)
+#    
+#    for i in range(20):
+#        self.source.SetRadius(np.random.random())
+#        vpl.gcf().update()
+#        time.sleep(.1)
 
-    show()
+    vpl.show()
     
     
     

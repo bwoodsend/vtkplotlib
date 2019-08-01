@@ -5,7 +5,8 @@ Created on Sun Jul 21 15:29:19 2019
 @author: Brénainn Woodsend
 
 
-one line to give the program's name and a brief idea of what it does.
+SalarBar.py
+Adds a scalar/color bar.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -25,13 +26,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import vtk
 import numpy as np
-#from matplotlib import pylab as plt
-from matplotlib import colors
 import os
 import sys
 from pathlib2 import Path
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vtk.util.numpy_support import (
                                     numpy_to_vtk,
                                     numpy_to_vtkIdTypeArray,
@@ -39,9 +36,6 @@ from vtk.util.numpy_support import (
                                     )
 
 from vtkplotlib.BasePlot import BasePlot
-from vtkplotlib.figures import gcf, show
-from vtkplotlib.nuts_and_bolts import flatten_all_but_last
-
 
 
 
@@ -64,11 +58,11 @@ class ScalarBar(BasePlot):
 
 if __name__ == "__main__":
     from stl.mesh import Mesh
-    from vtkplotlib.MeshPlot import MeshPlot
+    import vtkplotlib as vpl
     
     mesh = Mesh.from_file("C:/Users/Brénainn/Documents/uni/project/stl/1_mandibular.stl")
-    plot = MeshPlot(mesh, scalars=mesh.x)
+    plot = vpl.mesh_plot(mesh, scalars=mesh.x)
 
-    self = ScalarBar(plot)
+    self = vpl.scalar_bar(plot)
 
-    show()
+    vpl.show()

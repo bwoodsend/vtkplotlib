@@ -5,7 +5,8 @@ Created on Sat Jul 20 23:55:28 2019
 @author: Brénainn Woodsend
 
 
-one line to give the program's name and a brief idea of what it does.
+MeshPlot.py 
+Plot a 3D stl (like) mesh.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -38,22 +39,136 @@ from vtk.util.numpy_support import (
                                     vtk_to_numpy,
                                     )
 
-from stl.mesh import Mesh
 
 
 from vtkplotlib.BasePlot import ConstructedPlot
-from vtkplotlib.figures import gcf
 from vtkplotlib.nuts_and_bolts import flatten_all_but_last
 
+
+
+MESH_DATA_TYPE = \
+"""'mesh_data' must be any of the following forms:
+
+1)  Some kind of mesh class that has form 2) stored in mesh.vectors. 
+    For example numpy-stl's stl.mesh.Mesh or pymesh's pymesh.stl.Stl
+
+    
+2)   An np.array with shape (n, 3, 3) in the form:
+    
+       np.array([[[x, y, z],  # corner 0  \\
+                  [x, y, z],  # corner 1  | triangle 0
+                  [x, y, z]], # corner 2  /
+                 ...
+                 [[x, y, z],  # corner 0  \\
+                  [x, y, z],  # corner 1  | triangle n-1
+                  [x, y, z]], # corner 2  /
+                ])
+    
+    Note it's not uncommon to have arrays of shape (n, 3, 4) or (n, 4, 3) 
+    where the additional enties' meanings are usually irrelevant (often to
+    represent scalars but as stl has no color this is always uniform). Hence
+    to support mesh classes that have these, these arrays are allowed and the
+    extra entries are ignored.
+        
+
+    
+3)  An np.array with shape (k, 3) of (usually unique) vertices in the form:
+        
+        np.array([[x, y, z],
+                  [x, y, z],
+                  ...
+                  [x, y, z],
+                  [x, y, z],
+                  ])
+    
+    And a second argument of an np.array of integers with shape (n, 3) of point
+    args in the form
+    
+        np.array([[i, j, k],  # triangle 0
+                  ...
+                  [i, j, k],  # triangle n-1
+                  ])
+    
+    where i, j, k are the indices of the points (in the vertices array) 
+    representing each corner of a triangle.
+    
+    Note that this form can (and is) easily converted to form 2) using
+    
+        vertices = unique_vertices[point_args]
+
+
+If you are using or have written an stl library that you want supported then
+let me know. If it's numpy based then it's probably only a few extra lines to 
+support.
+        
+"""
+
+
+MESH_DATA_TYPE_EX = lambda msg :ValueError("Invalid mesh_data type\n{}\n{}"\
+                                           .format(MESH_DATA_TYPE, msg))
+
+
 class MeshPlot(ConstructedPlot):
-    def __init__(self, mesh, tri_scalars=None, scalars=None, color=None, opacity=None, fig=None):
+    """Plot an STL (like) surface composed of lots of little triangles. Accepts
+    mesh types from various 3rd party libraries. This was primarily written for
+    the numpy-stl library. Failing that can also take other more generic formats.
+    See __init__ for more info.
+    """
+    def __init__(self, *mesh_data, tri_scalars=None, scalars=None, color=None, opacity=None, fig=None):
         super().__init__(fig)
         
-        self.mesh = mesh
-        triangles = np.empty((len(mesh), 4), np.int64)
+        # Try to support as many of the mesh libtaries out there as possible
+        # without having all of those libraries as dependencies
+        
+        if len(mesh_data) == 1:
+            mesh_data = mesh_data[0]
+            
+            if isinstance(mesh_data, np.ndarray):
+                self.vectors = mesh_data
+                
+            elif hasattr(mesh_data, "vectors"):
+                self.vectors = mesh_data.vectors
+                if self.vectors.shape[1:] != (3, 3):
+                    self.vectors = self.vectors[:, :3, :3]
+                
+            else:
+                raise MESH_DATA_TYPE_EX("")
+            
+            if self.vectors.shape[1:] != (3, 3):
+                raise MESH_DATA_TYPE_EX("mesh_data is invalid shape {}".format(self.vectors.shape))
+            
+                
+        elif len(mesh_data) == 2:
+            vertices, args = mesh_data
+            if not isinstance(vertices, np.ndarray):
+                raise MESH_DATA_TYPE_EX("First argument is of invalid type {}"\
+                                        .format(type(vertices)))
+                
+            if vertices.shape[1:] != (3,):
+                raise MESH_DATA_TYPE_EX("First argument has invalid shape {}. Should be (..., 3)."\
+                                 .format(vertices.shape))
+                
+            if not isinstance(args, np.ndarray):
+                raise MESH_DATA_TYPE_EX("Second argument is of invalid type {}"\
+                                        .format(type(args)))
+                
+            if args.shape[1:] != (3,):
+                raise MESH_DATA_TYPE_EX("Second argument has invalid shape {}. Should be (n, 3)."\
+                                 .format(args.shape))
+                
+            if args.dtype != int:
+                raise MESH_DATA_TYPE_EX("Second argument must be an int dtype array")
+                
+            self.vectors = vertices[args]
+            
+        else:
+            raise MESH_DATA_TYPE_EX("")
+                                 
+            
+        triangles = np.empty((len(self.vectors), 4), np.int64)
         triangles[:, 0] = 3
         for i in range(3):
-            triangles[:, i+1] = np.arange(i, len(mesh) * 3, 3)
+            triangles[:, i+1] = np.arange(i, len(self.vectors) * 3, 3)
             
         triangles = triangles.ravel()
 
@@ -74,38 +189,57 @@ class MeshPlot(ConstructedPlot):
         self.set_scalars(scalars)
         self.set_tri_scalars(tri_scalars)
         self.color_opacity(color, opacity)
-    
+
+    __init__.__doc__ = (__init__.__doc__ or "") + MESH_DATA_TYPE    
 
     def update_points(self):
-        vertices = flatten_all_but_last(self.mesh.vectors)
+        """If self.vectors has been modified (either resigned to a new array or
+        the array's contents have been altered) then this be called after."""
+        vertices = flatten_all_but_last(self.vectors)
         self.fig.temp.append(vertices)
         
         self.points.SetData(numpy_to_vtk(vertices))        
 
     
-    def set_tri_scalars(self, tri_scalars):
+    def set_tri_scalars(self, tri_scalars, min=None, max=None):
+        """Sets a scalar for each triangle for generating heatmaps. 
+        
+        tri_scalars should be an 1D np.array of length n. 
+        
+        Calls self.set_scalars. See set_scalars for implications.
+        """
         if tri_scalars is not None:
     #        scalars = np.array([tri_scalars, tri_scalars, tri_scalars]).T
-            assert tri_scalars.shape == (len(self.mesh), )
+            assert tri_scalars.shape == (len(self.vectors), )
             scalars = np.empty((len(tri_scalars), 3))
             for i in range(3):
                 scalars[:, i] = tri_scalars
                 
-            self.set_scalars(scalars)
+            self.set_scalars(scalars, min, max)
     
-            
-    def set_scalars(self, scalars):
+    
+    def set_scalars(self, scalars, min=None, max=None):
+        """Sets a scalar for each corner of each triangle for generating heatmaps. 
+        
+        scalars should be an array with shape (n, 3).
+        
+        self.set_scalars and self.set_tri_scalars will overwrite each other. 
+        If either form of scalars is used then self.color is ignored.
+        """
+        
         if scalars is not None:
     #        scalars[~np.isfinite(scalars)] = np.nanmean(scalars)
-            if scalars.shape != (len(self.mesh), 3):
+            if scalars.shape != (len(self.vectors), 3):
                 raise ValueError("Expected (n, 3) shape array. Got {}".format(scalars.shape))
     
             self.poly_data.GetPointData().SetScalars(numpy_to_vtk(scalars.ravel()))
             self.fig.temp.append(scalars)
             
-            self.mapper.SetScalarRange(np.nanmin(scalars), np.nanmax(scalars))
+            min = min or np.nanmin(scalars)
+            max = max or np.nanmax(scalars)
+            self.mapper.SetScalarRange(min, max)
             
-        
+    
      
     
 
@@ -113,27 +247,42 @@ class MeshPlot(ConstructedPlot):
 if __name__ == "__main__":
     import time
     import vtkplotlib as vpl
-
+    from stl.mesh import Mesh
+    
+    
     
     fig = vpl.gcf()
-    mesh = Mesh.from_file("C:/Users/Brénainn/Documents/uni/project/stl/1_mandibular.stl")
-    self = vpl.mesh_plot(mesh)
+    
+    path = vpl.data.STLS[0]
+    _mesh = Mesh.from_file(path)
+    
+#    vertices = flatten_all_but_last(_mesh.vectors)
+#    point_args = np.arange(len(_mesh) * 3).reshape((len(_mesh), 3))
+#    
+#    shuffle_args = np.arange(len(point_args))
+#    np.random.shuffle(shuffle_args)
+#    point_args = point_args[shuffle_args]
+#    
+#    self = vpl.mesh_plot(vertices, point_args)
+    
+    self = vpl.mesh_plot(_mesh.vectors)
     
 
 #    self.property.SetEdgeVisibility(True)
     
-#    fig.show(False)
-#    
-##    t0 = time.perf_counter()
-#    for i in range(7):
-##        self.color = np.random.random(3)
-##        print(self.color)
-#        self.set_tri_scalars((mesh.x[:, 0] + i) % 15 )
-##        mesh.rotate(np.ones(3), .1)
-#        fig.update()
-#        self.update_points()
-#        time.sleep(1)
-#    print(time.perf_counter() - t0)
+    fig.show(False)
+    
+    t0 = time.perf_counter()
+    for i in range(100):
+#        self.color = np.random.random(3)
+#        print(self.color)
+        self.set_tri_scalars((_mesh.x[:, 0] + i) % 20 )
+        _mesh.rotate(np.ones(3), .1, np.mean(_mesh.vectors, (0, 1)))
+        fig.update()
+        self.update_points()
+#        time.sleep(.01)
+        if (time.perf_counter() - t0) > 2:
+            break
     
 #    fig.show(False)
 #    time.sleep(3)
@@ -143,20 +292,20 @@ if __name__ == "__main__":
 #    self.color_opacity((0, 1, 0))
 #    [vpl.plot(i, join_ends=True, color="k") for i in mesh.vectors[-5000:]]
     
-    edges = vtk.vtkExtractEdges()
-    edges.SetInputData(self.poly_data)
-    
-    mapper = vtk.vtkPolyDataMapper()
-    mapper.SetInputData(edges.GetOutput())
-    
-    actor = vtk.vtkActor()
-    actor.SetMapper(mapper)
-    
-    actor.GetProperty().SetColor(1,0,0)
+#    edges = vtk.vtkExtractEdges()
+#    edges.SetInputData(self.poly_data)
+#    
+#    mapper = vtk.vtkPolyDataMapper()
+#    mapper.SetInputData(edges.GetOutput())
+#    
+#    actor = vtk.vtkActor()
+#    actor.SetMapper(mapper)
+#    
+#    actor.GetProperty().SetColor(1,0,0)
 
     
 #    fig.add_actor(actor)
-    fig.render.AddActor(actor)
+#    fig.render.AddActor(actor)
     
     
     fig.show()

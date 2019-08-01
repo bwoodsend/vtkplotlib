@@ -5,7 +5,7 @@ Created on Sun Jul 21 15:54:56 2019
 @author: Brénainn Woodsend
 
 
-one line to give the program's name and a brief idea of what it does.
+Arrow.py creates an arror / quiver plot.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -25,24 +25,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import vtk
 import numpy as np
-#from matplotlib import pylab as plt
-from matplotlib import colors
-import os
-import sys
-from pathlib2 import Path
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vtk.util.numpy_support import (
                                     numpy_to_vtk,
                                     numpy_to_vtkIdTypeArray,
                                     vtk_to_numpy,
                                     )
 
-
-
 from vtkplotlib.BasePlot import SourcedPlot, _iter_colors, _iter_points, _iter_scalar
-from vtkplotlib.figures import gcf, show
 from vtkplotlib import geometry as geom
+
 
 class Arrow(SourcedPlot):
     def __init__(self, start, end, length=None, color=None, opacity=None, fig=None):
@@ -52,9 +43,16 @@ class Arrow(SourcedPlot):
         if length == None:
             length = geom.distance(diff)
                     
+        # vtk needs a full set of axes to build about.
+        # eX is just the direction the arrow is pointing in.
+        # eY and eZ must be perpendiculr to each other and eX. However beyond 
+        # that exact choice of eY and eZ does not matter. It only rotates the 
+        # arrow about eX which you don't see because it's (approximately) round.
         eX, eY, eZ = geom.orthogonal_bases(diff)
         arrowSource = vtk.vtkArrowSource()
-            
+
+
+        # This next bit puts the arrow where it's supposed to go
         matrix = vtk.vtkMatrix4x4()
 
         # Create the direction cosine matrix
@@ -70,19 +68,30 @@ class Arrow(SourcedPlot):
         transform.Concatenate(matrix)
         transform.Scale(length, length, length)
         
+        
         self.source = arrowSource
             
         self.add_to_plot()
         self.actor.SetUserMatrix(transform.GetMatrix())
             
         self.color_opacity(color, opacity)
-                    
             
 
 
 def arrow(start, end, length=None, color=None, opacity=None, fig=None):
+    """Draw an arrow / arrows from 'start' to 'end'. 'start' and 'end' should
+    have matching shapes. Arrow lengths are automatically calculated by 
+    pythagoras but can be overwritten by setting 'length'. 'length' can either 
+    be a single value for all arrows or an array of lengths to match the number
+    of arrows. Note arrays are supported only for convinience and just use a
+    python for loop. There is no speed bonus for using numpy or trying to plot
+    in bulk here. Returns an array of stand-alone Arrow objects with same shape
+    as the input."""
+    
     start = np.asarray(start)
     end = np.asarray(end)
+    
+    assert start.shape == end.shape
     
     out = np.empty(start.shape[:-1], object)
     out_flat = out.ravel()
@@ -99,6 +108,12 @@ def arrow(start, end, length=None, color=None, opacity=None, fig=None):
     
 
 def quiver(point, gradient, length=None, length_scale=1, color=None, opacity=None, fig=None):
+    """Create an arrow from 'point' towards a direction given by 'gradient'. 
+    Lengths by default are the magnitude of 'gradient but can be scaled with
+    'length_scale' or overwritten with 'length'. See arrow's docs for more 
+    detail.
+    """
+    
     if length is None:
         length = geom.distance(gradient)
     if length_scale != 1:
@@ -110,10 +125,12 @@ def quiver(point, gradient, length=None, length_scale=1, color=None, opacity=Non
 
 if __name__ == "__main__":
     
+    import vtkplotlib as vpl
+    
     t = np.linspace(0, 2 * np.pi)
     points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
     grads = np.roll(points, 10)
     
     arrows = quiver(points, grads)
     
-    show()
+    vpl.show()

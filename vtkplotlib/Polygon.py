@@ -5,7 +5,8 @@ Created on Sun Jul 21 21:48:12 2019
 @author: Brénainn Woodsend
 
 
-one line to give the program's name and a brief idea of what it does.
+Polygon.py
+Creates a filled polygon.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -26,12 +27,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import vtk
 import numpy as np
 #from matplotlib import pylab as plt
-from matplotlib import colors
 import os
 import sys
 from pathlib2 import Path
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vtk.util.numpy_support import (
                                     numpy_to_vtk,
                                     numpy_to_vtkIdTypeArray,
@@ -41,13 +39,13 @@ from vtk.util.numpy_support import (
 
 
 from vtkplotlib.BasePlot import ConstructedPlot, _iter_colors, _iter_points, _iter_scalar
-from vtkplotlib.figures import gcf, show
 from vtkplotlib import geometry as geom
 
 
 
 
 class Polygon(ConstructedPlot):
+    """Creates a filled polygon with 'vertices' as it's corners."""
     def __init__(self, vertices, color=None, opacity=None, fig=None):
         super().__init__(fig)
     
@@ -85,10 +83,12 @@ class Polygon(ConstructedPlot):
 
 
 if __name__ == "__main__":
+    import vtkplotlib as vpl
+    
     t = np.arange(0, 1, .1) * 2 * np.pi
     points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
     
-    self = Polygon(points, color="r")
+    self = vpl.polygon(points, color="r")
     
-    show()
+    vpl.show()
 

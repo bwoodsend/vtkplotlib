@@ -26,6 +26,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 import matplotlib.pylab as plt
 
+"""
+Warning in advance. I use this file for multiple projects so there will be a 
+lot of irrelevant functions in here.
+"""
+
 
 def distance(points):
     return np.sqrt(np.sum(points ** 2, axis=-1))
@@ -99,19 +104,6 @@ def plot_path_separated(*paths, direction, **plotargs):
     for (perp, parr) in zip(*separate_paths_concatenate(*paths, direction=direction)):
         plt.plot(perp, parr, **plotargs)
 
-
-def from_xz(xz, y=0):
-    shape_xz = xz.shape
-    shape_xyz = shape_xz[:-1] + (shape_xz[-1] + 1,)
-    
-    xyz = np.empty(shape_xyz, xz.dtype)
-    xyz[..., 0] = xz[..., 0]
-    xyz[..., 1] = y
-    xyz[..., 2] = xz[..., 1]
-    return xyz
-
-def to_xz(xyz):
-    return xyz[..., [0, 2]]
     
 
 def rotation_matrix(theta_rad):
@@ -433,12 +425,6 @@ def set_angle_range(x, lb=0,
     return y
     
     
-def row_to_3cols(arr):
-    out_shape = arr.shape + (3,)
-    out = np.empty(out_shape, arr.dtype)
-    for i in range(3):
-        out[..., i] = arr
-    return out
 
 
 

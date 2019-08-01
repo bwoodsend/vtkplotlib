@@ -5,7 +5,7 @@ Created on Mon May 13 15:15:26 2019
 @author: Brénainn Woodsend
 
 nuts_and_bolts.py
-Dumping ground for various misc methods.
+Dumping ground for various misc functions.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -23,12 +23,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
 
+"""Dumping ground for random bits and bobs. I use this for several projects so
+there will be a lot of irrelevant functions."""
+
 import numpy as np
 import matplotlib.pylab as plt
 import sys
 import os
 
-"""Dumping ground for random bits and bobs."""
+
 
 
 def set_to_array(s, dtype=float):
