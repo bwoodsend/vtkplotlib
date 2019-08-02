@@ -26,6 +26,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 import matplotlib.pylab as plt
 
+from vtkplotlib import nuts_and_bolts
+
 """
 Warning in advance. I use this file for multiple projects so there will be a 
 lot of irrelevant functions in here.
@@ -200,7 +202,7 @@ def spherical(vects):
 
 def orthogonal_bases(vector0):
     vector0 = np.asarray(vector0)
-    import nuts_and_bolts
+    
     old_shape = vector0.shape
     vector0 = nuts_and_bolts.flatten_all_but_last(vector0)
     vector0 = normalised(vector0)

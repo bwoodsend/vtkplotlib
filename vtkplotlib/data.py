@@ -42,8 +42,8 @@ ICONS_FOLDER = DATA_FOLDER / "icons"
 
 ICONS = {i.stem: str(i) for i in ICONS_FOLDER.glob("*")}
 
-assert ICONS_FOLDER.is_dir()
-assert STL_FOLDER.is_dir()
+#assert ICONS_FOLDER.is_dir()
+#assert STL_FOLDER.is_dir()
 
 
 

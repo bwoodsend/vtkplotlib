@@ -5,7 +5,8 @@ Created on Sun Jul 21 15:46:53 2019
 @author: Brénainn Woodsend
 
 
-one line to give the program's name and a brief idea of what it does.
+Text3D.py
+Creates a 3D text plot.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify

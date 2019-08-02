@@ -31,8 +31,6 @@ import numpy as np
 import os
 import sys
 from pathlib2 import Path
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 
 from vtkplotlib.render_window import VTKRenderer
@@ -73,43 +71,49 @@ class Figure(BaseFigure):
         global _figure
         _figure = self
         
-        
 
-class QtFigure(BaseFigure, QWidget):
-    """The vtk render window embedded into a QWidget. This can be embedded into
-    a GUI the same way all other QWidgets are used.
-    """
+try:        
 
-    def __init__(self, name="qt vtk figure", parent=None):
-        QWidget.__init__(self, parent)
-
-
-        self.vl = QVBoxLayout()
-        self.vtkWidget = QVTKRenderWindowInteractor(self)
-        self.vl.addWidget(self.vtkWidget)
-        VTKRenderer.__init__(self,
-                             self.vtkWidget.GetRenderWindow(),
-                             self.vtkWidget.GetRenderWindow().GetInteractor())
-
-        self.setLayout(self.vl)
+    from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
+    from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+    
+    
+    class QtFigure(BaseFigure, QWidget):
+        """The vtk render window embedded into a QWidget. This can be embedded into
+        a GUI the same way all other QWidgets are used.
+        """
+    
+        def __init__(self, name="qt vtk figure", parent=None):
+            QWidget.__init__(self, parent)
+    
+    
+            self.vl = QVBoxLayout()
+            self.vtkWidget = QVTKRenderWindowInteractor(self)
+            self.vl.addWidget(self.vtkWidget)
+            VTKRenderer.__init__(self,
+                                 self.vtkWidget.GetRenderWindow(),
+                                 self.vtkWidget.GetRenderWindow().GetInteractor())
+    
+            self.setLayout(self.vl)
+            
+            self.window_name = name
+            
+            global _figure
+            _figure = self
+    
+            
+            
+        def show(self, block=False):
+            QWidget.show(self)
+            BaseFigure.show(self, block)
+            self.setWindowTitle(self.window_name)
+    
+            global _figure
+            if block and _figure is self:
+                _figure = None
         
-        self.window_name = name
-        
-        global _figure
-        _figure = self
-
-        
-        
-    def show(self, block=False):
-        QWidget.show(self)
-        BaseFigure.show(self, block)
-        self.setWindowTitle(self.window_name)
-
-        global _figure
-        if block and _figure is self:
-            _figure = None
-        
-        
+except ImportError:
+    pass    
         
 _figure = None
 
@@ -156,7 +160,7 @@ def show(block=True, fig=None):
         _figure = None
 
 
-def view(focal_point=None, camera_position=None, forwards=None, up_view=None, fig=None):
+def view(focal_point=None, camera_position=None, camera_direction=None, up_view=None, fig=None):
     """Set the camera view. If forwards is used then focal_point and
         camera_position are ignored.
     
@@ -164,9 +168,12 @@ def view(focal_point=None, camera_position=None, forwards=None, up_view=None, fi
             np.array([x, y, z]) of the point you are looking at.
             
         camera_position:
-            np.array([x, y, z]) of the point you are looking from.
+            np.array([x, y, z]) of the point you are looking from. If 
+            'focal_point' is not also given then 'camera_position' is relative
+            to where VTK determines is the middle of your plots. This is 
+            equivelant to setting 'camera_direction' as -camera_direction.
             
-        forwards:
+        camera_direction:
             np.array([eX, eY, eZ]) 
             The direction the camera is pointing.
             
@@ -179,10 +186,14 @@ def view(focal_point=None, camera_position=None, forwards=None, up_view=None, fi
     fig = fig or gcf()
     camera = fig.render.GetActiveCamera()
     
-    # vtk has a strange feature where if only this is specified then it 
+    if (camera_direction is not None or camera_position is not None):
+        if focal_point is None:
+            focal_point = np.zeros(3)
+    
+    # vtk's rules are if only this is specified then it 
     # is used as a direction vector instead.
-    if forwards is not None:
-        camera.SetPosition(*-forwards)
+    if camera_direction is not None:
+        camera.SetPosition(*-camera_direction)
     
     else:
         if focal_point is not None:

@@ -5,7 +5,8 @@ Created on Sun Jul 21 15:47:18 2019
 @author: Brénainn Woodsend
 
 
-one line to give the program's name and a brief idea of what it does.
+Text.py
+Adds text to the window.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -30,7 +31,6 @@ from matplotlib import colors
 import os
 import sys
 from pathlib2 import Path
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vtk.util.numpy_support import (
                                     numpy_to_vtk,
@@ -41,10 +41,10 @@ from vtk.util.numpy_support import (
 
 
 from vtkplotlib.BasePlot import BasePlot
-from vtkplotlib.figures import gcf, show
-from vtkplotlib.nuts_and_bolts import flatten_all_but_last
 
 class Text(BasePlot):
+    """Creates text at a fixed point on the window (independent of camera
+    position / orientation)."""
     def __init__(self, text_str, position=(0, 0), fontsize=18, color=(1, 1, 1), fig=None):
         # create a text actor
         super().__init__(fig)
@@ -68,7 +68,7 @@ class Text(BasePlot):
 
 
 if __name__ == "__main__":
+    import vtkplotlib as vpl
     
-    
-    self = Text("eggs")
-    show()
+    self = vpl.text("eggs", (100, 300))
+    vpl.show()

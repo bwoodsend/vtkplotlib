@@ -26,7 +26,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 from .figures import (Figure as figure,
-                      QtFigure,
                       gcf,
                       show,
                       view,
@@ -34,7 +33,18 @@ from .figures import (Figure as figure,
                       save_fig,
                       close,
                       )
-from .fancy_figure import QtFigure2
+
+try:
+    import PyQt5.QtWidgets
+    QT_AVAILABLE = True
+    del PyQt5
+except ImportError:
+    QT_AVAILABLE = False
+
+if QT_AVAILABLE:
+    from .figures import QtFigure
+    from .fancy_figure import QtFigure2
+
 from .Arrow import arrow, quiver
 from .Lines import Lines as plot
 from .MeshPlot import MeshPlot as mesh_plot
