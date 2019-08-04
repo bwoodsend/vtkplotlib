@@ -27,28 +27,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import vtk
 import numpy as np
 #from matplotlib import pylab as plt
-from matplotlib import colors
 import os
 import sys
 from pathlib2 import Path
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-from vtk.util.numpy_support import (
-                                    numpy_to_vtk,
-                                    numpy_to_vtkIdTypeArray,
-                                    vtk_to_numpy,
-                                    )
 
 from vtkplotlib.figures import gcf
+from vtkplotlib.colors import process_color
 from vtkplotlib import nuts_and_bolts
 
 
-mpl_colors = {}
-mpl_colors.update(colors.BASE_COLORS)
-for dic in (colors.CSS4_COLORS, colors.TABLEAU_COLORS, colors.XKCD_COLORS):
-    for (key, val) in dic.items():
-        mpl_colors[key.split(":")[-1]] = colors.hex2color(val)
         
-
 
 class BasePlot(object):
     """A base class for all plots in vtkplotlib. This tries to handle all the
@@ -68,23 +56,25 @@ class BasePlot(object):
         
         
         self.property = self.actor.GetProperty()
-        self.fig.add_actor(self.actor)
+        if self.fig is not None:
+            self.fig.add_plot(self)
 
         
     def color_opacity(self, color=None, opacity=None):
         prop = self.property
+        
+        color, opacity = process_color(color, opacity)
     
         if opacity is not None:
             prop.SetOpacity(opacity)
         
         if color is not None:
-            if isinstance(color, str):
-                color = mpl_colors[color]
-            
-            prop.SetColor(*color[:3])
-            
-            if len(color) == 4:
-                prop.SetOpacity(color[3])
+            prop.SetColor(color)
+
+    
+    def __hash__(self):
+        return hash(id(self))
+
                 
     @property
     def color(self):
@@ -103,37 +93,26 @@ class BasePlot(object):
         self.property.SetOpacity(x)
         
     @property
-    def visable(self):
+    def visible(self):
         return self.actor.GetVisibility()
     
-    @visable.setter
-    def visable(self, x):
+    @visible.setter
+    def visible(self, x):
         self.actor.SetVisibility(x)
         
-    visable.__doc__ = """Shows (=True) / hides (=False) the plot object"""
+    visible.__doc__ = """Shows (=True) / hides (=False) the plot object"""
     
-    color.__doc__ = """Sets / gets the color of the plot object.
-    Accepts either:
-        any iterable of length 3 or 4 representing
-            (r, g, b) or (r, g, b, alpha)
-        where numbers are either floats from 0 to 1 or ints from 0 to 255.
-        
-        Or a string color name. e.g "r" or "red". This uses matplotlib's 
-        named color libraries. See there or vtkplotlib.BasePlot.mpl_colors for
-        a full list of names.
-        
-        Return type is always a 3-tuple of floats (r, b, g). Use plot.opacity 
-        property to get the current opacity.
-    """
+    color.__doc__ = process_color.__doc__
     
     opacity.__doc__ = """Set / get the translucency. 0 is invisible, 1 is solid."""
         
         
 class SourcedPlot(BasePlot):
-    """Bases plots that have a source. This source is an physical object that
-    must be converted into a tri-mesh surface before it can proceed further down
-    the pipeline. E.g a sphere or an arrow. The source provides it's own
-    conversion to triangles with source.GetOutputPort()."""
+    """Bases plots that have a source. This source is a physical object that
+    must be converted/approximated into a tri-mesh surface before it can proceed
+    further down the pipeline. E.g a sphere or an arrow. The source provides 
+    it's own conversion to triangles with source.GetOutputPort(). This class
+    is just to handle the slightly different way of connecting the pipeline."""
     def add_to_plot(self):
         super().add_to_plot()
         self.mapper.SetInputConnection(self.source.GetOutputPort())
@@ -153,8 +132,7 @@ class ConstructedPlot(BasePlot):
         self.mapper.SetInputData(self.poly_data)
         
     
-        
-        
+    
         
         
 def _iter_points(points):

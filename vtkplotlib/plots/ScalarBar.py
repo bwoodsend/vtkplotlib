@@ -5,7 +5,7 @@ Created on Sun Jul 21 15:29:19 2019
 @author: Brénainn Woodsend
 
 
-SalarBar.py
+ScalarBar.py
 Adds a scalar/color bar.
 Copyright (C) 2019  Brénainn Woodsend
 
@@ -35,7 +35,7 @@ from vtk.util.numpy_support import (
                                     vtk_to_numpy,
                                     )
 
-from vtkplotlib.BasePlot import BasePlot
+from vtkplotlib.plots.BasePlot import BasePlot
 
 
 
@@ -52,7 +52,7 @@ class ScalarBar(BasePlot):
         self.actor.SetLookupTable(plot.mapper.GetLookupTable())
     
     
-        self.fig.add_actor(self.actor)
+        self.fig += self
 
 
 

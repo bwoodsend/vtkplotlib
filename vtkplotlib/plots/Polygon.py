@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jul 21 20:32:50 2019
+Created on Sun Jul 21 21:48:12 2019
 
 @author: Brénainn Woodsend
 
 
-Lines.py
-Plots lines through some points.
+Polygon.py
+Creates a filled polygon.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import vtk
 import numpy as np
+#from matplotlib import pylab as plt
 import os
 import sys
 from pathlib2 import Path
@@ -37,56 +38,47 @@ from vtk.util.numpy_support import (
 
 
 
-from vtkplotlib.BasePlot import ConstructedPlot, _iter_colors, _iter_points, _iter_scalar
+from vtkplotlib.plots.BasePlot import ConstructedPlot, _iter_colors, _iter_points, _iter_scalar
 from vtkplotlib import geometry as geom
 
 
 
-class Lines(ConstructedPlot):
-    """Plots a line going through an array of points. Optionally can be set to
-    join the last point with the first to create a polygon."""
-    def __init__(self, vertices, color=None, opacity=None, line_width=1.0, join_ends=False, fig=None):
+
+class Polygon(ConstructedPlot):
+    """Creates a filled polygon with 'vertices' as it's corners."""
+    def __init__(self, vertices, color=None, opacity=None, fig=None):
         super().__init__(fig)
+    
+        polygon = self.poly_data
         
         points = vtk.vtkPoints()
-        points.SetData(numpy_to_vtk(vertices))
+        points.SetData(numpy_to_vtk(vertices))        
+        polygon.SetPoints(points)
+        
         
         # vtkCellArray is a supporting object that explicitly represents cell connectivity.
         # The cell array structure is a raw integer list of the form:
         # (n,id1,id2,...,idn, n,id1,id2,...,idn, ...) where n is the number of points in
         # the cell, and id is a zero-offset index into an associated point list.
         
-        point_args = np.empty(1 + len(vertices) + join_ends, np.int64)
-        point_args[0] = len(vertices) + join_ends
+        point_args = np.empty(1 + len(vertices), np.int64)
+        point_args[0] = len(vertices)
         point_args[1: 1+len(vertices)] = np.arange(len(vertices))
-        if join_ends:
-            point_args[-1] = 0
+        polys = vtk.vtkCellArray()
+        polys.SetCells(1, numpy_to_vtkIdTypeArray(point_args.ravel()))
+        
         lines = vtk.vtkCellArray()
         lines.SetCells(len(point_args), numpy_to_vtkIdTypeArray(point_args.ravel()))
         
         
-        # vtkPolyData is a data object that is a concrete implementation of vtkDataSet.
-        # vtkPolyData represents a geometric structure consisting of vertices, lines,
-        # polygons, and/or triangle strips
-        polygon = self.poly_data
-        polygon.SetPoints(points)
+        polygon.SetPolys(polys)
         polygon.SetLines(lines)
         
         
-        # Create an actor to represent the polygon. The actor orchestrates rendering of
-        # the mapper's graphics primitives. An actor also refers to properties via a
-        # vtkProperty instance, and includes an internal transformation matrix. We
-        # set this actor's mapper to be polygonMapper which we created above.
-        self.actor = vtk.vtkActor()
-        
         self.add_to_plot()
-        
+
         self.color_opacity(color, opacity)
-        self.property.SetLineWidth(line_width)
-    
         
-
-
 
 
 
@@ -96,6 +88,7 @@ if __name__ == "__main__":
     t = np.arange(0, 1, .1) * 2 * np.pi
     points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
     
-    self = vpl.plot(points, color="r", line_width=3, join_ends=True)
+    self = vpl.polygon(points, color="r")
     
     vpl.show()
+

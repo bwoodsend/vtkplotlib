@@ -41,14 +41,15 @@ SCREENSHOT_ICON_PATH = ICONS_FOLDER / "screenshot.png"
 
 
 class QtFigure2(QtFigure):
-    """This is intended to be used as/for a sophistcated GUI when one is needed.
-    By providing some common features here, hopefully we can speed up the 
+    """This is intended to be used as/for a more sophisticated GUI when one is needed.
+    By providing some common features here, hopefully this can speed up the 
     tedious process of building a GUI. Any contributions here would be very
-    welcome. I want to write this so each extra feature is optional so that
+    welcome. I want to write this so that each extra feature is optional allowing
     custom GUIs can be built quickly.
     
     This is still under development. Currently it has:
         1) A screenshot button
+        2) A panel for preset camera views
     
     I hope/intend to add:
         1) An actor table to show / hide / color plots interactively.
@@ -64,7 +65,7 @@ class QtFigure2(QtFigure):
 #        self.menu.setFixedHeight(100)
 #        self.setStyle(Style())
     
-#        selstf.views = Views(["up"],
+#        self.views = Views(["up"],
 #                           [{"camera_direction": np.array([1, 0, 0])}],
 #                           self,
 #                           ).views
@@ -74,7 +75,8 @@ class QtFigure2(QtFigure):
         
         self.right_menu = self.menu#QtWidgets.QMenuBar()
 #        self.menu.addWidget(self.right_menu)
-        
+       
+        self.default_screenshot_path = Path.home() / (name + ".jpg")
         self.screenshot_button = Button("Screenshot",
                                         self.screenshot,
                                         SCREENSHOT_ICON_PATH)
@@ -85,7 +87,7 @@ class QtFigure2(QtFigure):
     def screenshot(self):
         path = QtWidgets.QFileDialog.getSaveFileName(self, 
                                                      "Save screenshot",
-                                                     self.window_name,
+                                                     str(self.default_screenshot_path),
                                                      "(*.jpg);;(*.png)")[0]
         
         if path:
@@ -108,7 +110,7 @@ class Button(QtWidgets.QPushButton):
         super().__init__(parent)
 
         if callback is None:
-            callback = self.defualt_callback
+            callback = self.default_callback
                 
         self.released.connect(callback)
         self.setIconSize(QtCore.QSize(40, 40))
@@ -124,7 +126,7 @@ class Button(QtWidgets.QPushButton):
             self.setText(name)
             
             
-    def defualt_callback(self):
+    def default_callback(self):
         print("QButton", repr(self.text()), "was triggered")
         
         
@@ -154,7 +156,7 @@ def as_qicon(obj):
     - os.Pathlike 
     - QtGui.QIcon
     - PIL.Image.Image
-Recieved {}""".format(type(obj)))
+Received {}""".format(type(obj)))
                     
 
         

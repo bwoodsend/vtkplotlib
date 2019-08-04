@@ -40,10 +40,10 @@ from vtk.util.numpy_support import (
 
 
 
-from vtkplotlib.BasePlot import SourcedPlot, _iter_colors, _iter_points, _iter_scalar
+from vtkplotlib.plots.BasePlot import SourcedPlot, _iter_colors, _iter_points, _iter_scalar
 from vtkplotlib.figures import gcf, show
 from vtkplotlib import geometry as geom
-from vtkplotlib.Arrow import Arrow
+from vtkplotlib.plots.Arrow import Arrow
 
 
 class Text3D(SourcedPlot):
@@ -65,8 +65,8 @@ class Text3D(SourcedPlot):
         self.source.SetText(string)
         
         
-        # This chunck is different to how most plots objects construct their
-        # pipeline. So super().add_to_plot() wont work unfortunlately.
+        # This chunk is different to how most plots objects construct their
+        # pipeline. So super().add_to_plot() wont work unfortunately.
         
         self.actor = vtk.vtkFollower()
         self.actor.SetScale(*scale)
@@ -79,7 +79,7 @@ class Text3D(SourcedPlot):
         self.mapper.SetInputConnection(self.source.GetOutputPort())
 
 
-        self.fig.add_actor(self.actor)
+        self.fig += self
         self.color_opacity(color, opacity)
         
         if follow_cam:

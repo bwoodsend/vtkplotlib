@@ -34,7 +34,7 @@ from vtk.util.numpy_support import (
 
 
 
-from vtkplotlib.BasePlot import SourcedPlot, _iter_colors, _iter_points, _iter_scalar
+from vtkplotlib.plots.BasePlot import SourcedPlot, _iter_colors, _iter_points, _iter_scalar
 
 
 class Sphere(SourcedPlot):
@@ -60,15 +60,22 @@ class Sphere(SourcedPlot):
      
         
 class Cursor(SourcedPlot):
-    def __init__(self, point, color=None, opacity=None, fig=None):
+    def __init__(self, point, color=None, opacity=None, radius=1, fig=None):
         super().__init__(fig)
         
         self.source = vtk.vtkCursor3D()
         self.source.SetTranslationMode(True)
-        self.point = point
         self.source.OutlineOff()
         
-        self.add_to_plot()        
+        
+        self.add_to_plot() 
+        
+#        if radius != 1:
+#            print("Warning - radius doesn't do anything")
+
+
+        self.point = point
+
         
         self.color_opacity(color, opacity)
 
@@ -81,7 +88,7 @@ class Cursor(SourcedPlot):
         self.source.SetFocalPoint(*point)
         
         
-def scatter(points, color=None, opacity=None, radius=1., fig=None):
+def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig=None):
     points = np.asarray(points)
     out = np.empty(points.shape[:-1], object)
     out_flat = out.ravel()
@@ -89,7 +96,12 @@ def scatter(points, color=None, opacity=None, radius=1., fig=None):
                                          _iter_colors(color, points.shape[:-1]),
                                          _iter_scalar(radius, points.shape[:-1]))):
         
-        out_flat[i] = Sphere(xyz, c, opacity, r, fig)
+        if use_cursors:
+            cls = Cursor
+        else:
+            cls = Sphere
+        
+        out_flat[i] = cls(xyz, c, opacity, r, fig)
         
     return out
         
@@ -101,9 +113,15 @@ if __name__ == "__main__":
     import time
     
     points = np.random.uniform(-10, 10, (30, 3))
-    
-#    self = vpl.cursor(points[0])
-    self = scatter(points, color=points, radius=np.abs(points[:, 0]) ** .5)[0]
+
+#    for i in range(3):
+#        self = vpl.cursor(np.array([5, 0, 0]) * i, radius=4) 
+        
+    self = scatter(points,
+                   color=points,
+                   radius=np.abs(points[:, 0]) ** .5,
+                   use_cursors=False
+                   )[0]
     
 #    vpl.show(False)
 #    

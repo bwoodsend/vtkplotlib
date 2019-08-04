@@ -41,7 +41,7 @@ from vtk.util.numpy_support import (
 
 
 
-from vtkplotlib.BasePlot import ConstructedPlot
+from vtkplotlib.plots.BasePlot import ConstructedPlot
 from vtkplotlib.nuts_and_bolts import flatten_all_but_last
 
 
@@ -65,7 +65,7 @@ MESH_DATA_TYPE = \
                 ])
     
     Note it's not uncommon to have arrays of shape (n, 3, 4) or (n, 4, 3) 
-    where the additional enties' meanings are usually irrelevant (often to
+    where the additional entries' meanings are usually irrelevant (often to
     represent scalars but as stl has no color this is always uniform). Hence
     to support mesh classes that have these, these arrays are allowed and the
     extra entries are ignored.
@@ -117,7 +117,7 @@ class MeshPlot(ConstructedPlot):
     def __init__(self, *mesh_data, tri_scalars=None, scalars=None, color=None, opacity=None, fig=None):
         super().__init__(fig)
         
-        # Try to support as many of the mesh libtaries out there as possible
+        # Try to support as many of the mesh libraries out there as possible
         # without having all of those libraries as dependencies
         
         if len(mesh_data) == 1:
@@ -256,56 +256,22 @@ if __name__ == "__main__":
     path = vpl.data.STLS[0]
     _mesh = Mesh.from_file(path)
     
-#    vertices = flatten_all_but_last(_mesh.vectors)
-#    point_args = np.arange(len(_mesh) * 3).reshape((len(_mesh), 3))
-#    
-#    shuffle_args = np.arange(len(point_args))
-#    np.random.shuffle(shuffle_args)
-#    point_args = point_args[shuffle_args]
-#    
-#    self = vpl.mesh_plot(vertices, point_args)
-    
     self = vpl.mesh_plot(_mesh.vectors)
     
 
-#    self.property.SetEdgeVisibility(True)
-    
     fig.show(False)
     
     t0 = time.perf_counter()
     for i in range(100):
 #        self.color = np.random.random(3)
 #        print(self.color)
-        self.set_tri_scalars((_mesh.x[:, 0] + i) % 20 )
+        self.set_tri_scalars((_mesh.x[:, 0] + 3 * i) % 20 )
         _mesh.rotate(np.ones(3), .1, np.mean(_mesh.vectors, (0, 1)))
         fig.update()
         self.update_points()
 #        time.sleep(.01)
         if (time.perf_counter() - t0) > 2:
             break
-    
-#    fig.show(False)
-#    time.sleep(3)
-#    self.color_opacity((1, 0, 0))
-#    fig.renWin.Render()
-#    time.sleep(3)
-#    self.color_opacity((0, 1, 0))
-#    [vpl.plot(i, join_ends=True, color="k") for i in mesh.vectors[-5000:]]
-    
-#    edges = vtk.vtkExtractEdges()
-#    edges.SetInputData(self.poly_data)
-#    
-#    mapper = vtk.vtkPolyDataMapper()
-#    mapper.SetInputData(edges.GetOutput())
-#    
-#    actor = vtk.vtkActor()
-#    actor.SetMapper(mapper)
-#    
-#    actor.GetProperty().SetColor(1,0,0)
-
-    
-#    fig.add_actor(actor)
-#    fig.render.AddActor(actor)
     
     
     fig.show()

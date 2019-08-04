@@ -27,32 +27,29 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from .figures import (Figure as figure,
                       gcf,
+                      scf,
+                      set_auto_fig,
                       show,
                       view,
                       reset_camera,
                       save_fig,
                       close,
+                      PyQt5_AVAILABLE
                       )
 
-try:
-    import PyQt5.QtWidgets
-    QT_AVAILABLE = True
-    del PyQt5
-except ImportError:
-    QT_AVAILABLE = False
 
-if QT_AVAILABLE:
-    from .figures import QtFigure
-    from .fancy_figure import QtFigure2
+if PyQt5_AVAILABLE:
+    from .figures import QtFigure, QtFigure2
+    
 
-from .Arrow import arrow, quiver
-from .Lines import Lines as plot
-from .MeshPlot import MeshPlot as mesh_plot
-from .Polygon import Polygon as polygon
-from .ScalarBar import ScalarBar as scalar_bar
-from .Scatter import scatter, Cursor as cursor
-from .Text import Text as text
-from .Text3D import Text3D as text3d
+from .plots.Arrow import arrow, quiver
+from .plots.Lines import Lines as plot
+from .plots.MeshPlot import MeshPlot as mesh_plot
+from .plots.Polygon import Polygon as polygon
+from .plots.ScalarBar import ScalarBar as scalar_bar
+from .plots.Scatter import scatter, Cursor as cursor
+from .plots.Text import Text as text
+from .plots.Text3D import Text3D as text3d, annotate
 
 from . import data
 

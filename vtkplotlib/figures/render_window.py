@@ -35,7 +35,6 @@ from vtk.util.numpy_support import (
 
 
 
-
 class VTKRenderer(object):
     """This is a figure without all the extra methods attached. All Figure classes
     with inherit from this. 
@@ -43,7 +42,7 @@ class VTKRenderer(object):
     This class handles creating and linking of:
         self.renWin = The outer box/window (with the close button)
         self.render = Shows the actual 2D image of the plot
-        self.iren = The interactor is incharge of responding to clicking on the plot
+        self.iren = The interactor is in charge of responding to clicking on the plot
         
     """
     def __init__(self, window=None, window_interactor=None):
@@ -60,7 +59,7 @@ class VTKRenderer(object):
         self.render = vtk.vtkRenderer()
         # And add it to the render window
         self.renWin.AddRenderer(self.render)
-        self.render.SetBackground(tuple(np.array([20, 50, 100]) / 256))
+        self.background_color = 20, 50, 100
         
         # Create a renderwindowinteractor
         # The render window interactor can either be vtk's default window type or 
@@ -74,6 +73,7 @@ class VTKRenderer(object):
         iren.SetRenderWindow(self.renWin)
         iren.SetInteractorStyle(vtk.vtkInteractorStyleTrackballCamera())
 
+        self.camera = self.render.GetActiveCamera()
         
         self.iren = iren
         self.window_name = ""
@@ -101,16 +101,28 @@ class VTKRenderer(object):
         self.renWin.Render()
         
         
-    def add_actor(self, actor):
+    def _add_actor(self, actor):
         self.render.AddActor(actor)
         
-        
-    def remove_actor(self, actor):
+    def _remove_actor(self, actor):
         self.render.RemoveActor(actor)
         
         
+        
+    @property
+    def background_color(self):
+        return self.render.GetBackground()
+    
+    @background_color.setter
+    def background_color(self, color):
+        from vtkplotlib.colors import process_color
 
-
+        color, opacity = process_color(color)
+        if color is not None:
+            self.render.SetBackground(*color)
+        if opacity is not None:
+            self.render.SetBackgroundAlpha(opacity)
+            
 
 
 

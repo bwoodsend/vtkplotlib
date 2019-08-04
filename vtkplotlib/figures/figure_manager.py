@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jul 20 21:21:20 2019
+Created on Sat Aug  3 14:09:25 2019
 
 @author: Brénainn Woodsend
 
 
-figures.py
-Provides/manages windows to render into.
+one line to give the program's name and a brief idea of what it does.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -21,110 +20,56 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 """
 
-
-
-import vtk
 import numpy as np
 import os
-import sys
 from pathlib2 import Path
 
-
-from vtkplotlib.render_window import VTKRenderer
-
-
-class BaseFigure(VTKRenderer):
-    
-    _reset_camera = True
-
-    def reset_camera(self):
-        return reset_camera(self)
-
-    
-    def show(self, block=True):
-        self.start(block, self._reset_camera)
-
-        global _figure
-        if block and _figure is self:
-            _figure = None
-            
-    def __iadd__(self, plot):
-        self.add_actor(plot.actor)
-        return self
-        
-    def __isub__(self, plot):
-        self.remove_actor(plot.actor)
-        return self
+import vtk
 
 
 
-class Figure(BaseFigure):
-    """The default figure class."""
-    def __init__(self, name="vtk figure"):
-        
-        super().__init__(vtk.vtkRenderWindow(), vtk.vtkRenderWindowInteractor())
-        self.window_name = name
-        
-        global _figure
-        _figure = self
-        
-
-try:        
-
-    from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
-    from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-    
-    
-    class QtFigure(BaseFigure, QWidget):
-        """The vtk render window embedded into a QWidget. This can be embedded into
-        a GUI the same way all other QWidgets are used.
-        """
-    
-        def __init__(self, name="qt vtk figure", parent=None):
-            QWidget.__init__(self, parent)
-    
-    
-            self.vl = QVBoxLayout()
-            self.vtkWidget = QVTKRenderWindowInteractor(self)
-            self.vl.addWidget(self.vtkWidget)
-            VTKRenderer.__init__(self,
-                                 self.vtkWidget.GetRenderWindow(),
-                                 self.vtkWidget.GetRenderWindow().GetInteractor())
-    
-            self.setLayout(self.vl)
-            
-            self.window_name = name
-            
-            global _figure
-            _figure = self
-    
-            
-            
-        def show(self, block=False):
-            QWidget.show(self)
-            BaseFigure.show(self, block)
-            self.setWindowTitle(self.window_name)
-    
-            global _figure
-            if block and _figure is self:
-                _figure = None
-        
-except ImportError:
-    pass    
-        
 _figure = None
 
-def gcf():
-    """Gets the current working figure. If there isn't one it creates one. The
-    new figure is always a regular Figure type (not Qt).
+_auto_fig = True
+
+
+def set_auto_fig(auto=True):
+    global _auto_fig
+    _auto_fig = auto
+    
+    
+def scf(figure):
+    """Sets the current working figure."""
+    global _figure
+    _figure = figure
+    
+
+def gcf(create_new=True):
+    """Gets the current working figure. If there isn't one it creates one
+    unless 'create_new' is set to False in which case returns None. The new
+    figure is always a regular Figure type (not a QtFigure). Returns None
+    if set_auto_fig(False) has been called.
     """
     global _figure
-    if _figure is None:
+
+#    print(_auto_fig)
+#    print(_figure)
+    if not _auto_fig:
+        return
+    if _figure is None and create_new:
+        from .figure import Figure
         _figure = Figure()
     return _figure
+
+
+class NoFigureError(Exception):
+    fmt = """{} requires a figure. Create one using vpl.figure() and pass it as
+    'fig' argument.""".format
+    def __init__(self, name):
+        super().__init__(self.fmt(name))
+        
 
 
 def show(block=True, fig=None):
@@ -134,8 +79,8 @@ def show(block=True, fig=None):
         is held until window exit.
         Otherwise the window is opened but not monitored. i.e an image 
         will appear on the screen but it wont respond to being clicked on.
-        By editting the plot and calling fig.update() you can create an
-        animiation but it will be non-interactive. True interactive hasn't
+        By editing the plot and calling fig.update() you can create an
+        animation but it will be non-interactive. True interactive hasn't
         been implemented yet - use the vtk example to build on top of this.
         And no you can't just run show in a background thread. It just
         doesn't work. If anyone does manage it then please let me know.
@@ -147,7 +92,7 @@ def show(block=True, fig=None):
         
     Important - A window can not be closed by the close button until it is in
                 interactive mode. Otherwise it'll just crash python. Use
-                vkplotlib.close() to kill a non interactive window.
+                vtkplotlib.close() to kill a non interactive window.
                 
     For either figure type 'block' == True will reset the figure given by gcf().
     """
@@ -155,14 +100,19 @@ def show(block=True, fig=None):
     global _figure
     current_fig = fig or gcf()
     
+    if current_fig is None:
+        raise NoFigureError("show")
+
+    
     current_fig.show(block)
     if block:
         _figure = None
 
 
+
 def view(focal_point=None, camera_position=None, camera_direction=None, up_view=None, fig=None):
     """Set the camera view. If forwards is used then focal_point and
-        camera_position are ignored.
+        camera_position are ignored. 
     
         focal_point:
             np.array([x, y, z]) of the point you are looking at.
@@ -171,7 +121,7 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
             np.array([x, y, z]) of the point you are looking from. If 
             'focal_point' is not also given then 'camera_position' is relative
             to where VTK determines is the middle of your plots. This is 
-            equivelant to setting 'camera_direction' as -camera_direction.
+            equivalent to setting 'camera_direction' as -camera_direction.
             
         camera_direction:
             np.array([eX, eY, eZ]) 
@@ -181,14 +131,33 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
             np.array([eX, eY, eZ])
             roll the camera so that the up_view vector is pointing towards the 
             top of the screen.
+            
+            
+        This needs some serious work. It'll likely be better to manipulate the
+        vtk camera directly (stored in fig.camera). You also might want to call
+        vpl.reset_camera() afterwards as it seems to be the only way to reset
+        the zoom automatically. An absolutely worst case scenario would be to
+        use the following:
+            
+            vpl.view(camera_direction=...,
+                     up_view=...,)        # set orientations first
+            vpl.reset_camera()            # auto reset the zoom
+            vpl.view(focal_point=middle_of_plot) # optionally shift the camera to where you want it.
+            
     """
         
     fig = fig or gcf()
-    camera = fig.render.GetActiveCamera()
+    if fig is None:
+        raise NoFigureError("save_fig")
+
+    camera = fig.camera
     
-    if (camera_direction is not None or camera_position is not None):
-        if focal_point is None:
+    if (camera_direction is not None or camera_position is not None) and \
+        (focal_point is None):
             focal_point = np.zeros(3)
+            reset_at_end = True
+    else:
+        reset_at_end = False
     
     # vtk's rules are if only this is specified then it 
     # is used as a direction vector instead.
@@ -207,8 +176,11 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
     if up_view is not None:
         camera.SetViewUp(*up_view)
         
+    if reset_at_end:
+        fig.reset_camera()
         
     return camera.GetFocalPoint(), camera.GetPosition(), camera.GetViewUp()
+
 
 
 def reset_camera(fig=None):
@@ -217,22 +189,25 @@ def reset_camera(fig=None):
     pointing into the middle of where all the actors are. Then it adjusts the
     zoom so that everything fits on the screen.
     """
-    (fig or gcf()).render.ResetCamera()
+    fig = (fig or gcf())
+    if fig is None:
+        raise NoFigureError("reset_camera")
+    
+    fig.render.ResetCamera()
 
-BaseFigure.reset_camera.__doc__ = reset_camera.__doc__
-BaseFigure.show.__doc__ = show.__doc__
+
 
 
 def save_fig(path, size=720, fig=None):
     """Take a screenshot and saves it to either a jpg or a png. jpg is
-        much better suited for compressing these files than png.
+        recommended as it is much better at compressing these files than png.
     
         path:
             str or Pathlike
             Save destination
             
         scale:
-            An int or a (width, hight) tuple of ints.
+            An int or a (width, height) tuple of ints.
             Set the image dimensions in pixels. If only one dimension is given
             then it is the height and an aspect ration of 16:9 is used.
             
@@ -254,6 +229,8 @@ def save_fig(path, size=720, fig=None):
     size = tuple(round(i / 300) for i in size)
         
     fig = fig or gcf()
+    if fig is None:
+        raise NoFigureError("save_fig")
     renWin = fig.renWin
     # figure has to be drawn
     renWin.Render()
@@ -278,40 +255,15 @@ def save_fig(path, size=720, fig=None):
     os.chdir(old_path)
 
 
+
 def close(fig=None):
-    global _figure
     fig = fig or gcf()
-    fig.iren.GetRenderWindow().Finalize()
-    fig.iren.TerminateApp()
-    _figure = None
+    if fig is not None:
+        fig.iren.GetRenderWindow().Finalize()
+        fig.iren.TerminateApp()
+        scf(None)
 
 
 
 if __name__ == "__main__":
-    import vtkplotlib as vpl
-    
-    QT = False
-        
-    if QT:
-        app = None
-        app = QApplication([])
-        self = vpl.QtFigure("a qt widget figure")
-        
-    else:    
-        self = vpl.figure("a normal vtk figure")
-        
-        
-#    vpl.plot(np.random.uniform(-10, 10, (20, 3)))
-        
-    direction = np.array([1, 0, 0])
-    vpl.quiver(np.array([0, 0, 0]), direction)
-    vpl.view(forwards=direction)
-    vpl.reset_camera()
-    
-#    vpl.save_fig(Path.home() / "img.jpg", 1080)
-    
-    self.show()
-    
-    
-    if QT:
-        app.exec_()
+    pass

@@ -48,12 +48,12 @@ def components_perpendicular_to_direction(vectors, normalised_direction):
     return vectors - inner_product(vectors, normalised_direction)[..., np.newaxis] * normalised_direction
 
     
-def highest(points, up=np.array([0, 0, 1]), include_hight=False):
+def highest(points, up=np.array([0, 0, 1]), include_height=False):
     
     heights = inner_product(points, up)
     arg = np.unravel_index(np.argmax(heights), heights.shape)
     
-    if include_hight:
+    if include_height:
         return points[arg], heights[arg]
     else:
         return points[arg]

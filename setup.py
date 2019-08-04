@@ -25,4 +25,6 @@ setup(name='vtkplotlib',
              # "PyQt5",
               ],
       zip_safe=False,
+      test_suite='nose.collector',
+      tests_require=['nose'],
       )

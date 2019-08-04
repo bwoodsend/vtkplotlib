@@ -5,7 +5,7 @@ Created on Sun Jul 21 15:54:56 2019
 @author: Brénainn Woodsend
 
 
-Arrow.py creates an arror / quiver plot.
+Arrow.py creates an arrow / quiver plot.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@ from vtk.util.numpy_support import (
                                     vtk_to_numpy,
                                     )
 
-from vtkplotlib.BasePlot import SourcedPlot, _iter_colors, _iter_points, _iter_scalar
+from vtkplotlib.plots.BasePlot import SourcedPlot, _iter_colors, _iter_points, _iter_scalar
 from vtkplotlib import geometry as geom
 
 
@@ -45,7 +45,7 @@ class Arrow(SourcedPlot):
                     
         # vtk needs a full set of axes to build about.
         # eX is just the direction the arrow is pointing in.
-        # eY and eZ must be perpendiculr to each other and eX. However beyond 
+        # eY and eZ must be perpendicular to each other and eX. However beyond 
         # that exact choice of eY and eZ does not matter. It only rotates the 
         # arrow about eX which you don't see because it's (approximately) round.
         eX, eY, eZ = geom.orthogonal_bases(diff)
@@ -83,7 +83,7 @@ def arrow(start, end, length=None, color=None, opacity=None, fig=None):
     have matching shapes. Arrow lengths are automatically calculated by 
     pythagoras but can be overwritten by setting 'length'. 'length' can either 
     be a single value for all arrows or an array of lengths to match the number
-    of arrows. Note arrays are supported only for convinience and just use a
+    of arrows. Note arrays are supported only for convenience and just use a
     python for loop. There is no speed bonus for using numpy or trying to plot
     in bulk here. Returns an array of stand-alone Arrow objects with same shape
     as the input."""
@@ -131,6 +131,6 @@ if __name__ == "__main__":
     points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
     grads = np.roll(points, 10)
     
-    arrows = quiver(points, grads)
+    arrows = quiver(points, grads, color=grads)
     
     vpl.show()

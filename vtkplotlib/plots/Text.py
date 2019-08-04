@@ -40,12 +40,13 @@ from vtk.util.numpy_support import (
 
 
 
-from vtkplotlib.BasePlot import BasePlot
+from vtkplotlib.plots.BasePlot import BasePlot
 
 class Text(BasePlot):
     """Creates text at a fixed point on the window (independent of camera
     position / orientation)."""
-    def __init__(self, text_str, position=(0, 0), fontsize=18, color=(1, 1, 1), fig=None):
+    def __init__(self, text_str, position=(0, 0), fontsize=18,
+                 color=(1, 1, 1), opacity=None, fig=None):
         # create a text actor
         super().__init__(fig)
         
@@ -56,13 +57,12 @@ class Text(BasePlot):
         
         self.property.SetFontFamilyToArial()
         self.property.SetFontSize(fontsize)
-        self.property.SetColor(*color)
-
+        self.color_opacity(color, opacity)
 
         self.actor.SetPosition(*position)
         
         # assign actor to the renderer
-        self.fig.add_actor(self.actor)
+        self.fig += self
 
 
 

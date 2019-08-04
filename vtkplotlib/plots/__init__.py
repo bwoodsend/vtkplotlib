@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jul 31 02:14:22 2019
+Created on Sun Aug  4 18:08:11 2019
 
 @author: Brénainn Woodsend
 
 
-one line to give the program's name and a brief idea of what it does.
+plot.__init__.py
+All the contents of the plots go here.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -23,17 +24,3 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-import numpy as np
-import matplotlib.pylab as plt
-import sys
-import os
-from pathlib2 import Path
-
-import vtkplotlib as vpl
-
-
-
-
-
-if __name__ == "__main__":
-    pass
