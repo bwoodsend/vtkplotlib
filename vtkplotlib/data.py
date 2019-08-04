@@ -32,7 +32,7 @@ from pathlib2 import Path
 
 import pkg_resources
 
-DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")).parent / "data"
+DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")) / "data"
 
 STL_FOLDER = DATA_FOLDER / "models"
 
