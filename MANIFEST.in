@@ -1,4 +1,4 @@
 include README.txt
 include LICENSE.txt
 include docs/*.txt
-include data/*.stl
+include data/*
