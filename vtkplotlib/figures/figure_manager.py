@@ -215,8 +215,8 @@ def save_fig(path, size=720, fig=None):
         Note that for some reason vtk can only work with multiples of 300
         pixels. 'size' will be therefore be rounded to conform to this.
             
-        And no I have no idea why it spins. But vtk's example in the docks 
-        does it as well so I think it's safe to say it's their problem.
+        And no I have no idea why it spins. But vtk's example in the docs does
+        it as well so I think it's safe to say the problem is on their side.
     
     """
     if not isinstance(path, Path):
@@ -226,7 +226,7 @@ def save_fig(path, size=720, fig=None):
     if isinstance(size, int):
         size = (size * 16) // 9, size
         
-    size = tuple(round(i / 300) for i in size)
+    size = tuple(max(round(i / 300), 1) for i in size)
         
     fig = fig or gcf()
     if fig is None:
@@ -242,7 +242,7 @@ def save_fig(path, size=720, fig=None):
     w2if.Update()
 
     old_path = Path.cwd()
-    os.chdir(path.parent)
+    os.chdir(str(path.parent))
     if path.suffix.lower() in (".jpg", ".jpeg"):
         writer = vtk.vtkJPEGWriter()
     elif path.suffix.lower() == ".png":
@@ -252,7 +252,7 @@ def save_fig(path, size=720, fig=None):
     writer.SetFileName(path.name)
     writer.SetInputConnection(w2if.GetOutputPort())
     writer.Write()
-    os.chdir(old_path)
+    os.chdir(str(old_path))
 
 
 

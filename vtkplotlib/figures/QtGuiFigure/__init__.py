@@ -30,8 +30,12 @@ import os
 from pathlib2 import Path
 
 from itertools import zip_longest
-from PIL import Image
 from PyQt5 import QtWidgets, QtGui, QtCore
+
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
 
 
 from vtkplotlib.figures import QtFigure, save_fig, view
@@ -140,11 +144,16 @@ def as_qicon(obj):
     if isinstance(obj, str):
         obj = Path(obj)
         
-    if isinstance(obj, os.PathLike):
+    try:
+        PathLike = os.PathLike
+    except AttributeError:
+        PathLike = Path
+        
+    if isinstance(obj, PathLike):
 #                if obj.is_file():
             pixmap = QtGui.QPixmap(str(obj))
             
-    if isinstance(obj, Image.Image):
+    if (Image is not None) and isinstance(obj, Image.Image):
         pixmap = obj.toqpixmap()
             
         

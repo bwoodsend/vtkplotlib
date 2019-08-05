@@ -49,10 +49,15 @@ class ScalarBar(BasePlot):
     
         self.actor.SetNumberOfLabels(6)
 
-        self.actor.SetLookupTable(plot.mapper.GetLookupTable())
+        self.lookup_table = plot.mapper.GetLookupTable()
+        self.lookup_table.ForceBuild()
+        self.actor.SetLookupTable(self.lookup_table)
     
     
-        self.fig += self
+#        self.fig += self
+        self.fig.render.AddActor2D(self.actor)
+        self.fig.plots.add(self)
+        
 
 
 
@@ -60,9 +65,10 @@ if __name__ == "__main__":
     from stl.mesh import Mesh
     import vtkplotlib as vpl
     
-    mesh = Mesh.from_file("C:/Users/Brénainn/Documents/uni/project/stl/1_mandibular.stl")
-    plot = vpl.mesh_plot(mesh, scalars=mesh.x)
+    mesh = Mesh.from_file(vpl.data.STLS[0])
+    plot = vpl.mesh_plot(mesh.vectors, scalars=mesh.x)
 
     self = vpl.scalar_bar(plot)
 
+    
     vpl.show()

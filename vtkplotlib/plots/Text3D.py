@@ -30,8 +30,6 @@ from matplotlib import colors
 import os
 import sys
 from pathlib2 import Path
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFileDialog
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vtk.util.numpy_support import (
                                     numpy_to_vtk,
                                     numpy_to_vtkIdTypeArray,
