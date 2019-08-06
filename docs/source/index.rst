@@ -30,8 +30,16 @@ Requirements for installing:
  - `pathlib2`_
  - `matplotlib`_
  - `vtk`_
+
  
  
+Installation:
+------------------------------------------------------------------------------
+
+ `pip install git+https://github.com/bwoodsend/vtkplotlib.git`
+
+
+
 Optional requirements:
 ------------------------------------------------------------------------------
 
@@ -47,13 +55,6 @@ Some features require you to install the following:
 .. _vtk: https://pypi.org/project/vtk/
 .. _PyQt5: https://pypi.org/project/PyQt5/
 .. _numpy-stl: https://pypi.org/project/numpy-stl/
-
-
-
-Installation:
-------------------------------------------------------------------------------
-
- `pip install git+https://github.com/bwoodsend/vtkplotlib.git`
 
 
 
