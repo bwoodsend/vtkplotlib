@@ -251,7 +251,7 @@ if __name__ == "__main__":
     
     fig = vpl.gcf()
     
-    path = vpl.data.STLS[0]
+    path = vpl.data.get_rabbit_stl()
     _mesh = Mesh.from_file(path)
     
     self = vpl.mesh_plot(_mesh.vectors)

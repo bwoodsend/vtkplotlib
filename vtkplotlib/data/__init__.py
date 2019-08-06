@@ -5,7 +5,7 @@ Created on Wed Jul 31 02:29:27 2019
 @author: Brénainn Woodsend
 
 
-data.py handles paths to the data folder in this package
+data.__init__.py handles paths to the data folder in this package
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,10 @@ DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")) / "data"
 
 STL_FOLDER = DATA_FOLDER / "models"
 
-STLS = [str(i) for i in STL_FOLDER.rglob("*.stl") if i.is_file()]
+def get_rabbit_stl():
+    folder = STL_FOLDER / "rabbit"
+    print("This is not my rabbit. See README.txt and LICENSE.txt in\n{}\nfor details.".format(folder))
+    return str(folder / "rabbit.stl")
 
 ICONS_FOLDER = DATA_FOLDER / "icons"
 
@@ -49,4 +52,5 @@ if __name__ == "__main__":
  
     assert ICONS_FOLDER.is_dir()
     assert STL_FOLDER.is_dir()
+    assert os.path.isfile(get_rabbit_stl())
     

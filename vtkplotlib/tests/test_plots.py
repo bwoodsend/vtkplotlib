@@ -68,7 +68,7 @@ class TestPlots(TestCase):
         
         fig = vpl.gcf()
         
-        path = vpl.data.STLS[0]
+        path = vpl.data.get_rabbit_stl()
         _mesh = Mesh.from_file(path)
         
         self = vpl.mesh_plot(_mesh.vectors)
@@ -103,7 +103,7 @@ class TestPlots(TestCase):
     
     @skipUnless(Mesh, "numpy-stl is not installed")
     def test_scalar_bar(self):
-        mesh = Mesh.from_file(vpl.data.STLS[0])
+        mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
         plot = vpl.mesh_plot(mesh, scalars=mesh.x)
     
         vpl.scalar_bar(plot)

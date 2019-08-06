@@ -244,7 +244,7 @@ if __name__ == "__main__":
 #    vpl.scatter(np.random.uniform(-5, 5, (5, 3)), fig=self)
 #    vpl.quiver(np.zeros((3, 3)), np.eye(3) * 5, color=np.eye(3))
     
-    vpl.mesh_plot(Mesh.from_file(vpl.data.STLS[0]))
+    vpl.mesh_plot(Mesh.from_file(vpl.data.get_rabbit_stl()))
     
         
     

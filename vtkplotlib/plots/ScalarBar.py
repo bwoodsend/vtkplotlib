@@ -65,7 +65,7 @@ if __name__ == "__main__":
     from stl.mesh import Mesh
     import vtkplotlib as vpl
     
-    mesh = Mesh.from_file(vpl.data.STLS[0])
+    mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
     plot = vpl.mesh_plot(mesh.vectors, scalars=mesh.x)
 
     self = vpl.scalar_bar(plot)
