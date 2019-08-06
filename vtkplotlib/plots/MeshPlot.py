@@ -207,8 +207,9 @@ class MeshPlot(ConstructedPlot):
         Calls self.set_scalars. See set_scalars for implications.
         """
         if tri_scalars is not None:
+            tri_scalars = tri_scalars.ravel()
     #        scalars = np.array([tri_scalars, tri_scalars, tri_scalars]).T
-            assert tri_scalars.shape == (len(self.vectors), )
+            assert tri_scalars.size == len(self.vectors)
             scalars = np.empty((len(tri_scalars), 3))
             for i in range(3):
                 scalars[:, i] = tri_scalars

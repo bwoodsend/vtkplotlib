@@ -93,9 +93,12 @@ class Lines(ConstructedPlot):
 if __name__ == "__main__":
     import vtkplotlib as vpl
     
-    t = np.arange(0, 1, .1) * 2 * np.pi
-    points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
+    t = np.arange(0, 1, .001) * 2 * np.pi
+    points = np.array([np.cos(2 * t),
+                       np.sin(3 * t),
+                       np.cos(5 * t) * np.sin(7 *t)]).T
     
-    self = vpl.plot(points, color="r", line_width=3, join_ends=True)
+#    vertices = np.random.uniform(-30, 30, (3, 3))
+    self = vpl.plot(points, color="green", line_width=3, join_ends=True)
     
     vpl.show()

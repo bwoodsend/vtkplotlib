@@ -56,12 +56,18 @@ class BaseFigure(VTKRenderer):
             
 
     def add_plot(self, plot):
+        if isinstance(plot, np.ndarray) and plot.dtype == object:
+            [self.add_plot(i) for i in plot.flat]
+            return
         if plot not in self.plots:
             self._add_actor(plot.actor)
             self.plots.add(plot)
 
         
     def remove_plot(self, plot):
+        if isinstance(plot, np.ndarray) and plot.dtype == object:
+            [self.remove_plot(i) for i in plot.flat]
+            return
         if plot in self.plots:
             self._remove_actor(plot.actor)
             self.plots.remove(plot)
