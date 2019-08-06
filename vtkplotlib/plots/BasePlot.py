@@ -36,7 +36,7 @@ from vtkplotlib.colors import process_color
 from vtkplotlib import nuts_and_bolts
 
 
-        
+
 
 class BasePlot(object):
     """A base class for all plots in vtkplotlib. This tries to handle all the
@@ -86,6 +86,7 @@ class BasePlot(object):
         
     @property
     def opacity(self):
+        """Set / get the translucency. 0 is invisible, 1 is solid."""
         return self.property.GetOpacity()
     
     @opacity.setter
@@ -94,17 +95,14 @@ class BasePlot(object):
         
     @property
     def visible(self):
+        """Shows (=True) / hides (=False) the plot object"""
         return self.actor.GetVisibility()
     
     @visible.setter
     def visible(self, x):
         self.actor.SetVisibility(x)
         
-    visible.__doc__ = """Shows (=True) / hides (=False) the plot object"""
-    
-    color.__doc__ = process_color.__doc__
-    
-    opacity.__doc__ = """Set / get the translucency. 0 is invisible, 1 is solid."""
+        
         
         
 class SourcedPlot(BasePlot):

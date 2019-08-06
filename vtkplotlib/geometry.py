@@ -74,38 +74,6 @@ def separate_path_components(path, direction):
     return perpendicular_components_vects, parallel_components
 
 
-def flatten_components(components):
-    local_displacements = components[1:] - components[:-1]
-    local_distances = distance(local_displacements)
-    
-    distances = np.empty(len(components), components.dtype)
-    distances[0] = 0
-    distances[1:] = np.cumsum(local_distances)
-    
-    return distances
-    
-
-def separate_paths_concatenate(*paths, direction):
-    perp_total = 0
-    perps = []
-    parrs = []
-    for path in paths:
-        if path is not None:
-            perp, parr= separate_path_components(path, direction)
-            perp = flatten_components(perp)
-            perps.append(perp + perp_total)
-            parrs.append(parr)
-            perp_total += perp[-1]
-        else:
-            print("Warning. A path was None")
-            perp_total += 1
-    return perps, parrs
-    
-    
-def plot_path_separated(*paths, direction, **plotargs):
-    for (perp, parr) in zip(*separate_paths_concatenate(*paths, direction=direction)):
-        plt.plot(perp, parr, **plotargs)
-
     
 
 def rotation_matrix(theta_rad):
