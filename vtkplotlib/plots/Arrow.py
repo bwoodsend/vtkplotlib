@@ -36,7 +36,7 @@ from vtkplotlib import geometry as geom
 
 
 class Arrow(SourcedPlot):
-    def __init__(self, start, end, length=None, color=None, opacity=None, fig=None):
+    def __init__(self, start, end, length=None, color=None, opacity=None, fig="gcf"):
         super().__init__(fig)
         
         diff = end - start
@@ -78,7 +78,7 @@ class Arrow(SourcedPlot):
             
 
 
-def arrow(start, end, length=None, color=None, opacity=None, fig=None):
+def arrow(start, end, length=None, color=None, opacity=None, fig="gcf"):
     """Draw an arrow / arrows from 'start' to 'end'. 'start' and 'end' should
     have matching shapes. Arrow lengths are automatically calculated by 
     pythagoras but can be overwritten by setting 'length'. 'length' can either 
@@ -107,7 +107,7 @@ def arrow(start, end, length=None, color=None, opacity=None, fig=None):
     return out_flat
     
 
-def quiver(point, gradient, length=None, length_scale=1, color=None, opacity=None, fig=None):
+def quiver(point, gradient, length=None, length_scale=1, color=None, opacity=None, fig="gcf"):
     """Create an arrow from 'point' towards a direction given by 'gradient'. 
     Lengths by default are the magnitude of 'gradient but can be scaled with
     'length_scale' or overwritten with 'length'. See arrow's docs for more 

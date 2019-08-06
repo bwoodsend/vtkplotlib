@@ -46,7 +46,7 @@ from vtkplotlib import geometry as geom
 
 class Polygon(ConstructedPlot):
     """Creates a filled polygon with 'vertices' as it's corners."""
-    def __init__(self, vertices, color=None, opacity=None, fig=None):
+    def __init__(self, vertices, color=None, opacity=None, fig="gcf"):
         super().__init__(fig)
     
         polygon = self.poly_data

@@ -45,7 +45,7 @@ class Text(BasePlot):
     """Creates text at a fixed point on the window (independent of camera
     position / orientation)."""
     def __init__(self, text_str, position=(0, 0), fontsize=18,
-                 color=(1, 1, 1), opacity=None, fig=None):
+                 color=(1, 1, 1), opacity=None, fig="gcf"):
         # create a text actor
         super().__init__(fig)
         

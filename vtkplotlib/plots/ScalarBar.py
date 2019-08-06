@@ -40,7 +40,7 @@ from vtkplotlib.plots.BasePlot import BasePlot
 
 
 class ScalarBar(BasePlot):
-    def __init__(self, plot, title="", fig=None):
+    def __init__(self, plot, title="", fig="gcf"):
     
         super().__init__(fig)
         

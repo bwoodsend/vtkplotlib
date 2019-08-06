@@ -72,7 +72,7 @@ class NoFigureError(Exception):
         
 
 
-def show(block=True, fig=None):
+def show(block=True, fig="gcf"):
     """Shows the figure.
     For regular figures:
         If 'block' is True then it enters interactive mode and the program
@@ -98,8 +98,8 @@ def show(block=True, fig=None):
     """
     
     global _figure
-    current_fig = fig or gcf()
-    
+    if fig == "gcf":
+      current_fig = gcf()
     if current_fig is None:
         raise NoFigureError("show")
 
@@ -110,7 +110,7 @@ def show(block=True, fig=None):
 
 
 
-def view(focal_point=None, camera_position=None, camera_direction=None, up_view=None, fig=None):
+def view(focal_point=None, camera_position=None, camera_direction=None, up_view=None, fig="gcf"):
     """Set the camera view. If forwards is used then focal_point and
         camera_position are ignored. 
     
@@ -146,7 +146,8 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
             
     """
         
-    fig = fig or gcf()
+    if fig == "gcf":
+      fig = gcf()
     if fig is None:
         raise NoFigureError("save_fig")
 
@@ -183,13 +184,14 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
 
 
 
-def reset_camera(fig=None):
+def reset_camera(fig="gcf"):
     """Reset the position of the camera. This does not touch the orientation.
     It pushes the camera so it whichever direction it is pointing, it is 
     pointing into the middle of where all the actors are. Then it adjusts the
     zoom so that everything fits on the screen.
     """
-    fig = (fig or gcf())
+    if fig == "gcf":
+      fig = gcf()
     if fig is None:
         raise NoFigureError("reset_camera")
     
@@ -198,7 +200,7 @@ def reset_camera(fig=None):
 
 
 
-def save_fig(path, size=720, fig=None):
+def save_fig(path, size=720, fig="gcf"):
     """Take a screenshot and saves it to either a jpg or a png. jpg is
         recommended as it is much better at compressing these files than png.
     
@@ -228,7 +230,8 @@ def save_fig(path, size=720, fig=None):
         
     size = tuple(max(round(i / 300), 1) for i in size)
         
-    fig = fig or gcf()
+    if fig == "gcf":
+      fig = gcf()
     if fig is None:
         raise NoFigureError("save_fig")
     renWin = fig.renWin
@@ -256,8 +259,9 @@ def save_fig(path, size=720, fig=None):
 
 
 
-def close(fig=None):
-    fig = fig or gcf()
+def close(fig="gcf"):
+    if fig == "gcf":
+      fig = gcf()
     if fig is not None:
         fig.iren.GetRenderWindow().Finalize()
         fig.iren.TerminateApp()

@@ -43,16 +43,22 @@ class BaseFigure(VTKRenderer):
 
         
     _reset_camera = True
+    has_been_shown = False
 
     def reset_camera(self):
         return reset_camera(self)
 
     
     def show(self, block=True):
+        if self.has_been_shown:
+            print(self, "has already been shown")
+            return
+        
         self.start(block, self._reset_camera)
 
         if block and gcf() is self:
             scf(None)
+            self.has_been_shown = True
             
 
     def add_plot(self, plot):

@@ -44,8 +44,10 @@ class BasePlot(object):
     setter/getters for very generic attributes like color can go here.
     """
     
-    def __init__(self, fig=None):
-        self.fig = fig or gcf()
+    def __init__(self, fig="gcf"):
+        if fig == "gcf":
+          fig = gcf()
+        self.fig = fig
         
         
     def add_to_plot(self):
@@ -121,7 +123,7 @@ class ConstructedPlot(BasePlot):
     manually into a vtk.vtkPolyData object (generic bucket class for storing
     points/lines/surfaces ...).
     """
-    def __init__(self, fig=None):
+    def __init__(self, fig="gcf"):
         super().__init__(fig)
         self.poly_data = vtk.vtkPolyData()
         

@@ -48,7 +48,7 @@ class Text3D(SourcedPlot):
     """Create a text actor in 3D space. Optionally can be set to orientate 
     itself to follow the camera (defaults to on).
     """
-    def __init__(self, string, position=(0, 0, 0), follow_cam=True, scale=1, color=None, opacity=None, fig=None):
+    def __init__(self, string, position=(0, 0, 0), follow_cam=True, scale=1, color=None, opacity=None, fig="gcf"):
         super().__init__(fig)
         # Create the 3D text and the associated mapper and follower (a type of
         # actor). Position the text so it is displayed over the origin of the
@@ -84,7 +84,7 @@ class Text3D(SourcedPlot):
             self.actor.SetCamera(self.fig.render.GetActiveCamera())
     
         
-def annotate(points, text, direction, text_color="w", arrow_color="k", distance=3, text_size=1, fig=None):
+def annotate(points, text, direction, text_color="w", arrow_color="k", distance=3, text_size=1, fig="gcf"):
     """Annotate a feature with an arrow and a text actor.
     
     If multiple points are given the highest is selected where high is 

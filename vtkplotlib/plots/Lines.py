@@ -45,7 +45,7 @@ from vtkplotlib import geometry as geom
 class Lines(ConstructedPlot):
     """Plots a line going through an array of points. Optionally can be set to
     join the last point with the first to create a polygon."""
-    def __init__(self, vertices, color=None, opacity=None, line_width=1.0, join_ends=False, fig=None):
+    def __init__(self, vertices, color=None, opacity=None, line_width=1.0, join_ends=False, fig="gcf"):
         super().__init__(fig)
         
         points = vtk.vtkPoints()

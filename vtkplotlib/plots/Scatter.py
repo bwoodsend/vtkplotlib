@@ -39,7 +39,7 @@ from vtkplotlib.plots.BasePlot import SourcedPlot, _iter_colors, _iter_points, _
 
 class Sphere(SourcedPlot):
     """Plot an individual sphere."""
-    def __init__(self, point, color=None, opacity=None, radius=1., fig=None):
+    def __init__(self, point, color=None, opacity=None, radius=1., fig="gcf"):
         super().__init__(fig)
         
         self.source = vtk.vtkSphereSource()
@@ -60,7 +60,7 @@ class Sphere(SourcedPlot):
      
         
 class Cursor(SourcedPlot):
-    def __init__(self, point, color=None, opacity=None, radius=1, fig=None):
+    def __init__(self, point, color=None, opacity=None, radius=1, fig="gcf"):
         super().__init__(fig)
         
         self.source = vtk.vtkCursor3D()
@@ -88,7 +88,7 @@ class Cursor(SourcedPlot):
         self.source.SetFocalPoint(*point)
         
         
-def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig=None):
+def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig="gcf"):
     points = np.asarray(points)
     out = np.empty(points.shape[:-1], object)
     out_flat = out.ravel()

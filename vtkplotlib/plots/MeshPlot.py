@@ -112,7 +112,7 @@ class MeshPlot(ConstructedPlot):
     the numpy-stl library. Failing that can also take other more generic formats.
     See __init__ for more info.
     """
-    def __init__(self, *mesh_data, tri_scalars=None, scalars=None, color=None, opacity=None, fig=None):
+    def __init__(self, *mesh_data, tri_scalars=None, scalars=None, color=None, opacity=None, fig="gcf"):
         super().__init__(fig)
         
         # Try to support as many of the mesh libraries out there as possible
