@@ -23,4 +23,6 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-
+import vtk.util.numpy_support
+import numpy as np
+np.warnings.filterwarnings("ignore", module=vtk.util.numpy_support.__name__)
