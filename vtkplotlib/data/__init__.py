@@ -37,7 +37,7 @@ DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")) / "data"
 STL_FOLDER = DATA_FOLDER / "models"
 
 def get_rabbit_stl():
-    folder = STL_FOLDER / "rabbit"
+    folder = STL_FOLDER
     print("This is not my rabbit. See README.txt and LICENSE.txt in\n{}\nfor details.".format(folder))
     return str(folder / "rabbit.stl")
 
