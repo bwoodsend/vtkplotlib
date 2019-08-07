@@ -300,6 +300,7 @@ To use 'tri_scalars':
 
     import vtkplotlib as vpl
     from stl.mesh import Mesh
+    import numpy as np
 
     # Open an STL as before
     path = vpl.data.get_rabbit_stl()
@@ -332,6 +333,7 @@ demonstrates the figure handling functions.
 .. code-block:: python
 
     import vtkplotlib as vpl
+    import numpy as np
     
     # You can create a figure explicitly using figure()
     fig = vpl.figure("Your Figure Title Here")

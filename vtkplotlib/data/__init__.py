@@ -38,7 +38,7 @@ STL_FOLDER = DATA_FOLDER / "models"
 
 def get_rabbit_stl():
     folder = STL_FOLDER
-    print("This is not my rabbit. See README.txt and LICENSE.txt in\n{}\nfor details.".format(folder))
+    print("This is not my rabbit file. See README.txt and LICENSE.txt in\n{}\nfor details.".format(folder))
     return str(folder / "rabbit.stl")
 
 ICONS_FOLDER = DATA_FOLDER / "icons"
