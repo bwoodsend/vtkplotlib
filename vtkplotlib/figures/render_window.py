@@ -78,7 +78,6 @@ class VTKRenderer(object):
         self.iren = iren
         self.window_name = ""
         
-        self.temp = []
         
         
     def start(self, block=True, reset_camera=True):

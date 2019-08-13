@@ -41,7 +41,7 @@ from vtk.util.numpy_support import (
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot
 from vtkplotlib.nuts_and_bolts import flatten_all_but_last
-
+from vtkplotlib import numpy_vtk
 
 
 MESH_DATA_TYPE = \
@@ -70,26 +70,27 @@ MESH_DATA_TYPE = \
         
 
     
-3)  An np.array with shape (k, 3) of (usually unique) vertices in the form:
+3)  A tuple containing:
+        An np.array with shape (k, 3) of (usually unique) vertices in the form:
+            
+            np.array([[x, y, z],
+                      [x, y, z],
+                      ...
+                      [x, y, z],
+                      [x, y, z],
+                      ])
+    
+    And an np.array of integers with shape (n, 3) of point
+        args in the form
         
-        np.array([[x, y, z],
-                  [x, y, z],
-                  ...
-                  [x, y, z],
-                  [x, y, z],
-                  ])
-    
-    And a second argument of an np.array of integers with shape (n, 3) of point
-    args in the form
-    
-        np.array([[i, j, k],  # triangle 0
-                  ...
-                  [i, j, k],  # triangle n-1
-                  ])
-    
-    where i, j, k are the indices of the points (in the vertices array) 
-    representing each corner of a triangle.
-    
+            np.array([[i, j, k],  # triangle 0
+                      ...
+                      [i, j, k],  # triangle n-1
+                      ])
+        
+        where i, j, k are the indices of the points (in the vertices array) 
+        representing each corner of a triangle.
+        
     Note that this form can (and is) easily converted to form 2) using
     
         vertices = unique_vertices[point_args]
@@ -112,31 +113,13 @@ class MeshPlot(ConstructedPlot):
     the numpy-stl library. Failing that can also take other more generic formats.
     See __init__ for more info.
     """
-    def __init__(self, *mesh_data, tri_scalars=None, scalars=None, color=None, opacity=None, fig="gcf"):
-        super().__init__(fig)
+    def __init__(self, mesh_data, tri_scalars=None, scalars=None, color=None, opacity=None, fig="gcf"):
+        super(MeshPlot, self).__init__(fig)
         
         # Try to support as many of the mesh libraries out there as possible
         # without having all of those libraries as dependencies
-        
-        if len(mesh_data) == 1:
-            mesh_data = mesh_data[0]
-            
-            if isinstance(mesh_data, np.ndarray):
-                self.vectors = mesh_data
-                
-            elif hasattr(mesh_data, "vectors"):
-                self.vectors = mesh_data.vectors
-                if self.vectors.shape[1:] != (3, 3):
-                    self.vectors = self.vectors[:, :3, :3]
-                
-            else:
-                raise MESH_DATA_TYPE_EX("")
-            
-            if self.vectors.shape[1:] != (3, 3):
-                raise MESH_DATA_TYPE_EX("mesh_data is invalid shape {}".format(self.vectors.shape))
-            
-                
-        elif len(mesh_data) == 2:
+
+        if isinstance(mesh_data, tuple) and len(mesh_data) == 2:
             vertices, args = mesh_data
             if not isinstance(vertices, np.ndarray):
                 raise MESH_DATA_TYPE_EX("First argument is of invalid type {}"\
@@ -158,10 +141,24 @@ class MeshPlot(ConstructedPlot):
                 raise MESH_DATA_TYPE_EX("Second argument must be an int dtype array")
                 
             self.vectors = vertices[args]
-            
+
+        
         else:
-            raise MESH_DATA_TYPE_EX("")
-                                 
+            if isinstance(mesh_data, np.ndarray):
+                self.vectors = mesh_data
+                
+            elif hasattr(mesh_data, "vectors"):
+                self.vectors = mesh_data.vectors
+                if self.vectors.shape[1:] != (3, 3):
+                    self.vectors = self.vectors[:, :3, :3]
+                
+            else:
+                raise MESH_DATA_TYPE_EX("")
+            
+            if self.vectors.shape[1:] != (3, 3):
+                raise MESH_DATA_TYPE_EX("mesh_data is invalid shape {}".format(self.vectors.shape))
+            
+        self.vectors = numpy_vtk.contiguous_safe(self.vectors)
             
         triangles = np.empty((len(self.vectors), 4), np.int64)
         triangles[:, 0] = 3
@@ -181,7 +178,7 @@ class MeshPlot(ConstructedPlot):
         
         self.add_to_plot()
         
-        self.fig.temp.append(triangles)
+        self.temp.append(triangles)
         
         
         self.set_scalars(scalars)
@@ -194,7 +191,7 @@ class MeshPlot(ConstructedPlot):
         """If self.vectors has been modified (either resigned to a new array or
         the array's contents have been altered) then this be called after."""
         vertices = flatten_all_but_last(self.vectors)
-        self.fig.temp.append(vertices)
+        self.temp.append(vertices)
         
         self.points.SetData(numpy_to_vtk(vertices))        
 
@@ -207,7 +204,7 @@ class MeshPlot(ConstructedPlot):
         Calls self.set_scalars. See set_scalars for implications.
         """
         if tri_scalars is not None:
-            tri_scalars = tri_scalars.ravel()
+            tri_scalars = numpy_vtk.contiguous_safe(tri_scalars.ravel())
     #        scalars = np.array([tri_scalars, tri_scalars, tri_scalars]).T
             assert tri_scalars.size == len(self.vectors)
             scalars = np.empty((len(tri_scalars), 3))
@@ -230,9 +227,11 @@ class MeshPlot(ConstructedPlot):
     #        scalars[~np.isfinite(scalars)] = np.nanmean(scalars)
             if scalars.shape != (len(self.vectors), 3):
                 raise ValueError("Expected (n, 3) shape array. Got {}".format(scalars.shape))
+            
+            scalars = numpy_vtk.contiguous_safe(scalars)
     
             self.poly_data.GetPointData().SetScalars(numpy_to_vtk(scalars.ravel()))
-            self.fig.temp.append(scalars)
+            self.temp.append(scalars)
             
             min = min or np.nanmin(scalars)
             max = max or np.nanmax(scalars)
@@ -275,3 +274,17 @@ if __name__ == "__main__":
     
     fig.show()
     
+
+def test_args_based_mesh(_mesh):
+    vectors = _mesh.vectors
+    
+    unique_points = set(tuple(i) for i in vectors.reshape(len(vectors) * 3, 3))
+    points_enum = {point: i for (i, point) in enumerate(unique_points)}
+    
+    points = np.array(sorted(unique_points, key=points_enum.get))
+    point_args = np.apply_along_axis(lambda x: points_enum[tuple(x)], -1, vectors)
+    
+    assert np.array_equal(points[point_args], vectors)
+    
+    vpl.mesh_plot((points, point_args))
+    vpl.show()

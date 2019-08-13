@@ -48,6 +48,7 @@ class BasePlot(object):
         if fig == "gcf":
           fig = gcf()
         self.fig = fig
+        self.temp = []
         
         
     def add_to_plot(self):
@@ -114,7 +115,7 @@ class SourcedPlot(BasePlot):
     it's own conversion to triangles with source.GetOutputPort(). This class
     is just to handle the slightly different way of connecting the pipeline."""
     def add_to_plot(self):
-        super().add_to_plot()
+        super(SourcedPlot, self).add_to_plot()
         self.mapper.SetInputConnection(self.source.GetOutputPort())
         
         
@@ -124,11 +125,11 @@ class ConstructedPlot(BasePlot):
     points/lines/surfaces ...).
     """
     def __init__(self, fig="gcf"):
-        super().__init__(fig)
+        super(ConstructedPlot, self).__init__(fig)
         self.poly_data = vtk.vtkPolyData()
         
     def add_to_plot(self):
-        super().add_to_plot()
+        super(ConstructedPlot, self).add_to_plot()
         self.mapper.SetInputData(self.poly_data)
         
     

@@ -68,7 +68,7 @@ class NoFigureError(Exception):
     fmt = """{} requires a figure. Create one using vpl.figure() and pass it as
     'fig' argument.""".format
     def __init__(self, name):
-        super().__init__(self.fmt(name))
+        super(NoFigureError, self).__init__(self.fmt(name))
         
 
 
@@ -163,7 +163,7 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
     # vtk's rules are if only this is specified then it 
     # is used as a direction vector instead.
     if camera_direction is not None:
-        camera.SetPosition(*-camera_direction)
+        camera.SetPosition(*-np.asarray(camera_direction))
     
     else:
         if focal_point is not None:
@@ -180,7 +180,9 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
     if reset_at_end:
         fig.reset_camera()
         
-    return camera.GetFocalPoint(), camera.GetPosition(), camera.GetViewUp()
+    return dict(focal_point=camera.GetFocalPoint(),
+                camera_position=camera.GetPosition(),
+                up_view=camera.GetViewUp())
 
 
 
@@ -228,7 +230,7 @@ def save_fig(path, size=720, fig="gcf"):
     if isinstance(size, int):
         size = (size * 16) // 9, size
         
-    size = tuple(max(round(i / 300), 1) for i in size)
+    size = tuple(max(int(round(i / 300)), 1) for i in size)
         
     if fig == "gcf":
       fig = gcf()
@@ -241,7 +243,10 @@ def save_fig(path, size=720, fig="gcf"):
     # screenshot code:
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(renWin)
-    w2if.SetScale(*size) 
+    try:
+        w2if.SetScale(*size) 
+    except AttributeError:
+        w2if.SetMagnification(size[0])
     w2if.Update()
 
     old_path = Path.cwd()

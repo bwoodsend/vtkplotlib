@@ -36,8 +36,8 @@ from vtkplotlib import geometry as geom
 
 
 class Arrow(SourcedPlot):
-    def __init__(self, start, end, length=None, color=None, opacity=None, fig="gcf"):
-        super().__init__(fig)
+    def __init__(self, start, end, length=None, width_scale=1, color=None, opacity=None, fig="gcf"):
+        super(Arrow, self).__init__(fig)
         
         diff = end - start
         if length == None:
@@ -66,7 +66,7 @@ class Arrow(SourcedPlot):
         transform = vtk.vtkTransform()
         transform.Translate(start)
         transform.Concatenate(matrix)
-        transform.Scale(length, length, length)
+        transform.Scale(length, length * width_scale, length * width_scale)
         
         
         self.source = arrowSource
@@ -78,7 +78,7 @@ class Arrow(SourcedPlot):
             
 
 
-def arrow(start, end, length=None, color=None, opacity=None, fig="gcf"):
+def arrow(start, end, length=None, width_scale=1, color=None, opacity=None, fig="gcf"):
     """Draw an arrow / arrows from 'start' to 'end'. 'start' and 'end' should
     have matching shapes. Arrow lengths are automatically calculated by 
     pythagoras but can be overwritten by setting 'length'. 'length' can either 
@@ -102,12 +102,12 @@ def arrow(start, end, length=None, color=None, opacity=None, fig="gcf"):
                                 _iter_scalar(length, start.shape[:-1]),
                                 _iter_colors(color, start.shape[:-1])):
         
-        out_flat[i] = Arrow(s, e, l, c, opacity, fig)
+        out_flat[i] = Arrow(s, e, l, width_scale, c, opacity, fig)
 
     return out_flat
     
 
-def quiver(point, gradient, length=None, length_scale=1, color=None, opacity=None, fig="gcf"):
+def quiver(point, gradient, length=None, length_scale=1, width_scale=1, color=None, opacity=None, fig="gcf"):
     """Create an arrow from 'point' towards a direction given by 'gradient'. 
     Lengths by default are the magnitude of 'gradient but can be scaled with
     'length_scale' or overwritten with 'length'. See arrow's docs for more 
@@ -119,7 +119,7 @@ def quiver(point, gradient, length=None, length_scale=1, color=None, opacity=Non
     if length_scale != 1:
         length *= length_scale
         
-    return arrow(point, point + gradient, length, color, opacity, fig)
+    return arrow(point, point + gradient, length, width_scale, color, opacity, fig)
 
 
 
@@ -131,6 +131,6 @@ if __name__ == "__main__":
     points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
     grads = np.roll(points, 10)
     
-    arrows = quiver(points, grads, color=grads)
+    arrows = quiver(points, grads, width_scale=.3, color=grads)
     
     vpl.show()

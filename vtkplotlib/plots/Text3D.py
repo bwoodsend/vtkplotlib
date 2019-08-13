@@ -49,7 +49,7 @@ class Text3D(SourcedPlot):
     itself to follow the camera (defaults to on).
     """
     def __init__(self, string, position=(0, 0, 0), follow_cam=True, scale=1, color=None, opacity=None, fig="gcf"):
-        super().__init__(fig)
+        super(Text3D, self).__init__(fig)
         # Create the 3D text and the associated mapper and follower (a type of
         # actor). Position the text so it is displayed over the origin of the
         # axes.

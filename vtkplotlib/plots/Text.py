@@ -47,7 +47,7 @@ class Text(BasePlot):
     def __init__(self, text_str, position=(0, 0), fontsize=18,
                  color=(1, 1, 1), opacity=None, fig="gcf"):
         # create a text actor
-        super().__init__(fig)
+        super(Text, self).__init__(fig)
         
         self.actor = vtk.vtkTextActor()
         self.actor.SetInput(text_str)

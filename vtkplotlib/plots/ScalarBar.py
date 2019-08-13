@@ -42,7 +42,7 @@ from vtkplotlib.plots.BasePlot import BasePlot
 class ScalarBar(BasePlot):
     def __init__(self, plot, title="", fig="gcf"):
     
-        super().__init__(fig)
+        super(ScalarBar, self).__init__(fig)
         
         self.actor = vtk.vtkScalarBarActor()
         self.actor.SetTitle(title)

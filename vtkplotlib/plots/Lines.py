@@ -38,7 +38,7 @@ from vtk.util.numpy_support import (
 
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot, _iter_colors, _iter_points, _iter_scalar
-from vtkplotlib import geometry as geom
+from vtkplotlib import geometry as geom, numpy_vtk
 
 
 
@@ -46,7 +46,10 @@ class Lines(ConstructedPlot):
     """Plots a line going through an array of points. Optionally can be set to
     join the last point with the first to create a polygon."""
     def __init__(self, vertices, color=None, opacity=None, line_width=1.0, join_ends=False, fig="gcf"):
-        super().__init__(fig)
+        super(Lines, self).__init__(fig)
+        
+        vertices = numpy_vtk.contiguous_safe(vertices)
+        self.temp.append(vertices)
         
         points = vtk.vtkPoints()
         points.SetData(numpy_to_vtk(vertices))

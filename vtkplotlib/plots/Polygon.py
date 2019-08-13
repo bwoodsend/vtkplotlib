@@ -39,7 +39,7 @@ from vtk.util.numpy_support import (
 
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot, _iter_colors, _iter_points, _iter_scalar
-from vtkplotlib import geometry as geom
+from vtkplotlib import geometry as geom, numpy_vtk
 
 
 
@@ -47,9 +47,12 @@ from vtkplotlib import geometry as geom
 class Polygon(ConstructedPlot):
     """Creates a filled polygon with 'vertices' as it's corners."""
     def __init__(self, vertices, color=None, opacity=None, fig="gcf"):
-        super().__init__(fig)
+        super(Polygon, self).__init__(fig)
     
         polygon = self.poly_data
+        
+        vertices = numpy_vtk.contiguous_safe(vertices)
+        self.temp.append(vertices)
         
         points = vtk.vtkPoints()
         points.SetData(numpy_to_vtk(vertices))        

@@ -36,7 +36,7 @@ from .figure_manager import reset_camera, scf, gcf
 
 class BaseFigure(VTKRenderer):
     def __init__(self, window=None, window_interactor=None):    
-        super().__init__(window, window_interactor)
+        super(BaseFigure, self).__init__(window, window_interactor)
         scf(self)
         
         self.plots = set()

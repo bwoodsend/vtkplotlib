@@ -76,7 +76,7 @@ class TestPlots(TestCase):
     
         fig.show(False)
         
-        t0 = time.perf_counter()
+        t0 = time.time()
         for i in range(100):
     #        self.color = np.random.random(3)
     #        print(self.color)
@@ -85,7 +85,7 @@ class TestPlots(TestCase):
             fig.update()
             self.update_points()
     #        time.sleep(.01)
-            if (time.perf_counter() - t0) > 1:
+            if (time.time() - t0) > 1:
                 break
         
         

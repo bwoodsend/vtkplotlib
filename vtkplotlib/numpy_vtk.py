@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Aug  5 11:14:43 2019
+Created on Tue Aug 13 17:50:57 2019
 
 @author: Brénainn Woodsend
 
 
-tests.__init__.py
+one line to give the program's name and a brief idea of what it does.
 Copyright (C) 2019  Brénainn Woodsend
 
 This program is free software: you can redistribute it and/or modify
@@ -23,12 +23,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-def test_all():
-    from unittest import main
-    from vtkplotlib.tests import test_figures, test_plots
+import numpy as np
+from vtk.util.numpy_support import numpy_to_vtk
 
-    main(test_figures.TestFigures())
-    main(test_plots.TestPlots())
+try:
+    numpy_to_vtk(np.arange(4).reshape(2, 2).T)
+    ARRAYS_MUST_BE_CONTIGUOUS = False
+except:
+    ARRAYS_MUST_BE_CONTIGUOUS = True
+    
+
+if ARRAYS_MUST_BE_CONTIGUOUS:
+    contiguous_safe = np.ascontiguousarray
+else:
+    contiguous_safe = lambda x:x
+    
+
+
+
 
 if __name__ == "__main__":
-    test_all()
+    print(ARRAYS_MUST_BE_CONTIGUOUS)

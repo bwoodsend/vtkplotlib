@@ -40,7 +40,7 @@ class Figure(BaseFigure):
     """The default figure class."""
     def __init__(self, name="vtk figure"):
         
-        super().__init__(vtk.vtkRenderWindow(), vtk.vtkRenderWindowInteractor())
+        super(Figure, self).__init__(vtk.vtkRenderWindow(), vtk.vtkRenderWindowInteractor())
         self.window_name = name
         
         

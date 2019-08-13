@@ -60,31 +60,27 @@ class QtFigure2(QtFigure):
     
     """
     def __init__(self, name="qt vtk figure", parent=None):
-        super().__init__(name, parent)
+        super(QtFigure2, self).__init__(name, parent)
 
 
         self.menu = QtWidgets.QHBoxLayout()
         self.vl.insertLayout(0, self.menu)
         
-#        self.menu.setFixedHeight(100)
-#        self.setStyle(Style())
     
 #        self.views = Views(["up"],
 #                           [{"camera_direction": np.array([1, 0, 0])}],
 #                           self,
 #                           ).views
-        self.view_buttons = ViewButtons.default(self)
-                           
-        self.menu.addLayout(self.view_buttons.to_layout())
+#        self.view_buttons = ViewButtons.default(self)
+#                           
+#        self.menu.addLayout(self.view_buttons.to_layout())
         
-        self.right_menu = self.menu#QtWidgets.QMenuBar()
-#        self.menu.addWidget(self.right_menu)
        
-        self.default_screenshot_path = Path.home() / (name + ".jpg")
-        self.screenshot_button = Button("Screenshot",
-                                        self.screenshot,
-                                        SCREENSHOT_ICON_PATH)
-        self.right_menu.addWidget(self.screenshot_button)
+        self.default_screenshot_path = Path() / (name + ".jpg")
+#        self.screenshot_button = Button("Screenshot",
+#                                        self.screenshot,
+#                                        SCREENSHOT_ICON_PATH)
+#        self.menu.addWidget(self.screenshot_button)
         
         
     
@@ -99,19 +95,13 @@ class QtFigure2(QtFigure):
         
         
     def show(self, block=False):
-#        self.menu.adjustSize()
-#        size = self.menu.sizeHint()
-#        size.setHeight(size.height() * 2)
-#        self.menu.resize(size)
-
-        super().show()
-#        self.menu.resize(size)
+        super(QtFigure2, self).show(block)
         
         
         
 class Button(QtWidgets.QPushButton):
     def __init__(self, name, callback=None, icon=None, parent=None):
-        super().__init__(parent)
+        super(Button, self).__init__(parent)
 
         if callback is None:
             callback = self.default_callback
@@ -174,7 +164,7 @@ class ViewButton(Button):
     def __init__(self, name, parent, icon=None,
                  view_args={}):
 
-        super().__init__(name, self.set_view, icon, parent)
+        super(ViewButton, self).__init__(name, self.set_view, icon, parent)
         
         self.args = view_args
     
