@@ -23,12 +23,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-def test_all():
-    from unittest import main
-    from vtkplotlib.tests import test_figures, test_plots
-
-    main(test_figures.TestFigures())
-    main(test_plots.TestPlots())
-
-if __name__ == "__main__":
-    test_all()
+#def test_all():
+#    from unittest import main
+#    from vtkplotlib.tests import test_figures, test_plots
+#
+#    main(test_figures.TestFigures())
+#    main(test_plots.TestPlots())
+#
+#if __name__ == "__main__":
+#    test_all()
