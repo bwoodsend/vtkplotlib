@@ -24,7 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
 
-
+from builtins import super
 
 import vtk
 import numpy as np
@@ -40,7 +40,7 @@ class Figure(BaseFigure):
     """The default figure class."""
     def __init__(self, name="vtk figure"):
         
-        super(Figure, self).__init__(vtk.vtkRenderWindow(), vtk.vtkRenderWindowInteractor())
+        super().__init__(vtk.vtkRenderWindow(), vtk.vtkRenderWindowInteractor())
         self.window_name = name
         
         

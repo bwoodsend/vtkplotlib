@@ -33,6 +33,7 @@ from vtk.util.numpy_support import (
                                     vtk_to_numpy,
                                     )
 
+from vtkplotlib import vtk_errors
 
 
 class VTKRenderer(object):
@@ -60,6 +61,8 @@ class VTKRenderer(object):
         # And add it to the render window
         self.renWin.AddRenderer(self.render)
         self.background_color = 20, 50, 100
+        vtk_errors.handler.attach(self.renWin)
+        vtk_errors.handler.attach(self.render)
         
         # Create a renderwindowinteractor
         # The render window interactor can either be vtk's default window type or 
@@ -122,7 +125,15 @@ class VTKRenderer(object):
         if opacity is not None:
             self.render.SetBackgroundAlpha(opacity)
             
-
+    def __del__(self):
+        # This prevents a vtk error dialog from popping up. 
+        self.render.RemoveAllViewProps()
+        del self.render
+        
+        self.renWin.Finalize()
+        del self.renWin
+            
+    
 
 
 if __name__ == "__main__":

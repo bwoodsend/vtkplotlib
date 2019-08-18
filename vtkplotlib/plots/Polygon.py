@@ -23,6 +23,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from builtins import super
 
 import vtk
 import numpy as np
@@ -47,7 +48,7 @@ from vtkplotlib import geometry as geom, numpy_vtk
 class Polygon(ConstructedPlot):
     """Creates a filled polygon with 'vertices' as it's corners."""
     def __init__(self, vertices, color=None, opacity=None, fig="gcf"):
-        super(Polygon, self).__init__(fig)
+        super().__init__(fig)
     
         polygon = self.poly_data
         

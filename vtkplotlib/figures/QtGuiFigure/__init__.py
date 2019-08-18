@@ -22,7 +22,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-
+from builtins import super
 
 import numpy as np
 import sys
@@ -60,27 +60,34 @@ class QtFigure2(QtFigure):
     
     """
     def __init__(self, name="qt vtk figure", parent=None):
-        super(QtFigure2, self).__init__(name, parent)
+        super().__init__(name, parent)
 
 
         self.menu = QtWidgets.QHBoxLayout()
         self.vl.insertLayout(0, self.menu)
         
+        self.plot_table = None
     
-#        self.views = Views(["up"],
-#                           [{"camera_direction": np.array([1, 0, 0])}],
-#                           self,
-#                           ).views
-#        self.view_buttons = ViewButtons.default(self)
+    
+    
+    def add_preset_views(self, names=None, view_params=None, icons=()):
+        if view_params is None:
+            self.view_buttons = ViewButtons.default(self)
+        else:
+            self.view_buttons = ViewButtons(names, view_params, self, icons=())
 #                           
-#        self.menu.addLayout(self.view_buttons.to_layout())
+        self.menu.addLayout(self.view_buttons.to_layout())
         
+        
+        
+    def add_screenshot_button(self):
        
-        self.default_screenshot_path = Path() / (name + ".jpg")
-#        self.screenshot_button = Button("Screenshot",
-#                                        self.screenshot,
-#                                        SCREENSHOT_ICON_PATH)
-#        self.menu.addWidget(self.screenshot_button)
+        self.default_screenshot_path = Path() / (self.window_name + ".jpg")
+
+        self.screenshot_button = Button("Screenshot",
+                                        self.screenshot,
+                                        SCREENSHOT_ICON_PATH)
+        self.menu.addWidget(self.screenshot_button)
         
         
     
@@ -91,17 +98,45 @@ class QtFigure2(QtFigure):
                                                      "(*.jpg);;(*.png)")[0]
         
         if path:
-            save_fig(path, 10, self)
+            save_fig(path, fig=self)
+            
+            
+    def add_show_plot_table_button(self):
+        self.show_plot_table_button = Button("Show plots menu",
+                                             self.show_plot_table)
+        self.menu.addWidget(self.show_plot_table_button)
+        
+        
+    def show_plot_table(self):
+        self.plot_table = table = PlotTable(self)
+        table.show()
+
         
         
     def show(self, block=False):
-        super(QtFigure2, self).show(block)
+        super().show(block)
+        
+    def update(self):
+        super().update()
+        if self.plot_table is not None:
+            self.plot_table.update()
+        
+    
+    def close(self):
+        super().close()
+    
+    
+    def add_all(self):
+        self.add_preset_views()    
+        self.add_screenshot_button()
+        self.add_show_plot_table_button()
+
         
         
         
 class Button(QtWidgets.QPushButton):
     def __init__(self, name, callback=None, icon=None, parent=None):
-        super(Button, self).__init__(parent)
+        super().__init__(parent)
 
         if callback is None:
             callback = self.default_callback
@@ -162,11 +197,11 @@ Received {}""".format(type(obj)))
 
 class ViewButton(Button):
     def __init__(self, name, parent, icon=None,
-                 view_args={}):
+                 view_params={}):
 
-        super(ViewButton, self).__init__(name, self.set_view, icon, parent)
+        super().__init__(name, self.set_view, icon, parent)
         
-        self.args = view_args
+        self.args = view_params
     
     
     def set_view(self):
@@ -178,10 +213,10 @@ class ViewButton(Button):
 
 
 class ViewButtons(object):
-    def __init__(self, names, view_args, fig, icons=()):
+    def __init__(self, names, view_params, fig, icons=()):
         self.buttons = []
         
-        for (name, args, icon) in zip_longest(names, view_args, icons):
+        for (name, args, icon) in zip_longest(names, view_params, icons):
             button = ViewButton(name, fig, icon, args)
             self.buttons.append(button)
             
@@ -200,7 +235,7 @@ class ViewButtons(object):
         ups = np.array([[0, 0, 1],
                         [0, 1, 0]])
     
-        view_args = []
+        view_params = []
         for d in directions:
                 args = {"camera_position": d}
                 
@@ -208,11 +243,11 @@ class ViewButtons(object):
                     if not (d & up).any():
                         args["up_view"] = up
                         break
-                view_args.append(args)
+                view_params.append(args)
         
         paths = [ICONS_FOLDER / (i + ".jpg") for i in names]
     
-        return cls(names, view_args, figure, icons=paths)
+        return cls(names, view_params, figure, icons=paths)
     
     
     def to_layout(self, parent=None):
@@ -222,6 +257,89 @@ class ViewButtons(object):
     
 
 
+class PlotTable(QtWidgets.QWidget):
+    def __init__(self, figure):
+        super().__init__()
+        self.figure = figure
+        self.plots = self.figure.plots
+        self.rows = dict()
+        
+        self.grid = QtWidgets.QGridLayout()
+        self.setLayout(self.grid)
+
+        self.timer = timer = QtCore.QTimer()
+        timer.setInterval(50)
+#        timer.timeout.connect(lambda: print(row.text.underMouse()))
+        timer.timeout.connect(self.update)
+        timer.start()
+
+        
+        self.update()
+
+        
+        
+    def add_plot(self, plot):
+        print("add", plot)
+        row = PlotTableRow(plot, len(self.rows))# + 1
+        row.add_to_grid(self.grid)
+        self.rows[plot] = row
+        
+        
+    def remove_plot(self, plot):
+        print("remove", plot)
+        self.rows.pop(plot)
+        
+        
+    def update(self):
+        for plot in (self.plots - self.rows.keys()):
+            self.add_plot(plot)
+            
+        for plot in (self.rows.keys() - self.plots):
+            self.remove_plot(plot)
+        
+        
+class PlotTableRow(object):
+    def __init__(self, plot, row_num):
+        self.plot = plot
+        self.row_num = row_num
+        
+        self.visible_ckbox = QtWidgets.QCheckBox()
+        self.visible_ckbox.setChecked(self.plot.visible)
+        self.visible_ckbox.stateChanged.connect(self.chk_box_change_cb)
+        
+        if hasattr(self.plot, "name"):
+            name = self.plot.name
+        else:
+            name = repr(self.plot)
+        self.text = QLabel_alterada(name)
+        self.text.released.connect(self.toggle_visible)
+        
+        
+        
+    def chk_box_change_cb(self):
+        state = bool(self.visible_ckbox.checkState())
+#        print("setting", self.plot, "visibility to", state)
+        
+        self.plot.visible = state
+        self.plot.fig.update()
+        
+        
+    def toggle_visible(self):
+        self.visible_ckbox.setChecked(not self.visible_ckbox.checkState())
+    
+    
+    def add_to_grid(self, grid):
+        grid.addWidget(self.visible_ckbox, self.row_num, 0)
+        grid.addWidget(self.text, self.row_num, 1)
+    
+    
+
+class QLabel_alterada(QtWidgets.QLabel):
+    released = QtCore.pyqtSignal()
+
+    def mouseReleaseEvent(self, ev):
+        self.released.emit()
+
 
 if __name__ == "__main__":
     import vtkplotlib as vpl
@@ -230,15 +348,30 @@ if __name__ == "__main__":
     app = None
     app = QtWidgets.QApplication(sys.argv)
     
-    self = vpl.QtFigure2("Some Dots")
+    self = vpl.QtFigure2("")
 #    vpl.scatter(np.random.uniform(-5, 5, (5, 3)), fig=self)
 #    vpl.quiver(np.zeros((3, 3)), np.eye(3) * 5, color=np.eye(3))
     
-    vpl.mesh_plot(Mesh.from_file(vpl.data.get_rabbit_stl()))
-    
-        
-    
+    plot = vpl.mesh_plot(Mesh.from_file(vpl.data.get_rabbit_stl()))
+    plot.name = "rabbit"
+    mesh_2 = Mesh.from_file(vpl.data.get_rabbit_stl())
+    mesh_2.translate(np.array([10, 0, 0]))
+#    vpl.scatter(np.random.uniform(-100, 100, (3, 3)))
+ 
+    self.add_all()    
+   
     self.show()
+
+#    app.processEvents()
+    plot = vpl.mesh_plot(mesh_2, color="g")
+    plot.name = "green rabbit"
+#    self.update()
+    
+    
+
+#    app.processEvents()
+#    row = table.rows[plot]
+
     
     app.exec_()
     

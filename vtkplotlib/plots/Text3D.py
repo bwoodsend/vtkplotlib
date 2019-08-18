@@ -23,6 +23,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from builtins import super
+
 import vtk
 import numpy as np
 #from matplotlib import pylab as plt
@@ -49,7 +51,7 @@ class Text3D(SourcedPlot):
     itself to follow the camera (defaults to on).
     """
     def __init__(self, string, position=(0, 0, 0), follow_cam=True, scale=1, color=None, opacity=None, fig="gcf"):
-        super(Text3D, self).__init__(fig)
+        super().__init__(fig)
         # Create the 3D text and the associated mapper and follower (a type of
         # actor). Position the text so it is displayed over the origin of the
         # axes.

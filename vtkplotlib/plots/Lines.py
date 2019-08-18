@@ -23,6 +23,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from builtins import super
 
 import vtk
 import numpy as np
@@ -46,7 +47,7 @@ class Lines(ConstructedPlot):
     """Plots a line going through an array of points. Optionally can be set to
     join the last point with the first to create a polygon."""
     def __init__(self, vertices, color=None, opacity=None, line_width=1.0, join_ends=False, fig="gcf"):
-        super(Lines, self).__init__(fig)
+        super().__init__(fig)
         
         vertices = numpy_vtk.contiguous_safe(vertices)
         self.temp.append(vertices)

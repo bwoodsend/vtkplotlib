@@ -23,6 +23,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from builtins import super
 
 import vtk
 import numpy as np
@@ -114,7 +115,7 @@ class MeshPlot(ConstructedPlot):
     See __init__ for more info.
     """
     def __init__(self, mesh_data, tri_scalars=None, scalars=None, color=None, opacity=None, fig="gcf"):
-        super(MeshPlot, self).__init__(fig)
+        super().__init__(fig)
         
         # Try to support as many of the mesh libraries out there as possible
         # without having all of those libraries as dependencies

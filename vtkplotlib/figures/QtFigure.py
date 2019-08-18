@@ -42,6 +42,8 @@ class QtFigure(BaseFigure, QWidget):
     """
 
     def __init__(self, name="qt vtk figure", parent=None):
+        
+        self.qapp = QApplication.instance() or QApplication(sys.argv)
         QWidget.__init__(self, parent)
 
 
@@ -61,6 +63,9 @@ class QtFigure(BaseFigure, QWidget):
         QWidget.show(self)
         BaseFigure.show(self, block)
         self.setWindowTitle(self.window_name)
+        
+        if block:
+            self.qapp.exec_()
 
 
 

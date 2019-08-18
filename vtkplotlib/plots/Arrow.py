@@ -21,7 +21,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-
+from builtins import super
 
 import vtk
 import numpy as np
@@ -37,7 +37,7 @@ from vtkplotlib import geometry as geom
 
 class Arrow(SourcedPlot):
     def __init__(self, start, end, length=None, width_scale=1, color=None, opacity=None, fig="gcf"):
-        super(Arrow, self).__init__(fig)
+        super().__init__(fig)
         
         diff = end - start
         if length == None:

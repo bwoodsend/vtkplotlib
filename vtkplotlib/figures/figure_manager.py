@@ -21,6 +21,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+from builtins import super
 
 import numpy as np
 import os
@@ -68,7 +69,7 @@ class NoFigureError(Exception):
     fmt = """{} requires a figure. Create one using vpl.figure() and pass it as
     'fig' argument.""".format
     def __init__(self, name):
-        super(NoFigureError, self).__init__(self.fmt(name))
+        super().__init__(self.fmt(name))
         
 
 
@@ -202,7 +203,7 @@ def reset_camera(fig="gcf"):
 
 
 
-def save_fig(path, size=720, fig="gcf"):
+def save_fig(path, magnifigation=1, pixels=None, fig="gcf"):
     """Take a screenshot and saves it to either a jpg or a png. jpg is
         recommended as it is much better at compressing these files than png.
     
@@ -210,14 +211,20 @@ def save_fig(path, size=720, fig="gcf"):
             str or Pathlike
             Save destination
             
-        scale:
+        magnifigation:
+            An int or a (width, height) tuple of ints.
+            Set the image dimensions relative to the size of the render.
+
+            
+        pixels:
             An int or a (width, height) tuple of ints.
             Set the image dimensions in pixels. If only one dimension is given
             then it is the height and an aspect ration of 16:9 is used.
             
             
-        Note that for some reason vtk can only work with multiples of 300
-        pixels. 'size' will be therefore be rounded to conform to this.
+        Note that VTK can only work with integer multiples of the render size
+        (given by figure.render_size). 'pixels' will be therefore be rounded to
+        conform to this.
             
         And no I have no idea why it spins. But vtk's example in the docs does
         it as well so I think it's safe to say the problem is on their side.
@@ -227,10 +234,15 @@ def save_fig(path, size=720, fig="gcf"):
         path = Path(path)
         
         
-    if isinstance(size, int):
-        size = (size * 16) // 9, size
+    if isinstance(pixels, int):
+        pixels = (pixels * 16) // 9, pixels
         
-    size = tuple(max(int(round(i / 300)), 1) for i in size)
+    if isinstance(magnifigation, int):
+        magnifigation = (magnifigation, magnifigation)
+        
+    if pixels is not None:
+        magnifigation = tuple(pixels[i] // fig.render_size[i] for i in range(2))
+
         
     if fig == "gcf":
       fig = gcf()
@@ -244,9 +256,9 @@ def save_fig(path, size=720, fig="gcf"):
     w2if = vtk.vtkWindowToImageFilter()
     w2if.SetInput(renWin)
     try:
-        w2if.SetScale(*size) 
+        w2if.SetScale(*magnifigation) 
     except AttributeError:
-        w2if.SetMagnification(size[0])
+        w2if.SetMagnification(magnifigation[0])
     w2if.Update()
 
     old_path = Path.cwd()

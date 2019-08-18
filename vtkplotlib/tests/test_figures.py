@@ -59,7 +59,7 @@ class TestFigures(TestCase):
     
     def test(self):
         plots = vpl.scatter(np.random.uniform(-10, 10, (30, 3)))
-        vpl.save_fig("im.jpg", 400)
+        vpl.save_fig("im.jpg")
         os.remove("im.jpg")
         
         vpl.close()
@@ -115,9 +115,6 @@ class TestFigures(TestCase):
         
     @skipUnless(vpl.PyQt5_AVAILABLE, "PyQt5 not installed")
     def test_qfigure(self):
-        from PyQt5.QtWidgets import QApplication
-        app = None
-        app = QApplication([])
         fig = vpl.QtFigure("a qt widget figure")
         
         self.assertIs(fig, vpl.gcf())
@@ -128,7 +125,19 @@ class TestFigures(TestCase):
         vpl.reset_camera()
     
         vpl.show()
-        app.exec_()
+
+
+    @skipUnless(vpl.PyQt5_AVAILABLE, "PyQt5 not installed")
+    def test_qfigure2(self):
+        fig = vpl.QtFigure2("a qt widget figure")
+        self.assertIs(fig, vpl.gcf())
+    
+        vpl.scatter(np.arange(9).reshape((3, 3)).T)
+        
+        fig.add_all()
+        
+    
+        vpl.show()
 
 
 

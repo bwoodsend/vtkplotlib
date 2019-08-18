@@ -23,6 +23,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from builtins import super
 
 import vtk
 import numpy as np
@@ -40,7 +41,7 @@ from vtkplotlib.plots.BasePlot import SourcedPlot, _iter_colors, _iter_points, _
 class Sphere(SourcedPlot):
     """Plot an individual sphere."""
     def __init__(self, point, color=None, opacity=None, radius=1., fig="gcf"):
-        super(Sphere, self).__init__(fig)
+        super().__init__(fig)
         
         self.source = vtk.vtkSphereSource()
         self.point = point
@@ -61,7 +62,7 @@ class Sphere(SourcedPlot):
         
 class Cursor(SourcedPlot):
     def __init__(self, point, color=None, opacity=None, radius=1, fig="gcf"):
-        super(Cursor, self).__init__(fig)
+        super().__init__(fig)
         
         self.source = vtk.vtkCursor3D()
         self.source.SetTranslationMode(True)

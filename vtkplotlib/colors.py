@@ -42,7 +42,7 @@ def process_color(color=None, opacity=None):
     
     'color' accepts either:
         A string color name. e.g "r" or "red". This uses matplotlib's 
-        named color libraries. See there or vtkplotlib.BasePlot.mpl_colors for
+        named color libraries. See there or vtkplotlib.colors.mpl_colors for
         a full list of names.
         
         Or an html hex string in the form "#RRGGBB". (An alpha here is silently ignored.)
@@ -57,7 +57,7 @@ def process_color(color=None, opacity=None):
         
     'opacity':
         An scalar like the numbers for 'color'.'opacity' overides alpha
-        if alpha provided in 'color'.
+        if alpha is provided in 'color'.
                 
 """
     
@@ -67,12 +67,28 @@ def process_color(color=None, opacity=None):
     if color is not None:
         if isinstance(color, str):
             if color[0] == "#":
+                # allow #RRGGBB hex colors
                 color = colors.hex2color(color)
             else:
-                color = mpl_colors[color]
+                # use matplotlib's color library
+                if color in mpl_colors:
+                    color = mpl_colors[color]
+                else:
+                    # If not in mpl's library try to correct user input and try again
+                    corrected = color.lower().replace("_", " ")
+                    if corrected in mpl_colors:
+                        print("Auto-correcting color {!r} to {!r}.\nMatplotlib colors are all lowercase and use spaces instead of underscores.".format(color, corrected))
+                        color = mpl_colors[corrected]
+                        
+                    else:
+                        # If still not found then cancel the whole operation (including opacity)
+                        print("Color {!r} not found. Skipping color assignment. See vtkplotlib.colors.mpl_colors.keys() for a list of available colors.".format(color))
+                        return None, None
+
 
         color = np.asarray(color)
         if color.dtype == int and color.max() > 1:
+            # convert 0 <= x < 256 colors to 0 <= x <= 1 
             color = color / 255.
             if opacity is not None:
                 opacity /= 255
@@ -94,6 +110,13 @@ def process_color(color=None, opacity=None):
 
 
 
-
 if __name__ == "__main__":
-    pass
+    for args in [((.3, .4, .6), .2),
+                 ([5, 8, 10], None),
+                 ("red", ),
+                 ("orange red", .5),
+                 ("Orange_Red", ),
+                 ("or33ange_rEd", ),
+                 ]:
+        print("process_color", args, "->", process_color(*args), "\n")
+    

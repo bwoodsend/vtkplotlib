@@ -23,6 +23,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from builtins import super
 
 import vtk
 import numpy as np
@@ -47,7 +48,7 @@ class Text(BasePlot):
     def __init__(self, text_str, position=(0, 0), fontsize=18,
                  color=(1, 1, 1), opacity=None, fig="gcf"):
         # create a text actor
-        super(Text, self).__init__(fig)
+        super().__init__(fig)
         
         self.actor = vtk.vtkTextActor()
         self.actor.SetInput(text_str)

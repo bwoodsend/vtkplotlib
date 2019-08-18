@@ -23,6 +23,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from builtins import super
 
 import vtk
 import numpy as np
@@ -42,7 +43,7 @@ from vtkplotlib.plots.BasePlot import BasePlot
 class ScalarBar(BasePlot):
     def __init__(self, plot, title="", fig="gcf"):
     
-        super(ScalarBar, self).__init__(fig)
+        super().__init__(fig)
         
         self.actor = vtk.vtkScalarBarActor()
         self.actor.SetTitle(title)

@@ -21,7 +21,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-
+from builtins import super
 
 import numpy as np
 import matplotlib.pylab as plt
@@ -36,7 +36,7 @@ from .figure_manager import reset_camera, scf, gcf
 
 class BaseFigure(VTKRenderer):
     def __init__(self, window=None, window_interactor=None):    
-        super(BaseFigure, self).__init__(window, window_interactor)
+        super().__init__(window, window_interactor)
         scf(self)
         
         self.plots = set()
@@ -86,6 +86,17 @@ class BaseFigure(VTKRenderer):
     def __isub__(self, plot):
         self.remove_plot(plot)
         return self
+
+    @property
+    def render_size(self):
+        """Get the render image size (width, height) in pixels. Note that if the
+        figure is a QtFigure then the setter will be constantly overridden by 
+        the parent widget's resizing."""
+        return self.renWin.GetSize()
+    
+    @render_size.setter
+    def render_size(self, size):
+        self.renWin.SetSize(*size)
 
 
 
