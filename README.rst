@@ -30,8 +30,12 @@ Requirements for installing:
  - `pathlib2`_
  - `matplotlib`_
  - `vtk`_
+ - `future`_
 
- 
+There is no VTK version for Windows users with python 2.7 on PyPi. But you can
+get a .whl from `here <https://www.lfd.uci.edu/~gohlke/pythonlibs/#vtk>`_.
+
+
  
 Installation:
 ------------------------------------------------------------------------------
@@ -55,6 +59,7 @@ Some features require you to install the following:
 .. _vtk: https://pypi.org/project/vtk/
 .. _PyQt5: https://pypi.org/project/PyQt5/
 .. _numpy-stl: https://pypi.org/project/numpy-stl/
+.. _future: https://pypi.org/project/future/
 
 
 
