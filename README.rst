@@ -12,6 +12,7 @@ Welcome to vtkplotlib's documentation!
        :caption: Contents:
 
 
+.. image:: https://github.com/bwoodsend/vtkplotlib/tree/master/docs/source/python_versions.svg
 
 
 A simple library to make 3D graphics using VTK easy. VTK is a very versatile 
