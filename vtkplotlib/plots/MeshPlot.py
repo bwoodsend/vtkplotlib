@@ -108,6 +108,55 @@ MESH_DATA_TYPE_EX = lambda msg :ValueError("Invalid mesh_data type\n{}\n{}"\
                                            .format(MESH_DATA_TYPE, msg))
 
 
+
+
+def normalise_mesh_type(mesh_data):
+    """Try to support as many of the mesh libraries out there as possible
+    without having all of those libraries as dependencies.
+    """
+
+    if isinstance(mesh_data, tuple) and len(mesh_data) == 2:
+        vertices, args = mesh_data
+        if not isinstance(vertices, np.ndarray):
+            raise MESH_DATA_TYPE_EX("First argument is of invalid type {}"\
+                                    .format(type(vertices)))
+            
+        if vertices.shape[1:] != (3,):
+            raise MESH_DATA_TYPE_EX("First argument has invalid shape {}. Should be (..., 3)."\
+                             .format(vertices.shape))
+            
+        if not isinstance(args, np.ndarray):
+            raise MESH_DATA_TYPE_EX("Second argument is of invalid type {}"\
+                                    .format(type(args)))
+            
+        if args.shape[1:] != (3,):
+            raise MESH_DATA_TYPE_EX("Second argument has invalid shape {}. Should be (n, 3)."\
+                             .format(args.shape))
+            
+        if args.dtype != int:
+            raise MESH_DATA_TYPE_EX("Second argument must be an int dtype array")
+            
+        vectors = vertices[args]
+
+    
+    else:
+        if isinstance(mesh_data, np.ndarray):
+            vectors = mesh_data
+            
+        elif hasattr(mesh_data, "vectors"):
+            vectors = mesh_data.vectors
+            if vectors.shape[1:] != (3, 3):
+                vectors = vectors[:, :3, :3]
+            
+        else:
+            raise MESH_DATA_TYPE_EX("")
+        
+        if vectors.shape[1:] != (3, 3):
+            raise MESH_DATA_TYPE_EX("mesh_data is invalid shape {}".format(vectors.shape))
+
+    return vectors
+
+
 class MeshPlot(ConstructedPlot):
     """Plot an STL (like) surface composed of lots of little triangles. Accepts
     mesh types from various 3rd party libraries. This was primarily written for
@@ -117,49 +166,8 @@ class MeshPlot(ConstructedPlot):
     def __init__(self, mesh_data, tri_scalars=None, scalars=None, color=None, opacity=None, fig="gcf"):
         super().__init__(fig)
         
-        # Try to support as many of the mesh libraries out there as possible
-        # without having all of those libraries as dependencies
-
-        if isinstance(mesh_data, tuple) and len(mesh_data) == 2:
-            vertices, args = mesh_data
-            if not isinstance(vertices, np.ndarray):
-                raise MESH_DATA_TYPE_EX("First argument is of invalid type {}"\
-                                        .format(type(vertices)))
-                
-            if vertices.shape[1:] != (3,):
-                raise MESH_DATA_TYPE_EX("First argument has invalid shape {}. Should be (..., 3)."\
-                                 .format(vertices.shape))
-                
-            if not isinstance(args, np.ndarray):
-                raise MESH_DATA_TYPE_EX("Second argument is of invalid type {}"\
-                                        .format(type(args)))
-                
-            if args.shape[1:] != (3,):
-                raise MESH_DATA_TYPE_EX("Second argument has invalid shape {}. Should be (n, 3)."\
-                                 .format(args.shape))
-                
-            if args.dtype != int:
-                raise MESH_DATA_TYPE_EX("Second argument must be an int dtype array")
-                
-            self.vectors = vertices[args]
-
-        
-        else:
-            if isinstance(mesh_data, np.ndarray):
-                self.vectors = mesh_data
-                
-            elif hasattr(mesh_data, "vectors"):
-                self.vectors = mesh_data.vectors
-                if self.vectors.shape[1:] != (3, 3):
-                    self.vectors = self.vectors[:, :3, :3]
-                
-            else:
-                raise MESH_DATA_TYPE_EX("")
             
-            if self.vectors.shape[1:] != (3, 3):
-                raise MESH_DATA_TYPE_EX("mesh_data is invalid shape {}".format(self.vectors.shape))
-            
-        self.vectors = numpy_vtk.contiguous_safe(self.vectors)
+        self.vectors = numpy_vtk.contiguous_safe(normalise_mesh_type(mesh_data))
             
         triangles = np.empty((len(self.vectors), 4), np.int64)
         triangles[:, 0] = 3
@@ -239,38 +247,52 @@ class MeshPlot(ConstructedPlot):
             self.mapper.SetScalarRange(min, max)
             
     
-     
+def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", opacity=None, fig="gcf"):
     
+    vectors = normalise_mesh_type(mesh_data)
+    tri_centres = np.mean(vectors, 1)
+
+    new_vectors = np.empty((len(vectors) * 3, 3, 3), vectors.dtype)
+#    new_vectors.fill(np.nan)
+
+    for i in range(3):
+        for j in range(2):
+            new_vectors[i::3, j % 3] = vectors[:, (i+j) % 3]
+            
+        new_vectors[i::3, 2 % 3] = tri_centres
+        
+    tri_scalars = edge_scalars.ravel()
+    if centre_scalar == "mean":
+        centre_scalars = np.mean(edge_scalars, 1)
+    else:
+        centre_scalars = centre_scalar
+#    
+    new_scalars = np.empty((len(tri_scalars), 3), dtype=tri_scalars.dtype)
+    new_scalars[:, 0] = new_scalars[:, 1] = tri_scalars
+    for i in range(3):
+        new_scalars[i::3, 2] = centre_scalars
+    
+    return MeshPlot(new_vectors, scalars=new_scalars, opacity=opacity, fig=fig)
 
 
 if __name__ == "__main__":
     import time
     import vtkplotlib as vpl
     from stl.mesh import Mesh
-    
-    
+    import geometry as geom
     
     fig = vpl.gcf()
     
     path = vpl.data.get_rabbit_stl()
     _mesh = Mesh.from_file(path)
     
-    self = vpl.mesh_plot(_mesh.vectors)
+#    self = _mesh#vpl.mesh_plot(_mesh.vectors)
     
-
-    fig.show(False)
+    edge_scalars = geom.distance(_mesh.vectors[:, np.arange(1, 4) % 3] - _mesh.vectors)
     
-    t0 = time.perf_counter()
-    for i in range(100):
-#        self.color = np.random.random(3)
-#        print(self.color)
-        self.set_tri_scalars((_mesh.x[:, 0] + 3 * i) % 20 )
-        _mesh.rotate(np.ones(3), .1, np.mean(_mesh.vectors, (0, 1)))
-        fig.update()
-        self.update_points()
-#        time.sleep(.01)
-        if (time.perf_counter() - t0) > 2:
-            break
+    self = vpl.mesh_plot_with_edge_scalars(_mesh, edge_scalars)
+    
+    mesh_data = _mesh
     
     
     fig.show()

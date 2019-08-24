@@ -50,6 +50,15 @@ class BaseFigure(VTKRenderer):
 
     
     def show(self, block=True):
+        # Try and force the console to finish displaying any preceeding print
+        # statements before VTK start is called and blocks everything. With 
+        # limited success.
+        print(end="", flush=True)
+        sys.stdout.flush()
+        for attr in ("buffer", "_buffer"):
+            if hasattr(sys.stdout, attr):
+                getattr(sys.stdout, attr).flush()
+
         if self.has_been_shown:
             print(self, "has already been shown")
             return

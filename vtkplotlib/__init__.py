@@ -44,7 +44,7 @@ if PyQt5_AVAILABLE:
 
 from .plots.Arrow import arrow, quiver
 from .plots.Lines import Lines as plot
-from .plots.MeshPlot import MeshPlot as mesh_plot
+from .plots.MeshPlot import MeshPlot as mesh_plot, mesh_plot_with_edge_scalars
 from .plots.Polygon import Polygon as polygon
 from .plots.ScalarBar import ScalarBar as scalar_bar
 from .plots.Scatter import scatter, Cursor as cursor
