@@ -21,6 +21,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+from __future__ import print_function
 from builtins import super
 
 import numpy as np
@@ -51,9 +52,13 @@ class BaseFigure(VTKRenderer):
     
     def show(self, block=True):
         # Try and force the console to finish displaying any preceeding print
-        # statements before VTK start is called and blocks everything. With 
+        # statements before VTK start is called and blocks everything. Rather 
         # limited success.
-        print(end="", flush=True)
+        try:
+            # python 2 doesn't have flush
+            print(end="", flush=True)
+        except TypeError:
+            pass
         sys.stdout.flush()
         for attr in ("buffer", "_buffer"):
             if hasattr(sys.stdout, attr):

@@ -40,43 +40,30 @@ from vtk.util.numpy_support import (
 
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot, _iter_colors, _iter_points, _iter_scalar
-from vtkplotlib import geometry as geom, numpy_vtk
+from vtkplotlib import nuts_and_bolts, numpy_vtk
 
 
 
 
 class Polygon(ConstructedPlot):
-    """Creates a filled polygon with 'vertices' as it's corners."""
+    """Creates a filled polygon with 'vertices' as it's corners. For a 3
+    dimensional `vertices` array, each 2d array within vertices is a polygon.
+    """
     def __init__(self, vertices, color=None, opacity=None, fig="gcf"):
         super().__init__(fig)
     
-        polygon = self.poly_data
+        # The implementation of this is actually exactly the same as Lines plot
+        # but sets args to polydata.polygons rather than polydata.lines
+        shape = vertices.shape[:-1]
+        points = numpy_vtk.contiguous_safe(nuts_and_bolts.flatten_all_but_last(vertices))
+        self.temp.append(points)
         
-        vertices = numpy_vtk.contiguous_safe(vertices)
-        self.temp.append(vertices)
+        args = nuts_and_bolts.flatten_all_but_last(np.arange(np.prod(shape)).reshape(shape))
         
-        points = vtk.vtkPoints()
-        points.SetData(numpy_to_vtk(vertices))        
-        polygon.SetPoints(points)
+        self.polydata.points = points
+        self.polydata.polygons = args
+            
         
-        
-        # vtkCellArray is a supporting object that explicitly represents cell connectivity.
-        # The cell array structure is a raw integer list of the form:
-        # (n,id1,id2,...,idn, n,id1,id2,...,idn, ...) where n is the number of points in
-        # the cell, and id is a zero-offset index into an associated point list.
-        
-        point_args = np.empty(1 + len(vertices), np.int64)
-        point_args[0] = len(vertices)
-        point_args[1: 1+len(vertices)] = np.arange(len(vertices))
-        polys = vtk.vtkCellArray()
-        polys.SetCells(1, numpy_to_vtkIdTypeArray(point_args.ravel()))
-        
-        lines = vtk.vtkCellArray()
-        lines.SetCells(len(point_args), numpy_to_vtkIdTypeArray(point_args.ravel()))
-        
-        
-        polygon.SetPolys(polys)
-        polygon.SetLines(lines)
         
         
         self.add_to_plot()

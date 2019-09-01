@@ -27,10 +27,6 @@ from builtins import super
 
 import vtk
 import numpy as np
-#from matplotlib import pylab as plt
-from matplotlib import colors
-import os
-import sys
 from pathlib2 import Path
 from vtk.util.numpy_support import (
                                     numpy_to_vtk,
@@ -103,10 +99,86 @@ support.
         
 """
 
+try:
+    from stl.mesh import Mesh as NumpyMesh
+    NUMPY_STL_AVAILABLE = True
+except ImportError:
+    NumpyMesh = None
+    NUMPY_STL_AVAILABLE = False
+
 
 MESH_DATA_TYPE_EX = lambda msg :ValueError("Invalid mesh_data type\n{}\n{}"\
                                            .format(MESH_DATA_TYPE, msg))
 
+
+def path_str_to_vectors(path, ignore_numpystl=False):
+    
+    # Ideally let numpy-stl open the file if it is installed.
+    if NUMPY_STL_AVAILABLE and not ignore_numpystl:
+        return NumpyMesh.from_file(path).vectors
+    
+    # Otherwise try vtk's STL reader - however it's far from flawless.
+    
+    # A lot of reduncy here. 
+    # -Read the STL using vtk's STLReader
+    # -Extract the polydata
+    # -Extract the vectors from the polydata
+    # This can then be given to mesh_plot which will convert it straight
+    # back again to a polydata.
+
+    from vtkplotlib.plots.polydata import PolyData
+    from vtkplotlib.unicode_paths import PathHandler
+    from vtkplotlib.vtk_errors import handler
+    
+    global path_handler
+    with PathHandler(path) as path_handler:
+        reader = vtk.vtkSTLReader()
+        handler.attach(reader)
+        reader.SetFileName(path_handler.access_path)
+        
+        # vtk does a really good job of point merging but it's really not 
+        # worth the hassle to use it just to save a bt of RAM as everything
+        # else in this script assumes an (n, 3, 3) table of vectors. Disable it
+        # for speed.
+    #        reader.SetMerging(False)
+        
+        # Normally Reader doesn't do any reading until it's been plotted.
+        # Update forces it to read.
+        reader.Update()
+        pd = PolyData(reader.GetOutput())
+    
+    # For some reason VTK just doesn't like some files. There are some vague
+    # warnings in their docs - this could be what they are on about. If it
+    # doesn't work `reader.GetOutput()` gives an empty polydata.
+    if pd.vtk_polydata.GetNumberOfPoints() == 0:
+        raise RuntimeError("VTK's STLReader failed to read the STL file and no STL io backend is installed. VTK's STLReader is rather patchy. To read this file please `pip install numpy-stl` first.")
+        
+    return normalise_mesh_type((pd.points, pd.polygons))
+    
+
+
+def vertices_args_pair_to_vectors(mesh_data):
+    vertices, args = mesh_data
+    if not isinstance(vertices, np.ndarray):
+        raise MESH_DATA_TYPE_EX("First argument is of invalid type {}"\
+                                .format(type(vertices)))
+        
+    if vertices.shape[1:] != (3,):
+        raise MESH_DATA_TYPE_EX("First argument has invalid shape {}. Should be (..., 3)."\
+                         .format(vertices.shape))
+        
+    if not isinstance(args, np.ndarray):
+        raise MESH_DATA_TYPE_EX("Second argument is of invalid type {}"\
+                                .format(type(args)))
+        
+    if args.shape[1:] != (3,):
+        raise MESH_DATA_TYPE_EX("Second argument has invalid shape {}. Should be (n, 3)."\
+                         .format(args.shape))
+        
+    if args.dtype.kind not in "iu":
+        raise MESH_DATA_TYPE_EX("Second argument must be an int dtype array")
+        
+    return vertices[args]
 
 
 
@@ -114,30 +186,13 @@ def normalise_mesh_type(mesh_data):
     """Try to support as many of the mesh libraries out there as possible
     without having all of those libraries as dependencies.
     """
+    if isinstance(mesh_data, Path):
+        mesh_data = str(mesh_data)
+    if isinstance(mesh_data, str):
+        vectors = path_str_to_vectors(mesh_data)
 
-    if isinstance(mesh_data, tuple) and len(mesh_data) == 2:
-        vertices, args = mesh_data
-        if not isinstance(vertices, np.ndarray):
-            raise MESH_DATA_TYPE_EX("First argument is of invalid type {}"\
-                                    .format(type(vertices)))
-            
-        if vertices.shape[1:] != (3,):
-            raise MESH_DATA_TYPE_EX("First argument has invalid shape {}. Should be (..., 3)."\
-                             .format(vertices.shape))
-            
-        if not isinstance(args, np.ndarray):
-            raise MESH_DATA_TYPE_EX("Second argument is of invalid type {}"\
-                                    .format(type(args)))
-            
-        if args.shape[1:] != (3,):
-            raise MESH_DATA_TYPE_EX("Second argument has invalid shape {}. Should be (n, 3)."\
-                             .format(args.shape))
-            
-        if args.dtype != int:
-            raise MESH_DATA_TYPE_EX("Second argument must be an int dtype array")
-            
-        vectors = vertices[args]
-
+    elif isinstance(mesh_data, tuple) and len(mesh_data) == 2:
+        vectors = vertices_args_pair_to_vectors(mesh_data)
     
     else:
         if isinstance(mesh_data, np.ndarray):
@@ -167,7 +222,7 @@ class MeshPlot(ConstructedPlot):
         super().__init__(fig)
         
             
-        self.vectors = numpy_vtk.contiguous_safe(normalise_mesh_type(mesh_data))
+        self.vectors = np.ascontiguousarray(normalise_mesh_type(mesh_data))
             
         triangles = np.empty((len(self.vectors), 4), np.int64)
         triangles[:, 0] = 3
@@ -179,11 +234,11 @@ class MeshPlot(ConstructedPlot):
         points = self.points = vtk.vtkPoints()
         self.update_points()
 
-        self.poly_data.SetPoints(points)
+        self.polydata.vtk_polydata.SetPoints(points)
         
         cells = vtk.vtkCellArray()
         cells.SetCells(len(triangles), numpy_to_vtkIdTypeArray(triangles))
-        self.poly_data.SetPolys(cells)
+        self.polydata.vtk_polydata.SetPolys(cells)
         
         self.add_to_plot()
         
@@ -236,10 +291,10 @@ class MeshPlot(ConstructedPlot):
     #        scalars[~np.isfinite(scalars)] = np.nanmean(scalars)
             if scalars.shape != (len(self.vectors), 3):
                 raise ValueError("Expected (n, 3) shape array. Got {}".format(scalars.shape))
-            
+
             scalars = numpy_vtk.contiguous_safe(scalars)
     
-            self.poly_data.GetPointData().SetScalars(numpy_to_vtk(scalars.ravel()))
+            self.polydata.vtk_polydata.GetPointData().SetScalars(numpy_to_vtk(scalars.ravel()))
             self.temp.append(scalars)
             
             min = min or np.nanmin(scalars)
@@ -279,18 +334,21 @@ if __name__ == "__main__":
     import time
     import vtkplotlib as vpl
     from stl.mesh import Mesh
-    import geometry as geom
     
     fig = vpl.gcf()
     
     path = vpl.data.get_rabbit_stl()
+#    path = "rabbit2.stl"
     _mesh = Mesh.from_file(path)
     
-#    self = _mesh#vpl.mesh_plot(_mesh.vectors)
+    mesh_data = _mesh.vectors
+    mesh_data = path
+
+#    vpl.mesh_plot(mesh_data)
     
-    edge_scalars = geom.distance(_mesh.vectors[:, np.arange(1, 4) % 3] - _mesh.vectors)
+    edge_scalars = vpl.geometry.distance(_mesh.vectors[:, np.arange(1, 4) % 3] - _mesh.vectors)
     
-    self = vpl.mesh_plot_with_edge_scalars(_mesh, edge_scalars)
+    self = vpl.mesh_plot_with_edge_scalars(_mesh, edge_scalars, centre_scalar=0)
     
     mesh_data = _mesh
     

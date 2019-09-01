@@ -35,7 +35,7 @@ from pathlib2 import Path
 from vtkplotlib.figures import gcf
 from vtkplotlib.colors import process_color
 from vtkplotlib import nuts_and_bolts
-
+from vtkplotlib.plots.polydata import PolyData
 
 
 
@@ -50,14 +50,14 @@ class BasePlot(object):
           fig = gcf()
         self.fig = fig
         self.temp = []
-        
-        
-    def add_to_plot(self):
+
         self.mapper = vtk.vtkPolyDataMapper()
         
         self.actor = vtk.vtkActor()
-        self.actor.SetMapper(self.mapper)
         
+        
+    def add_to_plot(self):
+        self.actor.SetMapper(self.mapper)
         
         self.property = self.actor.GetProperty()
         if self.fig is not None:
@@ -127,11 +127,18 @@ class ConstructedPlot(BasePlot):
     """
     def __init__(self, fig="gcf"):
         super().__init__(fig)
-        self.poly_data = vtk.vtkPolyData()
+        self.polydata = PolyData()
         
     def add_to_plot(self):
         super().add_to_plot()
-        self.mapper.SetInputData(self.poly_data)
+        if vtk.VTK_MAJOR_VERSION <= 5:
+            self.mapper.SetInput(self.polydata.vtk_polydata)
+        else:
+            self.mapper.SetInputData(self.polydata.vtk_polydata)
+
+        scalars = self.polydata.point_scalars
+        if scalars is not None:
+            self.mapper.SetScalarRange(np.nanmin(scalars), np.nanmin(scalars.max()))
         
     
     

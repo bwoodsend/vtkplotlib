@@ -213,13 +213,14 @@ def save_fig(path, magnifigation=1, pixels=None, fig="gcf"):
             
         magnifigation:
             An int or a (width, height) tuple of ints.
-            Set the image dimensions relative to the size of the render.
+            Set the image dimensions relative to the size of the render (window).
 
             
         pixels:
             An int or a (width, height) tuple of ints.
             Set the image dimensions in pixels. If only one dimension is given
-            then it is the height and an aspect ration of 16:9 is used.
+            then it is the height and an aspect ration of 16:9 is used. Overides
+            `magnification` if given.
             
             
         Note that VTK can only work with integer multiples of the render size
@@ -261,18 +262,21 @@ def save_fig(path, magnifigation=1, pixels=None, fig="gcf"):
         w2if.SetMagnification(magnifigation[0])
     w2if.Update()
 
-    old_path = Path.cwd()
-    os.chdir(str(path.parent))
-    if path.suffix.lower() in (".jpg", ".jpeg"):
-        writer = vtk.vtkJPEGWriter()
-    elif path.suffix.lower() == ".png":
-        writer = vtk.vtkPNGWriter()
-    else:
-        raise NotImplementedError(path.suffix + " is not supported")
-    writer.SetFileName(path.name)
-    writer.SetInputConnection(w2if.GetOutputPort())
-    writer.Write()
-    os.chdir(str(old_path))
+    from vtkplotlib.unicode_paths import PathHandler
+    
+    with PathHandler(path, "w") as path_handler:
+
+#        if path.suffix.lower() in (".jpg", ".jpeg"):
+#            writer = vtk.vtkJPEGWriter()
+#        elif path.suffix.lower() == ".png":
+#            writer = vtk.vtkPNGWriter()
+#        else:
+#            raise NotImplementedError(path.suffix + " is not supported")
+        writer = vtk.vtkImageWriter()
+            
+        writer.SetFileName(path_handler.access_path)
+        writer.SetInputConnection(w2if.GetOutputPort())
+        writer.Write()
 
 
 

@@ -135,6 +135,19 @@ class TestPlots(TestCase):
         arrow, text = vpl.annotate(point, "A ball", np.array([0, 0, 1]))
         
         vpl.show()
+        
+    
+    def test_surface(self):
+        thi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 100),
+                         np.linspace(0, np.pi, 50))
+
+
+        x = np.cos(thi) * np.sin(theta)
+        y = np.sin(thi) * np.sin(theta)
+        z = np.cos(theta)
+        
+        vpl.Surface(x, y, z, color="g")
+        vpl.show()
 
 
 

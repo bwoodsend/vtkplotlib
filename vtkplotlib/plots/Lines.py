@@ -39,7 +39,8 @@ from vtk.util.numpy_support import (
 
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot, _iter_colors, _iter_points, _iter_scalar
-from vtkplotlib import geometry as geom, numpy_vtk
+from vtkplotlib import numpy_vtk, nuts_and_bolts
+from vtkplotlib.plots.polydata import join_line_ends
 
 
 
@@ -49,39 +50,21 @@ class Lines(ConstructedPlot):
     def __init__(self, vertices, color=None, opacity=None, line_width=1.0, join_ends=False, fig="gcf"):
         super().__init__(fig)
         
-        vertices = numpy_vtk.contiguous_safe(vertices)
-        self.temp.append(vertices)
         
-        points = vtk.vtkPoints()
-        points.SetData(numpy_to_vtk(vertices))
+        shape = vertices.shape[:-1]
+        points = numpy_vtk.contiguous_safe(nuts_and_bolts.flatten_all_but_last(vertices))
+        self.temp.append(points)
         
-        # vtkCellArray is a supporting object that explicitly represents cell connectivity.
-        # The cell array structure is a raw integer list of the form:
-        # (n,id1,id2,...,idn, n,id1,id2,...,idn, ...) where n is the number of points in
-        # the cell, and id is a zero-offset index into an associated point list.
+        args = nuts_and_bolts.flatten_all_but_last(np.arange(np.prod(shape)).reshape(shape))
         
-        point_args = np.empty(1 + len(vertices) + join_ends, np.int64)
-        point_args[0] = len(vertices) + join_ends
-        point_args[1: 1+len(vertices)] = np.arange(len(vertices))
+        self.polydata.points = points
         if join_ends:
-            point_args[-1] = 0
-        lines = vtk.vtkCellArray()
-        lines.SetCells(len(point_args), numpy_to_vtkIdTypeArray(point_args.ravel()))
+            self.polydata.lines = join_line_ends(args)
+        else:
+            self.polydata.lines = args
         
+#        assert np.array_equal(points[args], vertices)
         
-        # vtkPolyData is a data object that is a concrete implementation of vtkDataSet.
-        # vtkPolyData represents a geometric structure consisting of vertices, lines,
-        # polygons, and/or triangle strips
-        polygon = self.poly_data
-        polygon.SetPoints(points)
-        polygon.SetLines(lines)
-        
-        
-        # Create an actor to represent the polygon. The actor orchestrates rendering of
-        # the mapper's graphics primitives. An actor also refers to properties via a
-        # vtkProperty instance, and includes an internal transformation matrix. We
-        # set this actor's mapper to be polygonMapper which we created above.
-        self.actor = vtk.vtkActor()
         
         self.add_to_plot()
         
@@ -92,17 +75,23 @@ class Lines(ConstructedPlot):
 
 
 
-
-
 if __name__ == "__main__":
     import vtkplotlib as vpl
     
     t = np.arange(0, 1, .001) * 2 * np.pi
-    points = np.array([np.cos(2 * t),
-                       np.sin(3 * t),
-                       np.cos(5 * t) * np.sin(7 *t)]).T
+    vertices = np.array([np.cos(2 * t),
+                         np.sin(3 * t),
+                         np.cos(5 * t) * np.sin(7 *t)]).T
+    vertices = np.array([vertices, vertices + 2])
+    
+    t = np.arange(0, 1, .125) * 2 * np.pi
+    vertices = np.array([np.cos(t), np.sin(t), np.zeros_like(t)]).T
     
 #    vertices = np.random.uniform(-30, 30, (3, 3))
-    self = vpl.plot(points, color="green", line_width=3, join_ends=True)
-    
+    self = vpl.plot(vertices, color="green", line_width=6, join_ends=True)
+#    self.polydata.point_scalars = vpl.geometry.distance(vertices)
+    self.polydata.point_scalars = t
+    fig = vpl.gcf()
+    fig.background_color = "grey"
+    self.add_to_plot()
     vpl.show()

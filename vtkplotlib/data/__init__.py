@@ -24,7 +24,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 import numpy as np
-import matplotlib.pylab as plt
 import sys
 import os
 from pathlib2 import Path
@@ -36,10 +35,13 @@ DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")) / "data"
 
 STL_FOLDER = DATA_FOLDER / "models"
 
-def get_rabbit_stl():
+def get_rabbit_stl(two=sys.platform=="win32"):
     folder = STL_FOLDER
     print("This is not my rabbit file. See README.txt and LICENSE.txt in\n{}\nfor details.".format(folder))
-    return str(folder / "rabbit.stl")
+    if two:
+        return str(folder / "rabbit2.stl")
+    else:
+        return str(folder / "rabbit.stl")
 
 ICONS_FOLDER = DATA_FOLDER / "icons"
 
