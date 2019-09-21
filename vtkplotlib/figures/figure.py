@@ -39,29 +39,34 @@ from .BaseFigure import BaseFigure
 class Figure(BaseFigure):
     """The default figure class."""
     def __init__(self, name="vtk figure"):
-        
-        super().__init__(vtk.vtkRenderWindow(), vtk.vtkRenderWindowInteractor())
+
+        super().__init__()
         self.window_name = name
-        
-        
+
+    def show(self, block=True):
+        super().show(block)
+        if block:
+            self.finalise()
+
+
 
 
 
 if __name__ == "__main__":
     import vtkplotlib as vpl
-    
+
     self = vpl.figure("a normal vtk figure")
-        
-        
+
+
 #    vpl.plot(np.random.uniform(-10, 10, (20, 3)))
-        
+
     direction = np.array([1, 0, 0])
     vpl.quiver(np.array([0, 0, 0]), direction)
     vpl.view(camera_direction=direction)
     vpl.reset_camera()
-    
+
 #    vpl.save_fig(Path.home() / "img.jpg", 1080)
-    
+
     self.show()
-    
-    
+
+

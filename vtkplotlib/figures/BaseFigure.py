@@ -36,23 +36,23 @@ from .figure_manager import reset_camera, scf, gcf
 
 
 class BaseFigure(VTKRenderer):
-    def __init__(self, window=None, window_interactor=None):    
-        super().__init__(window, window_interactor)
+    def __init__(self):
+        super().__init__()
         scf(self)
-        
+
         self.plots = set()
 
-        
+
     _reset_camera = True
-    has_been_shown = False
+#    has_been_shown = False
 
     def reset_camera(self):
         return reset_camera(self)
 
-    
+
     def show(self, block=True):
         # Try and force the console to finish displaying any preceeding print
-        # statements before VTK start is called and blocks everything. Rather 
+        # statements before VTK start is called and blocks everything. Rather
         # limited success.
         try:
             # python 2 doesn't have flush
@@ -64,16 +64,16 @@ class BaseFigure(VTKRenderer):
             if hasattr(sys.stdout, attr):
                 getattr(sys.stdout, attr).flush()
 
-        if self.has_been_shown:
-            print(self, "has already been shown")
-            return
-        
+#        if self.has_been_shown:
+#            print(self, "has already been shown")
+#            return
+
         self.start(block, self._reset_camera)
 
         if block and gcf() is self:
             scf(None)
-            self.has_been_shown = True
-            
+#            self.has_been_shown = True
+
 
     def add_plot(self, plot):
         if isinstance(plot, np.ndarray) and plot.dtype == object:
@@ -83,7 +83,7 @@ class BaseFigure(VTKRenderer):
             self._add_actor(plot.actor)
             self.plots.add(plot)
 
-        
+
     def remove_plot(self, plot):
         if isinstance(plot, np.ndarray) and plot.dtype == object:
             [self.remove_plot(i) for i in plot.flat]
@@ -96,7 +96,7 @@ class BaseFigure(VTKRenderer):
     def __iadd__(self, plot):
         self.add_plot(plot)
         return self
-        
+
     def __isub__(self, plot):
         self.remove_plot(plot)
         return self
@@ -104,16 +104,17 @@ class BaseFigure(VTKRenderer):
     @property
     def render_size(self):
         """Get the render image size (width, height) in pixels. Note that if the
-        figure is a QtFigure then the setter will be constantly overridden by 
+        figure is a QtFigure then the setter will be constantly overridden by
         the parent widget's resizing."""
         return self.renWin.GetSize()
-    
+
     @render_size.setter
     def render_size(self, size):
         self.renWin.SetSize(*size)
 
 
-
+    def update(self):
+        self.show(False)
 
 
 

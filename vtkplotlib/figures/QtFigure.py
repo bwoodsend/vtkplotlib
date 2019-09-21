@@ -27,45 +27,69 @@ import numpy as np
 import sys
 import os
 from pathlib2 import Path
-
+import vtk
 
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from vtkplotlib.figures.BaseFigure import BaseFigure, VTKRenderer
+from vtkplotlib import nuts_and_bolts
 
-from .BaseFigure import BaseFigure
-from .render_window import VTKRenderer
 
-
-class QtFigure(BaseFigure, QWidget):
+class QtFigure(QWidget, BaseFigure):
     """The vtk render window embedded into a QWidget. This can be embedded into
     a GUI the same way all other QWidgets are used.
     """
 
     def __init__(self, name="qt vtk figure", parent=None):
-        
+
         self.qapp = QApplication.instance() or QApplication(sys.argv)
         QWidget.__init__(self, parent)
 
+        self.window_name = name
 
         self.vl = QVBoxLayout()
         self.vtkWidget = QVTKRenderWindowInteractor(self)
         self.vl.addWidget(self.vtkWidget)
-        BaseFigure.__init__(self,
-                            self.vtkWidget.GetRenderWindow(),
-                            self.vtkWidget.GetRenderWindow().GetInteractor())
+        self.renWin
+        iren = self.iren
+
+
+        self.data_holder = []
+
+        BaseFigure.__init__(self)
+        iren.SetInteractorStyle(vtk.vtkInteractorStyleTrackballCamera())
+
 
         self.setLayout(self.vl)
-        
-        self.window_name = name
-        
 
-    def show(self, block=False):
+
+
+    def show(self, block=None):
         QWidget.show(self)
+        if block is None:
+            block = self.parent() is None
         BaseFigure.show(self, block)
         self.setWindowTitle(self.window_name)
-        
+
         if block:
             self.qapp.exec_()
+
+
+    @nuts_and_bolts.init_when_called
+    def renWin(self):
+        return self.vtkWidget.GetRenderWindow()
+
+    @nuts_and_bolts.init_when_called
+    def iren(self):
+        return self.vtkWidget.GetRenderWindow().GetInteractor()
+
+    def update(self):
+        BaseFigure.update(self)
+        QWidget.update(self)
+        self.repaint()
+        self.qapp.processEvents()
+
+
 
 
 
@@ -74,14 +98,10 @@ class QtFigure(BaseFigure, QWidget):
 if __name__ == "__main__":
     import vtkplotlib as vpl
 
-    app = None
-    app = QApplication([])
     self = vpl.QtFigure("a qt widget figure")
 
-    direction = np.array([1, 0, 0])
-    vpl.quiver(np.array([0, 0, 0]), direction)
-    vpl.view(camera_direction=direction)
-    vpl.reset_camera()
+    [self.render.AddActor(i.actor) for i in  vpl._quick_test_plot()]
+#    self.reset_camera()
+#    self.connect()
 
-    self.show()
-    app.exec_()
+    vpl.show(fig=self)

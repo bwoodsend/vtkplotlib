@@ -26,18 +26,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 from vtk.util.numpy_support import numpy_to_vtk
 
-try:
-    numpy_to_vtk(np.arange(4).reshape(2, 2).T)
-    ARRAYS_MUST_BE_CONTIGUOUS = False
-except:
-    ARRAYS_MUST_BE_CONTIGUOUS = True
-    
+# try:
+    # numpy_to_vtk(np.arange(4).reshape(2, 2).T)
+    # ARRAYS_MUST_BE_CONTIGUOUS = False
+# except:
+    # ARRAYS_MUST_BE_CONTIGUOUS = True
+
+ARRAYS_MUST_BE_CONTIGUOUS = True
 
 if ARRAYS_MUST_BE_CONTIGUOUS:
     contiguous_safe = np.ascontiguousarray
 else:
     contiguous_safe = lambda x:x
-    
+
 
 
 

@@ -31,8 +31,9 @@ from .figure_manager import (gcf,
                              set_auto_fig,
                              show,
                              save_fig,
+                             screenshot_fig,
                              close,
-                             reset_camera, 
+                             reset_camera,
                              view)
 
 try:

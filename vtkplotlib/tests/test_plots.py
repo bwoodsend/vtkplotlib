@@ -32,7 +32,7 @@ try:
     from stl.mesh import Mesh
 except ImportError:
     Mesh = None
-    
+
 
 
 class TestPlots(TestCase):
@@ -41,41 +41,41 @@ class TestPlots(TestCase):
         vpl.scatter(points)
         vpl.arrow(*points, color="g")
         vpl.show()
-        
-    
+
+
     def test_quiver(self):
         t = np.linspace(0, 2 * np.pi)
         points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
         grads = np.roll(points, 10)
-        
+
         arrows = vpl.quiver(points, grads, color=grads)
         self.assertEqual(arrows.shape, t.shape)
-        
+
         vpl.show()
-        
-    
+
+
     def test_plot(self):
         t = np.arange(0, 1, .1) * 2 * np.pi
         points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
         vpl.plot(points, color="r", line_width=3, join_ends=True)
-        
+
         vpl.show()
 
 
     @skipUnless(Mesh, "numpy-stl is not installed")
     def test_mesh(self):
         import time
-        
+
         fig = vpl.gcf()
-        
+
         path = vpl.data.get_rabbit_stl()
         _mesh = Mesh.from_file(path)
-        
+
         self = vpl.mesh_plot(_mesh.vectors)
-        
-    
+
+
         fig.show(False)
-        
+
         t0 = time.time()
         for i in range(100):
     #        self.color = np.random.random(3)
@@ -87,56 +87,56 @@ class TestPlots(TestCase):
     #        time.sleep(.01)
             if (time.time() - t0) > 1:
                 break
-        
-        
+
+
         fig.show()
-        
-        
+
+
     def test_polygon(self):
         t = np.arange(0, 1, .1) * 2 * np.pi
         points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
-        
+
         vpl.polygon(points, color="r")
-        
+
         vpl.show()
-    
-    
+
+
     @skipUnless(Mesh, "numpy-stl is not installed")
     def test_scalar_bar(self):
         mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
         plot = vpl.mesh_plot(mesh, scalars=mesh.x)
-    
+
         vpl.scalar_bar(plot)
-    
+
         vpl.show()
 
 
     def test_scatter(self):
         points = np.random.uniform(-10, 10, (30, 3))
-    
+
         vpl.scatter(points,
-                    color=points,
+                    color=vpl.colors.normalise(points),
                     radius=np.abs(points[:, 0]) ** .5,
                     use_cursors=False
                     )[0]
-            
+
         vpl.show()
-        
-        
+
+
     def test_text(self):
         vpl.text("text", (100, 100), color="g")
         vpl.show()
-        
+
 
     def test_annotate(self):
         point = np.array([1, 2, 3])
         vpl.scatter(point)
-        
+
         arrow, text = vpl.annotate(point, "A ball", np.array([0, 0, 1]))
-        
+
         vpl.show()
-        
-    
+
+
     def test_surface(self):
         thi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 100),
                          np.linspace(0, np.pi, 50))
@@ -145,14 +145,14 @@ class TestPlots(TestCase):
         x = np.cos(thi) * np.sin(theta)
         y = np.sin(thi) * np.sin(theta)
         z = np.cos(theta)
-        
+
         vpl.Surface(x, y, z, color="g")
         vpl.show()
 
 
 
 if __name__ == "__main__":
-    
+
     main()
-    
+
     self = TestPlots()

@@ -5,7 +5,7 @@ Created on Wed Jun 19 18:59:14 2019
 @author: Brénainn
 
 
-__init__.py 
+__init__.py
 Collects all the relevant parts and renames the classes to look like functions
 Copyright (C) 2019  Brénainn Woodsend
 
@@ -33,6 +33,7 @@ from .figures import (Figure as figure,
                       view,
                       reset_camera,
                       save_fig,
+                      screenshot_fig,
                       close,
                       PyQt5_AVAILABLE
                       )
@@ -40,7 +41,7 @@ from .figures import (Figure as figure,
 
 if PyQt5_AVAILABLE:
     from .figures import QtFigure, QtFigure2
-    
+
 
 from .plots.Arrow import arrow, quiver
 from .plots.Lines import Lines as plot
@@ -52,6 +53,13 @@ from .plots.Surface import Surface
 from .plots.Text import Text as text
 from .plots.Text3D import Text3D as text3d, annotate
 
+from .plots import BasePlot
+from .plots.polydata import PolyData
+
 from . import data
 
 color_bar = scalar_bar
+
+def _quick_test_plot():
+    import numpy as np
+    return scatter(np.random.uniform(-30, 30, (30, 3)), np.random.rand(30, 3))

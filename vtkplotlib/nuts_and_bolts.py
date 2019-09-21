@@ -66,22 +66,22 @@ def mask_and(mask, *masks):
 def set_element_0(s):
     for i in s:
         return i
-    
+
 def arg_array_inv(args, out_len=None, default=None):
     out_len = out_len or len(args)
     out = np.empty(out_len, args.dtype)
     if default is not None:
         out.fill(default)
-    
+
     out[args] = np.arange(len(args))
     return out
 
 
 def random_selection(lst, size=None):
     indices = np.random.randint(0, len(lst), size)
-    
+
     return np.asarray(lst)[indices]
-    
+
 def as_str(x):
     if isinstance(x, str):
         return x
@@ -98,6 +98,22 @@ def numpy_broadcastable(*arrs):
             return False
     return True
 
+
+def init_when_called(func):
+    attr = func.__name__
+    priv_attr = "_" + attr
+    @property
+    def wrapped(self):
+        if (not hasattr(self, priv_attr)):
+            setattr(self, priv_attr, func(self))
+        return getattr(self, priv_attr)
+
+    @wrapped.deleter
+    def wrapped(self):
+        if hasattr(self, priv_attr):
+            delattr(self, priv_attr)
+    wrapped.__doc__ = func.__doc__
+    return wrapped
 
 
 #def repeat(x=None, n):
