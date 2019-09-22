@@ -102,18 +102,17 @@ def numpy_broadcastable(*arrs):
 def init_when_called(func):
     attr = func.__name__
     priv_attr = "_" + attr
-    @property
-    def wrapped(self):
+
+    def getter(self):
         if (not hasattr(self, priv_attr)):
             setattr(self, priv_attr, func(self))
         return getattr(self, priv_attr)
 
-    @wrapped.deleter
-    def wrapped(self):
+    def deleter(self):
         if hasattr(self, priv_attr):
             delattr(self, priv_attr)
-    wrapped.__doc__ = func.__doc__
-    return wrapped
+
+    return property(getter, None, deleter, func.__doc__)
 
 
 #def repeat(x=None, n):
