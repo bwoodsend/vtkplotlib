@@ -51,35 +51,37 @@ class Polygon(ConstructedPlot):
     """
     def __init__(self, vertices, color=None, opacity=None, fig="gcf"):
         super().__init__(fig)
-    
+
         # The implementation of this is actually exactly the same as Lines plot
         # but sets args to polydata.polygons rather than polydata.lines
         shape = vertices.shape[:-1]
         points = numpy_vtk.contiguous_safe(nuts_and_bolts.flatten_all_but_last(vertices))
         self.temp.append(points)
-        
+
         args = nuts_and_bolts.flatten_all_but_last(np.arange(np.prod(shape)).reshape(shape))
-        
+
         self.polydata.points = points
         self.polydata.polygons = args
-            
-        
-        
-        
+
+
+
+
         self.add_to_plot()
 
         self.color_opacity(color, opacity)
-        
 
+
+def test():
+
+    import vtkplotlib as vpl
+
+    t = np.arange(0, 1, .1) * 2 * np.pi
+    points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
+
+    self = vpl.polygon(points, color="r")
+
+    vpl.show()
 
 
 if __name__ == "__main__":
-    import vtkplotlib as vpl
-    
-    t = np.arange(0, 1, .1) * 2 * np.pi
-    points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
-    
-    self = vpl.polygon(points, color="r")
-    
-    vpl.show()
-
+    test()

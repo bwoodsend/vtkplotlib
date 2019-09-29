@@ -42,53 +42,53 @@ class Sphere(SourcedPlot):
     """Plot an individual sphere."""
     def __init__(self, point, color=None, opacity=None, radius=1., fig="gcf"):
         super().__init__(fig)
-        
+
         self.source = vtk.vtkSphereSource()
         self.point = point
         self.source.SetRadius(radius)
-        
-        self.add_to_plot()        
-        
+
+        self.add_to_plot()
+
         self.color_opacity(color, opacity)
-        
+
     @property
     def point(self):
         return self.source.GetCenter()
-    
+
     @point.setter
     def point(self, point):
         self.source.SetCenter(*point)
-     
-        
+
+
 class Cursor(SourcedPlot):
     def __init__(self, point, color=None, opacity=None, radius=1, fig="gcf"):
         super().__init__(fig)
-        
+
         self.source = vtk.vtkCursor3D()
         self.source.SetTranslationMode(True)
         self.source.OutlineOff()
-        
-        
-        self.add_to_plot() 
-        
+
+
+        self.add_to_plot()
+
 #        if radius != 1:
 #            print("Warning - radius doesn't do anything")
 
 
         self.point = point
 
-        
+
         self.color_opacity(color, opacity)
 
     @property
     def point(self):
         return self.source.GetFocalPoint()
-    
+
     @point.setter
     def point(self, point):
         self.source.SetFocalPoint(*point)
-        
-        
+
+
 def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig="gcf"):
     points = np.asarray(points)
     out = np.empty(points.shape[:-1], object)
@@ -96,44 +96,40 @@ def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig=
     for (i, (xyz, c, r)) in enumerate(zip(_iter_points(points),
                                          _iter_colors(color, points.shape[:-1]),
                                          _iter_scalar(radius, points.shape[:-1]))):
-        
+
         if use_cursors:
             cls = Cursor
         else:
             cls = Sphere
-        
+
         out_flat[i] = cls(xyz, c, opacity, r, fig)
-        
+
     return out
-        
-    
-    
-    
-if __name__ == "__main__":
+
+
+
+def test():
     import vtkplotlib as vpl
-    import time
-    
+
     points = np.random.uniform(-10, 10, (30, 3))
 
 #    for i in range(3):
-#        self = vpl.cursor(np.array([5, 0, 0]) * i, radius=4) 
-        
-    self = scatter(points,
-                   color=points,
-                   radius=np.abs(points[:, 0]) ** .5,
-                   use_cursors=False
-                   )[0]
-    
-#    vpl.show(False)
-#    
-#    for i in range(20):
-#        self.source.SetRadius(np.random.random())
-#        vpl.gcf().update()
-#        time.sleep(.1)
+#        self = vpl.cursor(np.array([5, 0, 0]) * i, radius=4)
+
+    vpl.scatter(points,
+                color=vpl.colors.normalise(points),
+                radius=np.abs(points[:, 0]) ** .5,
+                use_cursors=False,
+                )[0]
+    cursor = vpl.scatter(points[::5], use_cursors=True)[0]
+    cursor.point += np.array([10, 0, 0])
+
+
 
     vpl.show()
-    
-    
-    
-    
+
+
+if __name__ == "__main__":
+     test()
+
 

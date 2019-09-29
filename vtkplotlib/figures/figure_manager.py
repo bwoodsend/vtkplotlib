@@ -76,7 +76,7 @@ def gcf_check(fig, function_name):
     if fig == "gcf":
       fig = gcf()
     if fig is None:
-        raise NoFigureError("save_fig")
+        raise NoFigureError(function_name)
     return fig
 
 
@@ -146,7 +146,7 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
 
     """
 
-    fig = gcf_check(fig, "save_fig")
+    fig = gcf_check(fig, "view")
 
     camera = fig.camera
 
@@ -199,6 +199,16 @@ def reset_camera(fig="gcf"):
 
 def screenshot_fig(magnification=1, pixels=None, fig="gcf"):
 
+    fig = gcf_check(fig, "screenshot_fig")
+
+    # figure has to be drawn
+    fig.update()
+
+    # screenshot code:
+    win_to_image_filter = vtk.vtkWindowToImageFilter()
+    win_to_image_filter.SetInput(fig.renWin)
+
+
     if isinstance(pixels, int):
         pixels = (pixels * 16) // 9, pixels
 
@@ -208,33 +218,19 @@ def screenshot_fig(magnification=1, pixels=None, fig="gcf"):
     if pixels is not None:
         magnification = tuple(pixels[i] // fig.render_size[i] for i in range(2))
 
-
-    if fig == "gcf":
-      fig = gcf()
-    if fig is None:
-        raise NoFigureError("save_fig")
-
-    # figure has to be drawn
-    fig.update()
-
-    # screenshot code:
-    win_to_image_filter = vtk.vtkWindowToImageFilter()
-    win_to_image_filter.SetInput(fig.renWin)
     try:
         win_to_image_filter.SetScale(*magnification)
     except AttributeError:
+        if magnification[0] != magnification[1]:
+            print("This version of VTK doesn't support seperate magnifications for height and width")
+            magnification = (magnification[0], magnification[0])
         win_to_image_filter.SetMagnification(magnification[0])
-    win_to_image_filter.Update()
-
 
     win_to_image_filter.Update()
 
     # Read the image as an array
-    array = vtk_to_numpy(win_to_image_filter.GetOutput().
-                         GetPointData().
-                         GetArray(0)).reshape(fig.render_size[::-1] + (3,))
-
-    return array[::-1]
+    from vtkplotlib import image_io
+    return image_io.vtkimagedata_to_array(win_to_image_filter.GetOutput())
 
 
 

@@ -93,35 +93,16 @@ class TestPlots(TestCase):
 
 
     def test_polygon(self):
-        t = np.arange(0, 1, .1) * 2 * np.pi
-        points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
-
-        vpl.polygon(points, color="r")
-
-        vpl.show()
+        vpl.plots.Polygon.test()
+        vpl.plots.Lines.test()
 
 
     @skipUnless(Mesh, "numpy-stl is not installed")
     def test_scalar_bar(self):
-        mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
-        plot = vpl.mesh_plot(mesh, scalars=mesh.x)
-
-        vpl.scalar_bar(plot)
-
-        vpl.show()
-
+        vpl.plots.ScalarBar.test()
 
     def test_scatter(self):
-        points = np.random.uniform(-10, 10, (30, 3))
-
-        vpl.scatter(points,
-                    color=vpl.colors.normalise(points),
-                    radius=np.abs(points[:, 0]) ** .5,
-                    use_cursors=False
-                    )[0]
-
-        vpl.show()
-
+        vpl.plots.Scatter.test()
 
     def test_text(self):
         vpl.text("text", (100, 100), color="g")
@@ -129,12 +110,8 @@ class TestPlots(TestCase):
 
 
     def test_annotate(self):
-        point = np.array([1, 2, 3])
-        vpl.scatter(point)
-
-        arrow, text = vpl.annotate(point, "A ball", np.array([0, 0, 1]))
-
-        vpl.show()
+        vpl.text3d
+        vpl.plots.Text3D.test()
 
 
     def test_surface(self):
@@ -146,13 +123,16 @@ class TestPlots(TestCase):
         y = np.sin(thi) * np.sin(theta)
         z = np.cos(theta)
 
-        vpl.Surface(x, y, z, color="g")
+        vpl.Surface(x, y, z, scalars=x.ravel()).set_scalar_range()
         vpl.show()
 
 
+    def test_suface_and_texturemap(self):
+        vpl.plots.Surface.test()
 
-if __name__ == "__main__":
 
-    main()
+#    def test_polydata(self):
+#        pd = vpl.PolyData()
 
-    self = TestPlots()
+
+

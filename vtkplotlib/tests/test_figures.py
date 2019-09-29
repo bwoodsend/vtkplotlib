@@ -21,11 +21,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+from __future__ import unicode_literals
 
 import numpy as np
 import os
+import sys
+from pathlib2 import Path
 
 import vtkplotlib as vpl
+import time
 from unittest import TestCase, main, skipUnless
 
 
@@ -33,10 +37,13 @@ class TestFigures(TestCase):
     def test_figure_io(self):
         vpl.close()
         self.assertIs(vpl.gcf(False), None)
-        
+
         vpl.set_auto_fig(False)
         self.assertIs(vpl.gcf(), None)
-        
+
+        with self.assertRaises(vpl.figures.figure_manager.NoFigureError):
+            vpl.screenshot_fig()
+
         fig = vpl.figure()
         self.assertIs(vpl.gcf(), None)
         del fig
@@ -44,31 +51,61 @@ class TestFigures(TestCase):
         vpl.set_auto_fig()
         fig = vpl.gcf()
         self.assertTrue(fig is not None)
-        
+
+
         self.assertIs(fig, vpl.gcf())
         vpl.close()
         self.assertIs(vpl.gcf(False), None)
         vpl.scf(fig)
         self.assertIs(fig, vpl.gcf())
-        
+
         vpl.close()
         fig = vpl.figure()
         self.assertIs(fig, vpl.gcf())
-        vpl.close()        
-        
-    
-    def test(self):
-        plots = vpl.scatter(np.random.uniform(-10, 10, (30, 3)))
-        vpl.save_fig("im.jpg")
-        os.remove("im.jpg")
-        
         vpl.close()
-        fig = vpl.figure() 
+
+
+
+
+    def test_save(self):
+        plots = vpl.scatter(np.random.uniform(-10, 10, (30, 3)))
+
+        # I can't get python2 to cooperate with unicode here.
+        # The os functions just don't like them.
+        if sys.version[0] == "3":
+
+            path = Path.cwd() / u"ҢघԝઌƔࢳܢˀા\\Հએࡓ\u061cཪЈतயଯ\u0886.png"
+            try:
+                os.mkdir(str(path.parent))
+                vpl.save_fig(path)
+                self.assertTrue(path.exists())
+                os.remove(str(path))
+            finally:
+                if path.parent.exists():
+                    os.rmdir(str(path.parent))
+
+        else:
+            path = Path.cwd() / "image.png"
+            vpl.save_fig(path)
+            os.remove(str(path))
+
+        self.assertEqual(vpl.screenshot_fig(2).shape,
+                         tuple(i * 2 for i in vpl.gcf().render_size) + (3,))
+
+        shape = tuple(i * j for (i, j) in zip(vpl.gcf().render_size, (2, 3)))
+        vpl.screenshot_fig(pixels=shape).shape
+        # The following will fail depending on VTK version
+#        self.assertEqual(vpl.screenshot_fig(pixels=shape).shape,
+#                         shape[::-1] + (3,))
+
+
+        vpl.close()
+        fig = vpl.figure()
         for plot in plots:
             fig += plot
         vpl.show()
-        
-        
+
+
     def test_view(self):
         vpl.set_auto_fig(True)
         vpl.close()
@@ -77,27 +114,27 @@ class TestFigures(TestCase):
         vpl.quiver(np.broadcast_to(point, (3, 3)),
                    grads,
                    color=np.eye(3))
-        
+
         vpl.view(focal_point=point,
                  camera_position=point-grads[0],
                  up_view=grads[1])
 #        vpl.view(camera_direction=grads[0],
 #                 up_view=grads[1],
 #                 )
-#        
+#
         vpl.reset_camera()
 #        vpl.view(point)
-        
-        
+
+
         vpl.text("Should be looking in the direction of the red arrow, with the green arrow pointing up")
         vpl.show()
 
-        
+
     def test_multi_figures(self):
         vpl.close()
-        
+
         vpl.set_auto_fig(False)
-        
+
         plot = vpl.plot(np.random.uniform(-10, 10, (10, 3)), join_ends=True)
         figs = []
         for i in range(1, 4):
@@ -105,25 +142,25 @@ class TestFigures(TestCase):
             fig += plot
             vpl.view(camera_direction=np.random.uniform(-1, 1, 3), fig=fig)
             vpl.reset_camera(fig)
-            
+
             fig.show(False)
             figs.append(fig)
         fig.show()
-        
+
         vpl.set_auto_fig(True)
-        
-        
+
+
     @skipUnless(vpl.PyQt5_AVAILABLE, "PyQt5 not installed")
     def test_qfigure(self):
         fig = vpl.QtFigure("a qt widget figure")
-        
+
         self.assertIs(fig, vpl.gcf())
-    
+
         direction = np.array([1, 0, 0])
         vpl.quiver(np.array([0, 0, 0]), direction)
         vpl.view(camera_direction=direction)
         vpl.reset_camera()
-    
+
         vpl.show()
 
 
@@ -131,17 +168,43 @@ class TestFigures(TestCase):
     def test_qfigure2(self):
         fig = vpl.QtFigure2("a qt widget figure")
         self.assertIs(fig, vpl.gcf())
-    
+
         vpl.scatter(np.arange(9).reshape((3, 3)).T)
-        
+        vpl._quick_test_plot()
+
         fig.add_all()
-        
-    
-        vpl.show()
+
+
+        fig.show(block=False)
+        fig.qapp.processEvents()
+
+        for i in fig.view_buttons.buttons:
+            i.released.emit()
+            fig.qapp.processEvents()
+            time.sleep(.1)
+
+        fig.screenshot_button.released.emit()
+        fig.show_plot_table_button.released.emit()
+
+
+        fig.show()
 
 
 
-if __name__ == "__main__":
-    
-    main()  
-    self = TestFigures()
+    def test_add_remove(self):
+        fig = vpl.figure()
+        plots = vpl._quick_test_plot(None)
+        fig += plots
+        fig.show(False)
+        fig -= plots
+        for i in plots:
+            fig += i
+            fig.update()
+            time.sleep(.05)
+        for i in plots:
+            fig -= i
+            fig.update()
+            time.sleep(.05)
+        vpl.close(fig)
+
+

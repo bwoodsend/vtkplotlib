@@ -49,44 +49,42 @@ class Lines(ConstructedPlot):
     join the last point with the first to create a polygon."""
     def __init__(self, vertices, color=None, opacity=None, line_width=1.0, join_ends=False, fig="gcf"):
         super().__init__(fig)
-        
-        
+
+
         shape = vertices.shape[:-1]
         points = numpy_vtk.contiguous_safe(nuts_and_bolts.flatten_all_but_last(vertices))
         self.temp.append(points)
-        
+
         args = nuts_and_bolts.flatten_all_but_last(np.arange(np.prod(shape)).reshape(shape))
-        
+
         self.polydata.points = points
         if join_ends:
             self.polydata.lines = join_line_ends(args)
         else:
             self.polydata.lines = args
-        
+
 #        assert np.array_equal(points[args], vertices)
-        
-        
+
+
         self.add_to_plot()
-        
+
         self.color_opacity(color, opacity)
         self.property.SetLineWidth(line_width)
-    
-        
 
 
 
-if __name__ == "__main__":
+def test():
     import vtkplotlib as vpl
-    
+
     t = np.arange(0, 1, .001) * 2 * np.pi
     vertices = np.array([np.cos(2 * t),
                          np.sin(3 * t),
                          np.cos(5 * t) * np.sin(7 *t)]).T
     vertices = np.array([vertices, vertices + 2])
-    
+
     t = np.arange(0, 1, .125) * 2 * np.pi
     vertices = np.array([np.cos(t), np.sin(t), np.zeros_like(t)]).T
-    
+
 #    vertices = np.random.uniform(-30, 30, (3, 3))
     self = vpl.plot(vertices, color="green", line_width=6, join_ends=True)
 #    self.polydata.point_scalars = vpl.geometry.distance(vertices)
@@ -95,3 +93,7 @@ if __name__ == "__main__":
     fig.background_color = "grey"
     self.add_to_plot()
     vpl.show()
+
+
+if __name__ == "__main__":
+    test()

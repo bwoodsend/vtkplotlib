@@ -33,37 +33,35 @@ from pathlib2 import Path
 import vtkplotlib as vpl
 from unittest import TestCase, skipUnless, main
 
-path = vpl.data.get_rabbit_stl(False)
+path = vpl.data.get_rabbit_stl()
 
 
 class TestMeshPlot(TestCase):
-    
+
     @skipUnless(vpl.NUMPY_STL_AVAILABLE, "Requires numpy-stl")
     def test_type_normalise(self):
         from stl.mesh import Mesh
         mesh = Mesh.from_file(path)
         vectors = mesh.vectors
-        
+
         unique_points = set(tuple(i) for i in vectors.reshape(len(vectors) * 3, 3))
         points_enum = {point: i for (i, point) in enumerate(unique_points)}
-        
+
         points = np.array(sorted(unique_points, key=points_enum.get))
         point_args = np.apply_along_axis(lambda x: points_enum[tuple(x)], -1, vectors)
-        
+
         for fmt in (path, mesh, vectors, (points, point_args)):
             normalised = vpl.plots.MeshPlot.normalise_mesh_type(fmt)
             self.assertTrue(np.array_equal(normalised, vectors))
-            
+
         for i in range(2):
             try:
                 normalised = vpl.plots.MeshPlot.path_str_to_vectors(path, i)
                 self.assertTrue(np.array_equal(normalised, vectors))
             except RuntimeError as ex:
                 print(repr(ex))
-        
-    
 
 
 
-if __name__ == "__main__":
-    main()
+
+

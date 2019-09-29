@@ -33,15 +33,11 @@ import pkg_resources
 
 DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")) / "data"
 
-STL_FOLDER = DATA_FOLDER / "models"
+MODELS_FOLDER = DATA_FOLDER / "models"
 
-def get_rabbit_stl(two=sys.platform=="win32"):
-    folder = STL_FOLDER
-    print("This is not my rabbit file. See README.txt and LICENSE.txt in\n{}\nfor details.".format(folder))
-    if two:
-        return str(folder / "rabbit2.stl")
-    else:
-        return str(folder / "rabbit.stl")
+def get_rabbit_stl():
+#    print("This is not my rabbit file. See README.txt and LICENSE.txt in\n{}\nfor details.".format(folder))
+    return str(MODELS_FOLDER / "rabbit" / "rabbit.stl")
 
 ICONS_FOLDER = DATA_FOLDER / "icons"
 
@@ -51,8 +47,8 @@ ICONS = {i.stem: str(i) for i in ICONS_FOLDER.glob("*")}
 
 
 if __name__ == "__main__":
- 
+
     assert ICONS_FOLDER.is_dir()
-    assert STL_FOLDER.is_dir()
+    assert MODELS_FOLDER.is_dir()
     assert os.path.isfile(get_rabbit_stl())
-    
+

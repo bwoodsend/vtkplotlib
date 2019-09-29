@@ -143,7 +143,7 @@ class ConstructedPlot(BasePlot):
 
     def set_scalar_range(self, range=None):
         if range is None:
-            range = self.polydata.point_scalars
+            range = self.polydata.point_colors
         self.mapper.SetScalarRange(np.nanmin(range), np.nanmax(range))
 
 #    @property

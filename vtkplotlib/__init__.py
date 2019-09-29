@@ -48,7 +48,7 @@ from .plots.Lines import Lines as plot
 from .plots.MeshPlot import MeshPlot as mesh_plot, mesh_plot_with_edge_scalars, NUMPY_STL_AVAILABLE
 from .plots.Polygon import Polygon as polygon
 from .plots.ScalarBar import ScalarBar as scalar_bar
-from .plots.Scatter import scatter, Cursor as cursor
+from .plots.Scatter import scatter
 from .plots.Surface import Surface
 from .plots.Text import Text as text
 from .plots.Text3D import Text3D as text3d, annotate
@@ -60,6 +60,7 @@ from . import data
 
 color_bar = scalar_bar
 
-def _quick_test_plot():
+def _quick_test_plot(fig="gcf"):
     import numpy as np
-    return scatter(np.random.uniform(-30, 30, (30, 3)), np.random.rand(30, 3))
+    return scatter(np.random.uniform(-30, 30, (30, 3)), np.random.rand(30, 3), fig=fig)
+

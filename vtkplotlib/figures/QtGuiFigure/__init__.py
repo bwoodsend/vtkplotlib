@@ -345,37 +345,37 @@ class QLabel_alterada(QtWidgets.QLabel):
         self.released.emit()
 
 
-if __name__ == "__main__":
-    import vtkplotlib as vpl
-    from stl.mesh import Mesh
-
-    app = None
-    app = QtWidgets.QApplication(sys.argv)
-
-    self = vpl.QtFigure2("Rabbits")
-#    vpl.scatter(np.random.uniform(-5, 5, (5, 3)), fig=self)
-#    vpl.quiver(np.zeros((3, 3)), np.eye(3) * 5, color=np.eye(3))
-
-    plot = vpl.mesh_plot(Mesh.from_file(vpl.data.get_rabbit_stl()))
-    plot.name = "rabbit"
-    mesh_2 = Mesh.from_file(vpl.data.get_rabbit_stl())
-    mesh_2.translate(np.array([100, 0, 0]))
-#    vpl.scatter(np.random.uniform(-100, 100, (3, 3)))
-
-    self.add_all()
-
-#    self.show(False)
-
-#    app.processEvents()
-    plot = vpl.mesh_plot(mesh_2, color="g")
-    plot.name = "green rabbit"
-#    self.update()
-
-
-
-#    app.processEvents()
-#    row = table.rows[plot]
-
-    self.show()
-#    app.exec_()
-
+#if __name__ == "__main__":
+#    import vtkplotlib as vpl
+#    from stl.mesh import Mesh
+#
+#    app = None
+#    app = QtWidgets.QApplication(sys.argv)
+#
+#    self = vpl.QtFigure2("Rabbits")
+##    vpl.scatter(np.random.uniform(-5, 5, (5, 3)), fig=self)
+##    vpl.quiver(np.zeros((3, 3)), np.eye(3) * 5, color=np.eye(3))
+#
+#    plot = vpl.mesh_plot(Mesh.from_file(vpl.data.get_rabbit_stl()))
+#    plot.name = "rabbit"
+#    mesh_2 = Mesh.from_file(vpl.data.get_rabbit_stl())
+#    mesh_2.translate(np.array([100, 0, 0]))
+##    vpl.scatter(np.random.uniform(-100, 100, (3, 3)))
+#
+#    self.add_all()
+#
+##    self.show(False)
+#
+##    app.processEvents()
+#    plot = vpl.mesh_plot(mesh_2, color="g")
+#    plot.name = "green rabbit"
+##    self.update()
+#
+#
+#
+##    app.processEvents()
+##    row = table.rows[plot]
+#
+#    self.show()
+##    app.exec_()
+#

@@ -23,18 +23,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-import sys
 
 class ErrorObserver:
 
     def __init__(self):
         self.CallDataType = 'string0'
+        self.messages = set()
 
     def __call__(self, obj, event, message):
-        sys.stdout.write(message)
-       
+        if message not in self.messages:
+            print(message)
+            self.messages.add(message)
+
     def attach(self, vtk_obj):
         vtk_obj.AddObserver("ErrorEvent", self)
+
+
 
 handler = ErrorObserver()
 

@@ -46,57 +46,64 @@ def sep_last_ax(points):
     points = np.asarray(points)
     return tuple(points[..., i] for i in range(points.shape[-1]))
 
+def zip_axes(*axes):
+    import numpy as np
+    return np.concatenate([i[..., np.newaxis] for i in axes], axis=-1)
+
+def unzip_axes(points):
+    return sep_last_ax(points)
+
 def flatten_all_but_last(arr):
     arr = np.asarray(arr)
     return arr.reshape(int(np.prod(arr.shape[:-1])), arr.shape[-1])
 
-def mask_union(mask, *masks):
-    out = mask.copy()
-    for m in masks:
-        np.logical_or(out, m, out=out)
-    return out
-
-def mask_and(mask, *masks):
-    out = mask.copy()
-    for m in masks:
-        np.logical_and(out, m, out=out)
-    return out
-
-
-def set_element_0(s):
-    for i in s:
-        return i
-
-def arg_array_inv(args, out_len=None, default=None):
-    out_len = out_len or len(args)
-    out = np.empty(out_len, args.dtype)
-    if default is not None:
-        out.fill(default)
-
-    out[args] = np.arange(len(args))
-    return out
-
-
-def random_selection(lst, size=None):
-    indices = np.random.randint(0, len(lst), size)
-
-    return np.asarray(lst)[indices]
-
-def as_str(x):
-    if isinstance(x, str):
-        return x
-    elif isinstance(x, bytes):
-        return x.decode(errors="replace")
-    else:
-        return str(x)
-
-def numpy_broadcastable(*arrs):
-    arrs = (np.asarray(i) for i in arrs)
-    for lens in zip(*(i.shape[::-1] for i in arrs)):
-        lens = set(lens)
-        if len(lens - {1}) > 1:
-            return False
-    return True
+#def mask_union(mask, *masks):
+#    out = mask.copy()
+#    for m in masks:
+#        np.logical_or(out, m, out=out)
+#    return out
+#
+#def mask_and(mask, *masks):
+#    out = mask.copy()
+#    for m in masks:
+#        np.logical_and(out, m, out=out)
+#    return out
+#
+#
+#def set_element_0(s):
+#    for i in s:
+#        return i
+#
+#def arg_array_inv(args, out_len=None, default=None):
+#    out_len = out_len or len(args)
+#    out = np.empty(out_len, args.dtype)
+#    if default is not None:
+#        out.fill(default)
+#
+#    out[args] = np.arange(len(args))
+#    return out
+#
+#
+#def random_selection(lst, size=None):
+#    indices = np.random.randint(0, len(lst), size)
+#
+#    return np.asarray(lst)[indices]
+#
+#def as_str(x):
+#    if isinstance(x, str):
+#        return x
+#    elif isinstance(x, bytes):
+#        return x.decode(errors="replace")
+#    else:
+#        return str(x)
+#
+#def numpy_broadcastable(*arrs):
+#    arrs = (np.asarray(i) for i in arrs)
+#    for lens in zip(*(i.shape[::-1] for i in arrs)):
+#        lens = set(lens)
+#        if len(lens - {1}) > 1:
+#            return False
+#    return True
 
 
 def init_when_called(func):

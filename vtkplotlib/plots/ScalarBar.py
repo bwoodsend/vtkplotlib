@@ -42,34 +42,37 @@ from vtkplotlib.plots.BasePlot import BasePlot
 
 class ScalarBar(BasePlot):
     def __init__(self, plot, title="", fig="gcf"):
-    
+
         super().__init__(fig)
-        
+
         self.actor = vtk.vtkScalarBarActor()
         self.actor.SetTitle(title)
-    
+
         self.actor.SetNumberOfLabels(6)
 
         self.lookup_table = plot.mapper.GetLookupTable()
         self.lookup_table.ForceBuild()
         self.actor.SetLookupTable(self.lookup_table)
-    
-    
+
+
 #        self.fig += self
         self.fig.render.AddActor2D(self.actor)
         self.fig.plots.add(self)
-        
 
+
+
+def test():
+    from stl.mesh import Mesh
+    import vtkplotlib as vpl
+
+    mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
+    plot = vpl.mesh_plot(mesh, scalars=mesh.x)
+
+    vpl.scalar_bar(plot)
+
+    vpl.show()
 
 
 if __name__ == "__main__":
-    from stl.mesh import Mesh
-    import vtkplotlib as vpl
-    
-    mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
-    plot = vpl.mesh_plot(mesh.vectors, scalars=mesh.x)
+    test()
 
-    self = vpl.scalar_bar(plot)
-
-    
-    vpl.show()

@@ -47,7 +47,7 @@ from vtkplotlib.plots.Arrow import Arrow
 
 
 class Text3D(SourcedPlot):
-    """Create a text actor in 3D space. Optionally can be set to orientate 
+    """Create a text actor in 3D space. Optionally can be set to orientate
     itself to follow the camera (defaults to on).
     """
     def __init__(self, string, position=(0, 0, 0), follow_cam=True, scale=1, color=None, opacity=None, fig="gcf"):
@@ -57,62 +57,65 @@ class Text3D(SourcedPlot):
         # axes.
         if np.isscalar(scale):
             scale = (scale, ) * 3
-            
+
         if not isinstance(string, str):
             string = str(string)
-        
+
         self.source = vtk.vtkVectorText()
         self.source.SetText(string)
-        
-        
+
+
         # This chunk is different to how most plots objects construct their
         # pipeline. So super().add_to_plot() wont work unfortunately.
-        
+
         self.actor = vtk.vtkFollower()
         self.actor.SetScale(*scale)
         self.actor.SetPosition(*position)
 
         self.mapper = vtk.vtkPolyDataMapper()
         self.actor.SetMapper(self.mapper)
-        
+
         self.property = self.actor.GetProperty()
         self.mapper.SetInputConnection(self.source.GetOutputPort())
 
 
         self.fig += self
         self.color_opacity(color, opacity)
-        
+
         if follow_cam:
             self.actor.SetCamera(self.fig.render.GetActiveCamera())
-    
-        
+
+
 def annotate(points, text, direction, text_color="w", arrow_color="k", distance=3, text_size=1, fig="gcf"):
     """Annotate a feature with an arrow and a text actor.
-    
-    If multiple points are given the highest is selected where high is 
+
+    If multiple points are given the highest is selected where high is
     determined by 'direction' (unit vector 1D np.array with length 3).
     The arrow points to the highest point and the text is placed at a point
     'distance' above (where above also is determined by direction).
     """
-    
+
     point = geom.highest(points, direction)
     text_point = point + distance * direction
-    return (Arrow(text_point, point, color=arrow_color, fig=fig), 
+    return (Arrow(text_point, point, color=arrow_color, fig=fig),
         Text3D(text, text_point, color=text_color, scale=text_size, fig=fig))
+
+
+def test():
+    import vtkplotlib as vpl
+
+#    self = vpl.text3d("some text", follow_cam=True)
+
+    point = np.array([1, 2, 3])
+    vpl.scatter(point)
+
+    arrow, text = vpl.annotate(point, point, np.array([0, 0, 1]))
+
+
+    vpl.show()
+
 
 
 
 if __name__ == "__main__":
-    import vtkplotlib as vpl
-    
-#    self = vpl.text3d("some text", follow_cam=True)
-    
-    point = np.array([1, 2, 3])
-    vpl.scatter(point)
-    
-    arrow, text = annotate(point, "A ball", np.array([0, 0, 1]))
-    
-    
-    vpl.show()
-    
-    
+    test()

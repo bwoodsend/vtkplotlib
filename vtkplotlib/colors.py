@@ -24,10 +24,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from __future__ import division
+from future.utils import string_types, as_native_str
 
 import numpy as np
 from matplotlib import colors, pylab as plt
 from pathlib2 import Path
+import vtk
+from vtk.util.numpy_support import numpy_to_vtk
+
 
 try:
     from PIL import Image
@@ -79,14 +84,16 @@ def process_color(color=None, opacity=None):
         if isinstance(color, str):
             if color[0] == "#":
                 # allow #RRGGBB hex colors
-                color = colors.hex2color(color)
+                # mpl's hex2rgb doesn't allow opacity. Otherwise I'd just use that
+                return process_color(tuple(int(color[i: 2 + i], 16) for i in range(1, len(color), 2)),
+                                     opacity)
             else:
                 # use matplotlib's color library
                 if color in mpl_colors:
                     color = mpl_colors[color]
                 else:
                     # If not in mpl's library try to correct user input and try again
-                    corrected = color.lower().replace("_", " ")
+                    corrected = color.lower().replace("_", " ").replace("-", " ")
                     if corrected in mpl_colors:
                         print("Auto-correcting color {!r} to {!r}.\nMatplotlib colors are all lowercase and use spaces instead of underscores.".format(color, corrected))
                         color = mpl_colors[corrected]
@@ -129,15 +136,25 @@ class TextureMap(object):
 
         if isinstance(array, PathLike):
             array = str(array)
-        if Image and isinstance(array, str):
-            array = Image.open(array)
+        if isinstance(array, string_types):
+            try:
+#                raise ValueError()
+                array = plt.imread(array)
+            except ValueError:
+                from vtkplotlib.image_io import read
+                array = read(array)
+            array = np.swapaxes(array, 0, 1)[:, ::-1]
         if Image and isinstance(array, Image.Image):
             array = np.array(array)
             array = np.swapaxes(array, 0, 1)[:, ::-1]
-        if (not isinstance(array, np.ndarray)) \
-            or (len(array.shape) != 3) \
-            or not (3 <= array.shape[2] <= 4):
-                raise TypeError("`array` must be an np.ndarray with shape (n, m, 3) or (n, m, 4)")
+
+        ex = lambda x: TypeError("`array` must be an np.ndarray with shape (m, n, 3) or (m, n, 4). Got {} {}".format(x, as_native_str(array)))
+        if (not isinstance(array, np.ndarray)):
+            raise ex(type(array))
+        if (len(array.shape) != 3):
+            raise ex(array.shape)
+        if not (3 <= array.shape[2] <= 4):
+            raise ex(array.shape)
 
         if array.dtype.kind in "ui":
             array = array / ((1 << (8 * array.dtype.itemsize)) - 1)
@@ -181,11 +198,54 @@ class TextureMap(object):
             uv = uv.astype(np.uint)
             return self.array[uv[..., 0], uv[..., 1]]
 
+converted_cmaps = {}
+temp = []
+
+def vtk_cmap(cmap):
+    if isinstance(cmap, str):
+        if cmap in converted_cmaps:
+            return converted_cmaps[cmap]
+        cmap = plt.get_cmap(cmap)
+
+    if isinstance(cmap, vtk.vtkLookupTable):
+        return cmap
+
+    if isinstance(cmap, (colors.ListedColormap, colors.LinearSegmentedColormap)):
+        name = cmap.name
+        if name in converted_cmaps:
+            return converted_cmaps[name]
+    else:
+        name = None
+
+    if isinstance(cmap, colors.ListedColormap):
+        cmap = np.array(cmap.colors)
+
+    if callable(cmap):
+        cmap = cmap(np.arange(256, dtype=np.uint8))
+
+    if not isinstance(cmap, np.ndarray):
+        raise TypeError()
+
+    if cmap.ndim == 2 and 3 <= cmap.shape[1] <= 4:
+        cmap = np.ascontiguousarray((colors.to_rgba_array(cmap) * 255).astype(np.uint8))
+        table = vtk.vtkLookupTable()
+        table.SetTable(numpy_to_vtk(cmap))
+
+        temp.append(cmap)
+        if name is not None:
+            converted_cmaps[name] = table
+        return table
+
+    else:
+        raise ValueError()
+
+
 
 
 
 
 if __name__ == "__main__":
+    import vtkplotlib as vpl
     for args in [((.3, .4, .6), .2),
                  ([5, 8, 10], None),
                  ("red", ),
@@ -200,10 +260,9 @@ if __name__ == "__main__":
     self = TextureMap(path)
     self.interpolate = True
 
-    n = 100
-    uv = np.empty((n, n, 2))
-    uv[..., 0] = np.linspace(0, 1, n)
-    uv[..., 1] = np.linspace(0, 1, n)[:, np.newaxis]
+    n = 1000
+    t = np.linspace(0, 1, n)
+    uv = vpl.nuts_and_bolts.zip_axes(*np.meshgrid(t, t))
 
 #    plt.figure(figsize=(n // 72,) * 2)
 #    plt.imshow(self(uv))
@@ -212,3 +271,8 @@ if __name__ == "__main__":
     from PIL import Image
     im = Image.fromarray((self(uv) * 255).astype(np.uint8))
 #    im.show()
+
+#    cmap = plt.get_cmap("Blues")
+#    table = vtk.vtkLookupTable()
+#    table_colors = cmap(np.arange(256, dtype=np.uint8))
+#    table.SetTable(numpy_to_vtk((vpl.colors.colors.to_rgba_array(table_colors) * 255).astype(np.uint8), True))
