@@ -64,3 +64,4 @@ def _quick_test_plot(fig="gcf"):
     import numpy as np
     return scatter(np.random.uniform(-30, 30, (30, 3)), np.random.rand(30, 3), fig=fig)
 
+from .nuts_and_bolts import zip_axes, unzip_axes
