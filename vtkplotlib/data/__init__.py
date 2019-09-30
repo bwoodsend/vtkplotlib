@@ -46,9 +46,10 @@ ICONS = {i.stem: str(i) for i in ICONS_FOLDER.glob("*")}
 
 
 
-if __name__ == "__main__":
-
+def assert_ok():
     assert ICONS_FOLDER.is_dir()
     assert MODELS_FOLDER.is_dir()
     assert os.path.isfile(get_rabbit_stl())
 
+if __name__ == "__main__":
+    assert_ok()

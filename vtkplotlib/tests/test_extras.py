@@ -59,5 +59,9 @@ class TestExtras(TestCase):
         from vtkplotlib.unicode_paths import test
         test()
 
+    def test_data(self):
+        vpl.data.assert_ok()
+
+
 
 
