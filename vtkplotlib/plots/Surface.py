@@ -87,7 +87,7 @@ def test():
     y = np.sin(thi) * np.sin(theta)
     z = np.cos(theta)
 
-    self = vpl.Surface(x, y, z, fig=None)
+    self = vpl.surface(x, y, z, fig=None)
     path = vpl.data.ICONS["Right"]
     self.polydata.texture_map = vpl.colors.TextureMap(path, interpolate=True)
     self.colors = vpl.colors.normalise(vpl.nuts_and_bolts.zip_axes(thi, theta), (0, 1))

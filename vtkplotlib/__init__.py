@@ -49,7 +49,7 @@ from .plots.MeshPlot import MeshPlot as mesh_plot, mesh_plot_with_edge_scalars, 
 from .plots.Polygon import Polygon as polygon
 from .plots.ScalarBar import ScalarBar as scalar_bar
 from .plots.Scatter import scatter
-from .plots.Surface import Surface
+from .plots.Surface import Surface as surface
 from .plots.Text import Text as text
 from .plots.Text3D import Text3D as text3d, annotate
 
@@ -65,3 +65,4 @@ def _quick_test_plot(fig="gcf"):
     return scatter(np.random.uniform(-30, 30, (30, 3)), np.random.rand(30, 3), fig=fig)
 
 from .nuts_and_bolts import zip_axes, unzip_axes
+from .colors import TextureMap

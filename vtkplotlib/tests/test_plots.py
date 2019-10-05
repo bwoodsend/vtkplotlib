@@ -123,7 +123,7 @@ class TestPlots(TestCase):
         y = np.sin(thi) * np.sin(theta)
         z = np.cos(theta)
 
-        vpl.Surface(x, y, z, scalars=x.ravel()).set_scalar_range()
+        vpl.surface(x, y, z, scalars=x.ravel()).set_scalar_range()
         vpl.show()
 
 
