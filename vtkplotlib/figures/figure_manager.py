@@ -44,6 +44,9 @@ def set_auto_fig(auto=True):
 def scf(figure):
     """Sets the current working figure."""
     global _figure
+    if _figure is not None:
+        from vtkplotlib._history import figure_history
+        figure_history.deque.append(_figure)
     _figure = figure
 
 
@@ -271,8 +274,7 @@ def close(fig="gcf"):
     if fig == "gcf":
       fig = gcf()
     if fig is not None:
-        fig.renWin.Finalize()
-        fig.iren.TerminateApp()
+        fig.finalise()
     if fig is gcf(False):
         scf(None)
 

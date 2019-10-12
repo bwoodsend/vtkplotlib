@@ -62,7 +62,7 @@ if __name__ == "__main__":
     from vtkplotlib import vtk_image_reader
     path = vpl.data.ICONS["Right"]
 
-    plt.imshow(read(path))
+    plt.imshow(vtk_image_reader.read(path))
     plt.show()
 
 

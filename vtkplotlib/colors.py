@@ -31,7 +31,7 @@ import numpy as np
 from matplotlib import colors, pylab as plt
 from pathlib2 import Path
 import vtk
-from vtk.util.numpy_support import numpy_to_vtk
+from vtk.util.numpy_support import numpy_to_vtk, vtk_to_numpy
 
 
 try:
@@ -232,8 +232,8 @@ def vtk_cmap(cmap):
         table.SetTable(numpy_to_vtk(cmap))
 
         temp.append(cmap)
-        if name is not None:
-            converted_cmaps[name] = table
+#        if name is not None:
+#            converted_cmaps[name] = table
         return table
 
     else:

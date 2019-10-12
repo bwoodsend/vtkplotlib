@@ -51,7 +51,10 @@ class ScalarBar(BasePlot):
         self.actor.SetNumberOfLabels(6)
 
         self.lookup_table = plot.mapper.GetLookupTable()
-        self.lookup_table.ForceBuild()
+        if self.lookup_table.GetTable().GetNumberOfTuples() == 0:
+            # ForceBuild resets it as well as building it. Thus overwriting any
+            # existing colormap. Only build if it has not already been built.
+            self.lookup_table.ForceBuild()
         self.actor.SetLookupTable(self.lookup_table)
 
 
