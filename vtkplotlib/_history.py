@@ -26,7 +26,6 @@
 
 
 import numpy as np
-import matplotlib.pylab as plt
 import sys
 import os
 from pathlib2 import Path
@@ -51,4 +50,7 @@ class FigureHistory(object):
     def __repr__(self):
         return "<%s %s>" % (self.__class__.__name__, self.deque)
 
-figure_history = FigureHistory()
+try:
+    figure_history
+except NameError:
+    figure_history = FigureHistory()

@@ -25,7 +25,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #from builtins import super
 
 import numpy as np
-#import matplotlib.pylab as plt
 
 from vtkplotlib import nuts_and_bolts
 

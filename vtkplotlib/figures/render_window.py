@@ -26,7 +26,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import vtk
 import numpy as np
-#from matplotlib import pylab as plt
 from vtk.util.numpy_support import (
                                     numpy_to_vtk,
                                     numpy_to_vtkIdTypeArray,

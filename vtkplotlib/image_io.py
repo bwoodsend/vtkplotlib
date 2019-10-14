@@ -24,7 +24,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 import numpy as np
-import matplotlib.pylab as plt
 import sys
 import os
 from pathlib2 import Path
@@ -63,6 +62,8 @@ def vtkimagedata_to_array(image_data):
 if __name__ == "__main__":
     import vtkplotlib as vpl
     from vtkplotlib import image_io
+    import matplotlib.pylab as plt
+
     path = vpl.data.ICONS["Right"]
 
     plt.imshow(image_io.read(path))

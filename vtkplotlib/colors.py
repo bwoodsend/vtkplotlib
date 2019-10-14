@@ -28,7 +28,7 @@ from __future__ import division
 from future.utils import string_types, as_native_str
 
 import numpy as np
-from matplotlib import colors, pylab as plt
+from matplotlib import colors, cm
 from pathlib2 import Path
 import vtk
 from vtk.util.numpy_support import numpy_to_vtk, vtk_to_numpy
@@ -139,8 +139,9 @@ class TextureMap(object):
         if isinstance(array, string_types):
             try:
 #                raise ValueError()
-                array = plt.imread(array)
-            except ValueError:
+                from matplotlib.pylab import imread
+                array = imread(array)
+            except (ValueError, ImportError):
                 from vtkplotlib.image_io import read
                 array = read(array)
             array = np.swapaxes(array, 0, 1)[:, ::-1]
@@ -205,7 +206,7 @@ def vtk_cmap(cmap):
     if isinstance(cmap, str):
         if cmap in converted_cmaps:
             return converted_cmaps[cmap]
-        cmap = plt.get_cmap(cmap)
+        cmap = cm.get_cmap(cmap)
 
     if isinstance(cmap, vtk.vtkLookupTable):
         return cmap

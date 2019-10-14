@@ -25,7 +25,6 @@ from __future__ import print_function
 from builtins import super
 
 import numpy as np
-import matplotlib.pylab as plt
 import sys
 import os
 from pathlib2 import Path

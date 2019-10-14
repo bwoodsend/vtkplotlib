@@ -30,8 +30,10 @@ from pathlib2 import Path
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy
 
-
-_figure = None
+try:
+    _figure
+except NameError:
+    _figure = None
 
 _auto_fig = True
 

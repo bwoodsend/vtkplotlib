@@ -27,7 +27,6 @@ from builtins import super
 
 import vtk
 import numpy as np
-#from matplotlib import pylab as plt
 import os
 import sys
 from pathlib2 import Path

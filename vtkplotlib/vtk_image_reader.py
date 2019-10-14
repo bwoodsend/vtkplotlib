@@ -24,7 +24,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 import numpy as np
-import matplotlib.pylab as plt
 import sys
 import os
 from pathlib2 import Path
@@ -60,6 +59,8 @@ def read(path):
 if __name__ == "__main__":
     import vtkplotlib as vpl
     from vtkplotlib import vtk_image_reader
+    import matplotlib.pylab as plt
+
     path = vpl.data.ICONS["Right"]
 
     plt.imshow(vtk_image_reader.read(path))

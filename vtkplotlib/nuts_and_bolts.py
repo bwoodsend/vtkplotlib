@@ -27,7 +27,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 there will be a lot of irrelevant functions."""
 
 import numpy as np
-import matplotlib.pylab as plt
 import sys
 import os
 
@@ -48,7 +47,7 @@ def sep_last_ax(points):
 
 def zip_axes(*axes):
     import numpy as np
-    return np.concatenate([i[..., np.newaxis] for i in axes], axis=-1)
+    return np.concatenate([np.asarray(i)[..., np.newaxis] for i in axes], axis=-1)
 
 def unzip_axes(points):
     return sep_last_ax(points)

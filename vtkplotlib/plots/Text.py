@@ -27,7 +27,6 @@ from builtins import super
 
 import vtk
 import numpy as np
-#from matplotlib import pylab as plt
 from matplotlib import colors
 import os
 import sys

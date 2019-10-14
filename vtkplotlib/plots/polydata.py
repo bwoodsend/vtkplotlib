@@ -26,7 +26,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import numpy as np
 import os
 from pathlib2 import Path
-from matplotlib.pylab import get_cmap, imsave
+from matplotlib.cm import get_cmap
 import vtk
 from vtk.util.numpy_support import (
     numpy_to_vtk,
