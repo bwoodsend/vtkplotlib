@@ -141,9 +141,11 @@ class TextureMap(object):
 #                raise ValueError()
                 from matplotlib.pylab import imread
                 array = imread(array)
-            except (ValueError, ImportError):
+            except (ValueError, ImportError) as ex:
                 from vtkplotlib.image_io import read
                 array = read(array)
+                if array is NotImplemented:
+                    raise NotImplementedError("Could not find a suitable VTKImageReader for \"{}\" and matplotlib's search failed with the following error - {}".format(array, ex))
             array = np.swapaxes(array, 0, 1)[:, ::-1]
         if Image and isinstance(array, Image.Image):
             array = np.array(array)

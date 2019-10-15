@@ -30,21 +30,23 @@ import sys
 import os
 from pathlib2 import Path
 
-import runpy
+import importlib
 
 from unittest import TestCase, main
 
-MODULES = ("PIL", "PyQt5", "numpy-stl", )
+MODULES = ("PIL", "PyQt5", "stl", )
 
 class TestOptionalDependencyFallbacks(TestCase):
     def setUp(self):
 #        del sys.modules["vtkplotlib"]
         for i in MODULES:
             sys.modules[i] = None
+        importlib.invalidate_caches()
         global vpl
         import vtkplotlib as vpl
-        runpy.importlib.reload(vpl)
-        assert not vpl.PyQt5_AVAILABLE
+        importlib.reload(vpl)
+#        assert not vpl.PyQt5_AVAILABLE
+        self.test_the_test()
 
 
 
@@ -52,6 +54,8 @@ class TestOptionalDependencyFallbacks(TestCase):
         for i in MODULES:
             with self.assertRaises(ImportError):
                 __import__(i)
+            with self.assertRaises(AttributeError):
+                vpl.QtFigure
 
 
     def tearDown(self):
@@ -59,13 +63,18 @@ class TestOptionalDependencyFallbacks(TestCase):
             del sys.modules[i]
         global vpl
         import vtkplotlib as vpl
-        runpy.importlib.reload(vpl)
+        importlib.reload(vpl)
 
 
     def test_imread(self):
         tm = vpl.TextureMap(vpl.data.ICONS["Right"])
         plt.imshow(tm.array)
         plt.show()
+
+    def test_stl_reader(self):
+        vpl.mesh_plot(vpl.data.get_rabbit_stl())
+#        from stl import mesh
+        vpl.show()
 
 
 if __name__ == "__main__":
