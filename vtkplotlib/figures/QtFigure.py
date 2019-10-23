@@ -90,6 +90,13 @@ class QtFigure(QWidget, BaseFigure):
         self.qapp.processEvents()
 
 
+    def finalise(self):
+        """Very important that original finalise gets overwritten. This gets
+        called imediately after self.iren.Start(). The original performs resets
+        that stop the QtFigure from responding."""
+        pass
+
+
 
 
 

@@ -43,7 +43,7 @@ class BaseFigure(VTKRenderer):
 
 
     _reset_camera = True
-#    has_been_shown = False
+
 
     def reset_camera(self):
         return reset_camera(self)
@@ -63,15 +63,15 @@ class BaseFigure(VTKRenderer):
             if hasattr(sys.stdout, attr):
                 getattr(sys.stdout, attr).flush()
 
-#        if self.has_been_shown:
-#            print(self, "has already been shown")
-#            return
 
         self.start(block, self._reset_camera)
 
+        # Camera only gets reset automatically the first time self.show() is
+        # called.
+        self._reset_camera = False
+
         if block and gcf() is self:
             scf(None)
-#            self.has_been_shown = True
 
 
     def add_plot(self, plot):
@@ -112,8 +112,6 @@ class BaseFigure(VTKRenderer):
         self.renWin.SetSize(*size)
 
 
-    def update(self):
-        self.show(False)
 
 
 

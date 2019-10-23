@@ -86,22 +86,38 @@ class VTKRenderer(object):
         vtk_errors.handler.attach(self.render)
 
 
-    def start(self, block=True, reset_camera=True):
-        """Internal use only."""
-
-        self.connect()
-
+    def _start_interactive(self):
         # Enable user interface interactor
-        # This needs to happen after some of the Qt stuff is done
+        # This needs to happen after any Qt show calls (if using Qt)
         self.iren.Initialize()
+
+        self.iren.Start()
+        self.finalise()
+
+    def _show_window(self):
+        self.connect()
+        self.update()
+
+
+
+
+    def update(self):
         self.renWin.Render()
         self.renWin.SetWindowName(self.window_name)
+
+
+    def start(self,  block=True, reset_camera=True):
+        self._show_window()
 
         if reset_camera:
             self.render.ResetCamera()
 
+
         if block:
-            self.iren.Start()
+            self._start_interactive()
+
+
+
 
     def finalise(self):
         self.renWin.Finalize()
@@ -123,7 +139,6 @@ class VTKRenderer(object):
         self.render.RemoveActor(actor)
 
 
-
     @property
     def background_color(self):
         return self.render.GetBackground()
@@ -137,6 +152,7 @@ class VTKRenderer(object):
             self.render.SetBackground(*color)
         if opacity is not None:
             self.render.SetBackgroundAlpha(opacity)
+
 
     def __del__(self):
         # This prevents a vtk error dialog from popping up.
