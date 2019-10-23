@@ -206,8 +206,8 @@ def screenshot_fig(magnification=1, pixels=None, fig="gcf"):
 
     fig = gcf_check(fig, "screenshot_fig")
 
-    # figure has to be drawn
-    fig.update()
+    # figure has to be drawn, including the window it goes in.
+    fig.show(block=False)
 
     # screenshot code:
     win_to_image_filter = vtk.vtkWindowToImageFilter()

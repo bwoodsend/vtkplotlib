@@ -24,6 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
 import numpy as np
+import matplotlib.pylab as plt
 import os
 import sys
 from pathlib2 import Path
@@ -89,8 +90,11 @@ class TestFigures(TestCase):
             vpl.save_fig(path)
             os.remove(str(path))
 
-        self.assertEqual(vpl.screenshot_fig(2).shape,
+        array = vpl.screenshot_fig(2)
+        self.assertEqual(array.shape,
                          tuple(i * 2 for i in vpl.gcf().render_size) + (3,))
+        plt.imshow(array)
+        plt.show()
 
         shape = tuple(i * j for (i, j) in zip(vpl.gcf().render_size, (2, 3)))
         vpl.screenshot_fig(pixels=shape).shape
