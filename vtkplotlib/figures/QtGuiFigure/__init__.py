@@ -283,14 +283,14 @@ class PlotTable(QtWidgets.QWidget):
 
 
     def add_plot(self, plot):
-        print("add", plot)
+#        print("add", plot)
         row = PlotTableRow(plot, len(self.rows))# + 1
         row.add_to_grid(self.grid)
         self.rows[plot] = row
 
 
     def remove_plot(self, plot):
-        print("remove", plot)
+#        print("remove", plot)
         self.rows.pop(plot)
 
 
