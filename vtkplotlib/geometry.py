@@ -49,6 +49,7 @@ def inner_product(a, b):
 
 
 def highest(points, up=np.array([0, 0, 1]), include_height=False):
+    points = np.asarray(points)
 
     heights = inner_product(points, up)
     arg = np.unravel_index(np.argmax(heights), heights.shape)

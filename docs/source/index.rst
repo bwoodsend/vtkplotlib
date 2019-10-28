@@ -15,19 +15,24 @@ Welcome to vtkplotlib's documentation!
 .. image:: docs/source/python_versions.svg
 
 
-A simple library to make 3D graphics using VTK easy. VTK is a very versatile 
-library but you have to do a lot of the construction yourself. This and many 
-other factors make writing in it very slow and frustrating. This library seeks
-to overcome that by wrapping the all ugly bits into numpy friendly functions to
-create a 3D equivalent of matplotlib. It also takes advantage of VTK's lesser 
-known numpy support so that data can be more efficiently passed between numpy
-and VTK than most of the VTK examples you'll find online.
+A simple library to make 3D graphics using easy. Built on top of VTK. VTK is a
+very versatile library but still only has a rather low level API. Even the
+simplest examples require the construction and linking of a large number of
+compicated internal components. This and other factors make writing in it slow
+and painful. This library seeks to overcome that by wrapping the all ugliness
+into numpy friendly functions to create a 3D equivalent of matplotlib. All the
+VTK components/functionality are still accessable but by default are already
+setup for you. It also takes advantage of VTK's lesser known numpy support so
+that data can be efficiently copied by reference between numpy and VTK making
+it much faster than most of the VTK examples you'll find online. vtkplotlib
+is easy to install, is freezable with `pyinstaller`_, has direct support
+for STL plotting and can be embedded into `PyQt5`_ applications.
 
 
 Requirements for installing:
 ------------------------------------------------------------------------------
 
- - `numpy`_ 
+ - `numpy`_
  - `pathlib2`_
  - `matplotlib`_
  - `vtk`_
@@ -37,7 +42,7 @@ There is no VTK version for Windows users with python 2.7 on PyPi. But you can
 get a .whl from `here <https://www.lfd.uci.edu/~gohlke/pythonlibs/#vtk>`_.
 
 
- 
+
 Installation:
 ------------------------------------------------------------------------------
 
@@ -52,7 +57,7 @@ Some features require you to install the following:
 
  - `numpy-stl`_ or any other STL library if you want to plot STL files. `numpy-stl`_ is my STL library of choice.
  - `PyQt5`_ if you want to include your plots in a GUI.
- 
+
 
 .. _numpy: http://numpy.org/
 .. _matplotlib: http://matplotlib.org/
@@ -61,6 +66,7 @@ Some features require you to install the following:
 .. _PyQt5: https://pypi.org/project/PyQt5/
 .. _numpy-stl: https://pypi.org/project/numpy-stl/
 .. _future: https://pypi.org/project/future/
+.. _pyinstaller: https://www.pyinstaller.org/
 
 
 
@@ -76,17 +82,17 @@ Scatter plots:
 
 .. code-block:: python
 
-    import vtkplotlib as vpl    
+    import vtkplotlib as vpl
     import numpy as np
 
     # In vtkplotlib coordinates are always expressed as numpy arrays with shape
     # (3,) or (n, 3) or (..., 3).
-    # Create 30 random points. 
+    # Create 30 random points.
     points = np.random.uniform(-10, 10, (30, 3))
 
     # Plot the points as spheres.
     vpl.scatter(points)
-        
+
     # Show the plot.
     vpl.show()
 
@@ -116,7 +122,7 @@ or using any of matplotlib's named colors using strings.
 
     vpl.scatter(points, color="r")
     vpl.show()
-    
+
 See matplotlib or vpl.colors.mpl_colors for a full list of available colors.
 
 
@@ -137,7 +143,7 @@ Line plots:
 
 .. code-block:: python
 
-    import vtkplotlib as vpl    
+    import vtkplotlib as vpl
     import numpy as np
 
     # Create some kind of wiggly shape
@@ -145,12 +151,12 @@ Line plots:
     points = np.array([np.cos(2 * t),
                        np.sin(3 * t),
                        np.cos(5 * t) * np.sin(7 *t)]).T
-    
-    # Plot a line 
+
+    # Plot a line
     vpl.plot(points,
              color="green",
              line_width=3)
-    
+
     vpl.show()
 
 
@@ -164,11 +170,11 @@ the first.
     points = np.array([np.cos(t),
                        np.sin(t),
                        np.zeros_like(t)]).T
-    
+
     # Plot them
     vpl.plot(points,
              join_ends=True)
-    
+
     vpl.show()
 
 
@@ -177,24 +183,24 @@ the first.
 Mesh plots:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-To plot STL files you will need some kind of STL reader library. If you don't 
-have one then get this one `numpy-stl`_. Their Mesh class can be passed 
+To plot STL files you will need some kind of STL reader library. If you don't
+have one then get this one `numpy-stl`_. Their Mesh class can be passed
 directly to vpl.mesh_plot.
 
-The following example assumes you have installed `numpy-stl`_. 
+The following example assumes you have installed `numpy-stl`_.
 
 .. code-block:: python
-    
+
     import vtkplotlib as vpl
     from stl.mesh import Mesh
 
     # path = "if you have an STL file then put it's path here."
     # Otherwise vtkplotlib comes with a small STL file for demos/testing.
     path = vpl.data.get_rabbit_stl()
-    
+
     # Read the STL using numpy-stl
     mesh = Mesh.from_file(path)
-        
+
     # Plot the mesh
     vpl.mesh_plot(mesh)
 
@@ -208,14 +214,14 @@ support them all. To overcome this as best we can, mesh_plot has a flexible
 constructor which accepts any of the following.
 
 
-1.  Some kind of mesh class that has form 2) stored in mesh.vectors. 
+1.  Some kind of mesh class that has form 2) stored in mesh.vectors.
     For example numpy-stl's stl.mesh.Mesh or pymesh's pymesh.stl.Stl
 
-    
+
 2.   An np.array with shape (n, 3, 3) in the form:
 
     .. code-block:: python
-    
+
        np.array([[[x, y, z],  # corner 0  \
                   [x, y, z],  # corner 1  | triangle 0
                   [x, y, z]], # corner 2  /
@@ -224,43 +230,43 @@ constructor which accepts any of the following.
                   [x, y, z],  # corner 1  | triangle n-1
                   [x, y, z]], # corner 2  /
                 ])
-    
-    
-    Note it's not uncommon to have arrays of shape (n, 3, 4) or (n, 4, 3) 
+
+
+    Note it's not uncommon to have arrays of shape (n, 3, 4) or (n, 4, 3)
     where the additional entries' meanings are usually irrelevant (often to
     represent scalars but as STL has no color this is always uniform). Hence
     to support mesh classes that have these, these arrays are allowed and the
     extra entries are ignored.
-        
-    
+
+
 3.  An np.array with shape (k, 3) of (usually unique) vertices in the form:
-    
+
     .. code-block:: python
-        
+
         np.array([[x, y, z],
                   [x, y, z],
                   ...
                   [x, y, z],
                   [x, y, z],
                   ])
-    
+
     And a second argument of an np.array of integers with shape (n, 3) of point
     args in the form
-    
+
     .. code-block:: python
-    
+
         np.array([[i, j, k],  # triangle 0
                   ...
                   [i, j, k],  # triangle n-1
                   ])
-    
-    where i, j, k are the indices of the points (in the vertices array) 
+
+    where i, j, k are the indices of the points (in the vertices array)
     representing each corner of a triangle.
-    
+
     Note that this form can be (and is) easily converted to form 2) using
-    
+
     .. code-block:: python
-    
+
         vertices = unique_vertices[point_args]
 
 
@@ -289,16 +295,16 @@ To use 'scalars':
     # Open an STL as before
     path = vpl.data.get_rabbit_stl()
     mesh = Mesh.from_file(path)
-    
+
     # Plot it with the z values as the scalars. scalars is 'per vertex' or 1
     # value for each corner of each triangle and should have shape (n, 3).
     plot = vpl.mesh_plot(mesh, scalars=mesh.z)
-    
+
     # Optionally the plot created by mesh_plot can be passed to color_bar
     vpl.color_bar(plot, "Heights")
-    
+
     vpl.show()
-    
+
 
 To use 'tri_scalars':
 
@@ -315,9 +321,9 @@ To use 'tri_scalars':
     # tri_scalars is one value per triangle
     # Create some scalars showing "how far upwards" each triangle is facing
     tri_scalars = np.inner(mesh.units, np.array([0, 0, 1]))
-    
+
     vpl.mesh_plot(mesh, tri_scalars=tri_scalars)
-    
+
     vpl.show()
 
 
@@ -327,117 +333,124 @@ Figure managing:
 ...............................
 
 
-There are two main basic types in vtkplotlib. 
+There are two main basic types in vtkplotlib.
 
  - Figures are the window you plot into.
  - Plots are the physical objects that go in the figures.
 
 In all the previous examples the figure has been handled automatically. For more
-complex scenarios you may need to handle the figures yourself. The following 
+complex scenarios you may need to handle the figures yourself. The following
 demonstrates the figure handling functions.
 
 .. code-block:: python
 
     import vtkplotlib as vpl
     import numpy as np
-    
+
     # You can create a figure explicitly using figure()
     fig = vpl.figure("Your Figure Title Here")
-    
+
     # Creating a figure automatcally sets it as the current working figure
     # You can get the current figure using gcf()
     vpl.gcf() is fig # Should be True
-    
+
     # If a figure hadn't been explicitly created using figure() then gcf()
     # would have created one. If gcf() had also not been called here then
-    # the plotting further down will have called gcf().
-    
+    # the plotting further down will have internally called gcf().
+
     # A figure's properties can be editted directly
-    fig.background_color = "orange"
+    fig.background_color = "dark green"
     fig.window_name = "A New Window Title"
 
 
     points = np.random.uniform(-10, 10, (2, 3))
 
     # To add to a figure you can either:
-    
+
     # 1) Let it automatically add to the whichever figure gcf() returns
     vpl.scatter(points[0], color="r")
-    
-    # 2) Explicitly give it a figure to add to 
+
+    # 2) Explicitly give it a figure to add to
     vpl.scatter(points[1], radius=2, fig=fig)
-    
+
     # 3) Or pass fig=None to prevent it being added then add it later
     arrow = vpl.arrow(points[0], points[1], color="g", fig=None)
     fig += arrow
     # fig.add_plot(arrow) also does the same thing
 
-    
+
     # Finally when your ready to view the plot call show. Like before you can
     # do this one of several ways
-    # 1) fig.show() 
+    # 1) fig.show()
     # 2) vpl.show() # equivalent to gcf().show()
     # 3) vpl.show(fig=fig)
-    
-    fig.show() # The program will wait here until th user closes the window.
-    
-    
-Once a figure is shown it is deleted. A new figure must be used for future
-plots. Note that calling show on a figure that has already been shown 
-causes a crash. I've tried to overcome this but with no success. Until 
-someone finds a way round this we'll just have to accept figures are 
-single use.
+
+    fig.show() # The program will wait here until the user closes the window.
+
+
+    # Once a figure is shown it is gets placed in `vpl.figure_history` which
+    # stores recent figures. The default maximum number of figures is two. For
+    # convenience whilst console bashing, you can retrieve the last figure.
+    # But it will no longer be the current working figure.
+
+    vpl.figure_history[-1] is fig # Should be True
+    fig is vpl.gcf() # Should be False
+
+    # A figure can be reshown indefinately and should be exactly as you left it
+    # when it was closed.
+    fig.show()
+
+
 
 ..
     ...............................
     Using multiple figures:
     ...............................
-    
+
     If you need multiple figures open at once you can do this.
-    
+
     .. code-block:: python
-        
+
         import vtkplotlib as vpl
-        
+
         # The auto figure setting is just going to get in the way. To counter this
         # just switch it off.
         vpl.set_auto_fig(False)
-        
+
         # Now gcf() will not create new figures and always return None. New plots
         # will not automatically add themselves to figures.
-        
+
         # Create 3 labelled figures
         figures = []
         for i in range(1, 4):
             figures.append(vpl.figure("Figure {}".format(i)))
-    
-    
+
+
         # A plot can be added to multiple figures
         ball = vpl.scatter([0, 0, 0])
         for figure in figures:
             figure += ball
-    
-            
+
+
         # Or a different plot for each figure
         for figure in figures:
             vpl.scatter(np.ones(3), color=np.random.random(3), fig=figure)
-        
-        
+
+
         # Show all plots
         for figure in figures:
             # By default show() blocks until the window has been closed again. This
             # can be overidden using the following.
             figure.show(block=False)
-            
-        # Calling show(block=False) doesn't enable user interactivity. If you try 
+
+        # Calling show(block=False) doesn't enable user interactivity. If you try
         # to click on the windows now they won't respond. To make the windows
-        # responsive call show once more without using block=False. 
+        # responsive call show once more without using block=False.
         figure = figures[-1]
             # This causes the program to block here whilst it monitors the windows.
-            # VTK's 'monitor windows' function is global i.e it doesn't matter which 
+            # VTK's 'monitor windows' function is global i.e it doesn't matter which
             # figure calls it and it affects any and all windows that are open.
         print("showing", figure.window_name)
-        figure.show() 
-        
-        
-        
+        figure.show()
+
+
