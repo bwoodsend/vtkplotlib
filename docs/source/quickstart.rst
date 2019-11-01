@@ -47,7 +47,7 @@ will installed automatically.
 
 .. code-block:: shell
 
-    pip install git+https://github.com/bwoodsend/vtkplotlib.git
+    pip install vtkplotlib
 
 
 
