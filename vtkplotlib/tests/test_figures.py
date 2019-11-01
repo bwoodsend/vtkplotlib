@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Aug  3 21:02:41 2019
+# =============================================================================
+# Created on Sat Aug  3 21:02:41 2019
+#
+# @author: Brénainn Woodsend
+#
+#
+# test_figures.py tests the contents of the vtkplotlib.figures subpackage.
+# Copyright (C) 2019  Brénainn Woodsend
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# =============================================================================
 
-@author: Brénainn Woodsend
-
-
-one line to give the program's name and a brief idea of what it does.
-Copyright (C) 2019  Brénainn Woodsend
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
 from __future__ import unicode_literals
 
 import numpy as np
@@ -39,7 +40,7 @@ class TestFigures(TestCase):
         vpl.close()
         self.assertIs(vpl.gcf(False), None)
 
-        vpl.set_auto_fig(False)
+        vpl.auto_figure(False)
         self.assertIs(vpl.gcf(), None)
 
         with self.assertRaises(vpl.figures.figure_manager.NoFigureError):
@@ -49,7 +50,7 @@ class TestFigures(TestCase):
         self.assertIs(vpl.gcf(), None)
         del fig
 
-        vpl.set_auto_fig()
+        vpl.auto_figure(True)
         fig = vpl.gcf()
         self.assertTrue(fig is not None)
 
@@ -111,7 +112,7 @@ class TestFigures(TestCase):
 
 
     def test_view(self):
-        vpl.set_auto_fig(True)
+        vpl.auto_figure(True)
         vpl.close()
         grads = np.array(vpl.geometry.orthogonal_bases(np.random.rand(3)))
         point = np.random.uniform(-10, 10, 3)
@@ -137,7 +138,7 @@ class TestFigures(TestCase):
     def test_multi_figures(self):
         vpl.close()
 
-        vpl.set_auto_fig(False)
+        vpl.auto_figure(False)
 
         plot = vpl.plot(np.random.uniform(-10, 10, (10, 3)), join_ends=True)
         figs = []
@@ -151,7 +152,7 @@ class TestFigures(TestCase):
             figs.append(fig)
         fig.show()
 
-        vpl.set_auto_fig(True)
+        vpl.auto_figure(True)
 
 
     @skipUnless(vpl.PyQt5_AVAILABLE, "PyQt5 not installed")
@@ -174,7 +175,7 @@ class TestFigures(TestCase):
         self.assertIs(fig, vpl.gcf())
 
         vpl.scatter(np.arange(9).reshape((3, 3)).T)
-        vpl._quick_test_plot()
+        vpl.quick_test_plot()
 
         fig.add_all()
 
@@ -197,7 +198,7 @@ class TestFigures(TestCase):
 
     def test_add_remove(self):
         fig = vpl.figure()
-        plots = vpl._quick_test_plot(None)
+        plots = vpl.quick_test_plot(None)
         fig += plots
         fig.show(False)
         fig -= plots
@@ -212,3 +213,5 @@ class TestFigures(TestCase):
         vpl.close(fig)
 
 
+if __name__ == "__main__":
+    main(TestFigures())

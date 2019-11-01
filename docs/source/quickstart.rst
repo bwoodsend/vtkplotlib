@@ -1,32 +1,28 @@
-.. vtkplotlib documentation master file, created by
-   sphinx-quickstart on Tue Aug  6 00:07:07 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to vtkplotlib's documentation!
+Introduction
 ======================================
 
-..
-    .. toctree::
-       :maxdepth: 2
-       :caption: Contents:
 
 
-.. image:: docs/source/python_versions.svg
+.. image:: python_versions.svg
 
 
-A simple library to make 3D graphics using easy. Built on top of VTK. VTK is a
-very versatile library but still only has a rather low level API. Even the
+A simple library to make 3D graphics using easy. Built on top of VTK. Whilst
+VTK is a very versatile library, it still only has a rather low level API. Even the
 simplest examples require the construction and linking of a large number of
-compicated internal components. This and other factors make writing in it slow
+complicated internal components. This and other factors make writing in it slow
 and painful. This library seeks to overcome that by wrapping the all ugliness
 into numpy friendly functions to create a 3D equivalent of matplotlib. All the
-VTK components/functionality are still accessable but by default are already
-setup for you. It also takes advantage of VTK's lesser known numpy support so
-that data can be efficiently copied by reference between numpy and VTK making
-it much faster than most of the VTK examples you'll find online. vtkplotlib
-is easy to install, is freezable with `pyinstaller`_, has direct support
-for STL plotting and can be embedded into `PyQt5`_ applications.
+VTK components/functionality are still accessible but by default are already
+setup for you.
+
+Key features
+------------
+
+* Clean and easy to install.
+* Takes advantage of VTK's lesser known numpy support so that data can be efficiently copied by reference between numpy and VTK making it much faster than most of the VTK examples you'll find online.
+* Has direct support for STL plotting.
+* Can be embedded seamlessly into `PyQt5`_ applications.
+* Is freezable with `pyinstaller`_.
 
 
 Requirements for installing:
@@ -46,7 +42,12 @@ get a .whl from `here <https://www.lfd.uci.edu/~gohlke/pythonlibs/#vtk>`_.
 Installation:
 ------------------------------------------------------------------------------
 
- `pip install git+https://github.com/bwoodsend/vtkplotlib.git`
+To install run the following into shell/bash/terminal. The mandatory dependencies
+will installed automatically.
+
+.. code-block:: shell
+
+    pip install git+https://github.com/bwoodsend/vtkplotlib.git
 
 
 
@@ -56,7 +57,8 @@ Optional requirements:
 Some features require you to install the following:
 
  - `numpy-stl`_ or any other STL library if you want to plot STL files. `numpy-stl`_ is my STL library of choice.
- - `PyQt5`_ if you want to include your plots in a GUI.
+ - `PyQt5`_ if you want to include your plots in a larger Qt GUI.
+ - `namegenerator`_ for fun.
 
 
 .. _numpy: http://numpy.org/
@@ -67,6 +69,7 @@ Some features require you to install the following:
 .. _numpy-stl: https://pypi.org/project/numpy-stl/
 .. _future: https://pypi.org/project/future/
 .. _pyinstaller: https://www.pyinstaller.org/
+.. _namegenerator: https://pypi.org/project/namegenerator/
 
 
 
@@ -123,7 +126,7 @@ or using any of matplotlib's named colors using strings.
     vpl.scatter(points, color="r")
     vpl.show()
 
-See matplotlib or vpl.colors.mpl_colors for a full list of available colors.
+See matplotlib or ``vpl.colors.mpl_colors`` for a full list of available colors.
 
 
 Or colors can be given per point
@@ -147,10 +150,11 @@ Line plots:
     import numpy as np
 
     # Create some kind of wiggly shape
+    # use ``vpl.zip_axes`` to combine (x, y, z) axes
     t = np.linspace(0, 2 * np.pi, 300)
-    points = np.array([np.cos(2 * t),
-                       np.sin(3 * t),
-                       np.cos(5 * t) * np.sin(7 *t)]).T
+    points = vpl.zip_axes(np.cos(2 * t),
+                          np.sin(3 * t),
+                          np.cos(5 * t) * np.sin(7 *t))
 
     # Plot a line
     vpl.plot(points,
@@ -165,11 +169,9 @@ the first.
 
 .. code-block:: python
 
-    # Create the corners of an octogon
+    # Create the corners of an octagon
     t = np.arange(0, 1, 1 / 8) *  2 * np.pi
-    points = np.array([np.cos(t),
-                       np.sin(t),
-                       np.zeros_like(t)]).T
+    points = vpl.zip_axes(np.cos(t), np.sin(t), 0)
 
     # Plot them
     vpl.plot(points,
@@ -183,149 +185,8 @@ the first.
 Mesh plots:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-To plot STL files you will need some kind of STL reader library. If you don't
-have one then get this one `numpy-stl`_. Their Mesh class can be passed
-directly to vpl.mesh_plot.
-
-The following example assumes you have installed `numpy-stl`_.
-
-.. code-block:: python
-
-    import vtkplotlib as vpl
-    from stl.mesh import Mesh
-
-    # path = "if you have an STL file then put it's path here."
-    # Otherwise vtkplotlib comes with a small STL file for demos/testing.
-    path = vpl.data.get_rabbit_stl()
-
-    # Read the STL using numpy-stl
-    mesh = Mesh.from_file(path)
-
-    # Plot the mesh
-    vpl.mesh_plot(mesh)
-
-    # Show the figure
-    vpl.show()
-
-
-
-Unfortunately there are far too many mesh/STL libraries/classes out there to
-support them all. To overcome this as best we can, mesh_plot has a flexible
-constructor which accepts any of the following.
-
-
-1.  Some kind of mesh class that has form 2) stored in mesh.vectors.
-    For example numpy-stl's stl.mesh.Mesh or pymesh's pymesh.stl.Stl
-
-
-2.   An np.array with shape (n, 3, 3) in the form:
-
-    .. code-block:: python
-
-       np.array([[[x, y, z],  # corner 0  \
-                  [x, y, z],  # corner 1  | triangle 0
-                  [x, y, z]], # corner 2  /
-                 ...
-                 [[x, y, z],  # corner 0  \
-                  [x, y, z],  # corner 1  | triangle n-1
-                  [x, y, z]], # corner 2  /
-                ])
-
-
-    Note it's not uncommon to have arrays of shape (n, 3, 4) or (n, 4, 3)
-    where the additional entries' meanings are usually irrelevant (often to
-    represent scalars but as STL has no color this is always uniform). Hence
-    to support mesh classes that have these, these arrays are allowed and the
-    extra entries are ignored.
-
-
-3.  An np.array with shape (k, 3) of (usually unique) vertices in the form:
-
-    .. code-block:: python
-
-        np.array([[x, y, z],
-                  [x, y, z],
-                  ...
-                  [x, y, z],
-                  [x, y, z],
-                  ])
-
-    And a second argument of an np.array of integers with shape (n, 3) of point
-    args in the form
-
-    .. code-block:: python
-
-        np.array([[i, j, k],  # triangle 0
-                  ...
-                  [i, j, k],  # triangle n-1
-                  ])
-
-    where i, j, k are the indices of the points (in the vertices array)
-    representing each corner of a triangle.
-
-    Note that this form can be (and is) easily converted to form 2) using
-
-    .. code-block:: python
-
-        vertices = unique_vertices[point_args]
-
-
-
-Hopefully this will cover most of the cases. If you are using or have written
-an STL library that you want supported then let me know. If it's numpy based
-then it's probably only a few extra lines to support.
-
-
-
-.............................
-Mesh plotting with scalars:
-.............................
-
-
-To create a heat map like image use the 'scalars' or 'tri_scalars' options.
-
-
-To use 'scalars':
-
-.. code-block:: python
-
-    import vtkplotlib as vpl
-    from stl.mesh import Mesh
-
-    # Open an STL as before
-    path = vpl.data.get_rabbit_stl()
-    mesh = Mesh.from_file(path)
-
-    # Plot it with the z values as the scalars. scalars is 'per vertex' or 1
-    # value for each corner of each triangle and should have shape (n, 3).
-    plot = vpl.mesh_plot(mesh, scalars=mesh.z)
-
-    # Optionally the plot created by mesh_plot can be passed to color_bar
-    vpl.color_bar(plot, "Heights")
-
-    vpl.show()
-
-
-To use 'tri_scalars':
-
-.. code-block:: python
-
-    import vtkplotlib as vpl
-    from stl.mesh import Mesh
-    import numpy as np
-
-    # Open an STL as before
-    path = vpl.data.get_rabbit_stl()
-    mesh = Mesh.from_file(path)
-
-    # tri_scalars is one value per triangle
-    # Create some scalars showing "how far upwards" each triangle is facing
-    tri_scalars = np.inner(mesh.units, np.array([0, 0, 1]))
-
-    vpl.mesh_plot(mesh, tri_scalars=tri_scalars)
-
-    vpl.show()
-
+.. autoclass:: vtkplotlib.plots.MeshPlot.MeshPlot
+    :noindex:
 
 
 ...............................
@@ -350,7 +211,7 @@ demonstrates the figure handling functions.
     # You can create a figure explicitly using figure()
     fig = vpl.figure("Your Figure Title Here")
 
-    # Creating a figure automatcally sets it as the current working figure
+    # Creating a figure automatically sets it as the current working figure
     # You can get the current figure using gcf()
     vpl.gcf() is fig # Should be True
 
@@ -358,7 +219,7 @@ demonstrates the figure handling functions.
     # would have created one. If gcf() had also not been called here then
     # the plotting further down will have internally called gcf().
 
-    # A figure's properties can be editted directly
+    # A figure's properties can be edited directly
     fig.background_color = "dark green"
     fig.window_name = "A New Window Title"
 
@@ -396,7 +257,7 @@ demonstrates the figure handling functions.
     vpl.figure_history[-1] is fig # Should be True
     fig is vpl.gcf() # Should be False
 
-    # A figure can be reshown indefinately and should be exactly as you left it
+    # A figure can be reshown indefinitely and should be exactly as you left it
     # when it was closed.
     fig.show()
 
@@ -440,7 +301,7 @@ demonstrates the figure handling functions.
         # Show all plots
         for figure in figures:
             # By default show() blocks until the window has been closed again. This
-            # can be overidden using the following.
+            # can be overridden using the following.
             figure.show(block=False)
 
         # Calling show(block=False) doesn't enable user interactivity. If you try
@@ -452,5 +313,7 @@ demonstrates the figure handling functions.
             # figure calls it and it affects any and all windows that are open.
         print("showing", figure.window_name)
         figure.show()
+
+
 
 

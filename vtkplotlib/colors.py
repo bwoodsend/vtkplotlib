@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Aug  3 13:01:28 2019
-
-@author: Brénainn Woodsend
-
-
-colors.py
-Shamelessly steals matplotlib's color library. Functions for handling different
-color types.
-Copyright (C) 2019  Brénainn Woodsend
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
+# =============================================================================
+# Created on Sat Aug  3 13:01:28 2019
+#
+# @author: Brénainn Woodsend
+#
+#
+# colors.py "borrows" matplotlib's color library and contains functions for handling different
+# color types.
+# Copyright (C) 2019  Brénainn Woodsend
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# =============================================================================
 
 from __future__ import division
 from future.utils import string_types, as_native_str
@@ -72,7 +71,7 @@ def process_color(color=None, opacity=None):
         anything greater than 1. Hence from 0 to 1 is the preferred format.
 
     'opacity':
-        An scalar like the numbers for 'color'.'opacity' overides alpha
+        An scalar like the numbers for 'color'.'opacity' overrides alpha
         if alpha is provided in 'color'.
 
 """
@@ -132,6 +131,88 @@ def normalise(colors, axis=None):
 
 
 class TextureMap(object):
+    """Use a 2D image as a color lookup table.
+
+    .. warning::
+
+        This is still very much under development and requires a bit of
+        monkey-wrenching to use. Currently only ``vpl.surface`` and
+        ``vpl.PolyData`` have any support for it.
+
+
+    :param array: The image data. It is converted to an array if it isn't one already.
+    :type array: str path, os.PathLike, np.ndarray with shape (m, n, 3 or 4), PIL Image
+
+    :param interpolate: , defaults to False.
+    :type interpolate: bool, optional
+
+
+    :return: A callable texturemap object.
+    :rtype: ``vtkplotlib.colors.TextureMap``
+
+
+    The TextureMap object can be called to look up the color at a coordinate(s).
+    Like everything else in vktplotlib, texture coordinates should be zipped
+    into a single array of the form:
+
+    .. code-block:: python
+
+        np.array([[x0, y0],
+                  [x1, y1],
+                  ...,
+                  [xn, yn]])
+
+    Unlike typical images, texture-map coordinates traditionally use the
+    conventional (x, y) axes. i.e Right is x-increasing and up is y-increasing.
+    Indices are always between 0 and 1 and are independent of the size of the
+    image. To use texture-coordinates, pass an array with
+    ``array.shape[-1] == 2`` as the scalar argument to a plot command.
+
+
+    Typically texture-maps are found in some 3D file formats but integrating
+    those is still under development. Texture-maps also play very well with
+    parametric plots, namely ``vpl.surface`` using the 2 independent variables
+    as the texture coordinates.
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        import numpy as np
+
+        # Define the 2 independent variables
+        phi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 1024),
+                                 np.linspace(0, np.pi, 1024))
+
+        # Calculate the x, y, z values to form a sphere
+        x = np.cos(phi) * np.sin(theta)
+        y = np.sin(phi) * np.sin(theta)
+        z = np.cos(theta)
+
+        # You can play around with this. The coordinates must be zipped
+        # together into one array with ``shape[-1] == 2``, hence the
+        # ``vpl.zip_axes``. And must be between 0 and 1, hence the ``% 1.0``.
+        texture_coords = (vpl.zip_axes(phi * 3, theta * 5) / np.pi) % 1.0
+
+        # Pick an image to use. There is a picture of a shark here if you
+        # don't have one available.
+        path = vpl.data.ICONS["Right"]
+        texture_map = vpl.TextureMap(path, interpolate=True)
+
+
+        # You could convert ``texture_coords`` to ``colors`` now using.
+        # colors = texture_map(texture_coords)
+        # then pass ``colors`` as the `scalars` argument instead.
+
+        vpl.surface(x, y, z,
+                    scalars=texture_coords,
+                    texture_map=texture_map)
+
+        vpl.show()
+
+
+    """
+
+
     def __init__(self, array, interpolate=False):
 
         if isinstance(array, PathLike):

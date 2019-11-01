@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
-# Created on Wed Jul 31 02:29:27 2019
+# Created on Wed Aug 14 21:23:22 2019
 #
 # @author: Brénainn Woodsend
 #
 #
-# data.__init__.py handles paths to the data folder in vtkplotlib.
+# _vtk_errors.py listens to VTK errors and prints them to stdout.
 # Copyright (C) 2019  Brénainn Woodsend
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,33 +23,25 @@
 # =============================================================================
 
 
-import numpy as np
-import sys
-import os
-from pathlib2 import Path
 
+class ErrorObserver:
 
-import pkg_resources
+    def __init__(self):
+        self.CallDataType = 'string0'
+        self.messages = set()
 
-DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")) / "data"
+    def __call__(self, obj, event, message):
+        if message not in self.messages:
+            print(message)
+            self.messages.add(message)
 
-MODELS_FOLDER = DATA_FOLDER / "models"
-
-def get_rabbit_stl():
-#    print("This is not my rabbit file. See README.txt and LICENSE.txt in\n{}\nfor details.".format(folder))
-    return str(MODELS_FOLDER / "rabbit" / "rabbit.stl")
-
-ICONS_FOLDER = DATA_FOLDER / "icons"
-
-ICONS = {i.stem: str(i) for i in ICONS_FOLDER.glob("*")}
+    def attach(self, vtk_obj):
+        vtk_obj.AddObserver("ErrorEvent", self)
 
 
 
+handler = ErrorObserver()
 
-def assert_ok():
-    assert ICONS_FOLDER.is_dir()
-    assert MODELS_FOLDER.is_dir()
-    assert os.path.isfile(get_rabbit_stl())
 
 if __name__ == "__main__":
-    assert_ok()
+    pass

@@ -1,27 +1,28 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Jul 30 20:09:13 2019
+# =============================================================================
+# Created on Tue Jul 30 20:09:13 2019
+#
+# @author: Brénainn Woodsend
+#
+#
+# fancy_figure.py creates a more sophisticated render window for plotting into.
+# Copyright (C) 2019  Brénainn Woodsend
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# =============================================================================
 
-@author: Brénainn Woodsend
 
-
-fancy_figure.py
-Create a more sophisticated render window for plotting into.
-Copyright (C) 2019  Brénainn Woodsend
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
 from builtins import super
 
 import numpy as np
@@ -52,11 +53,44 @@ class QtFigure2(QtFigure):
     custom GUIs can be built quickly.
 
     This is still under development. Currently it has:
-        1) A screenshot button
-        2) A panel for preset camera views
+
+    1. A screenshot button.
+    2. A panel for preset camera views.
+    3. An actor table to show / hide / color plots interactively (although it needs some way to group them).
 
     I hope/intend to add:
-        1) An actor table to show / hide / color plots interactively.
+
+    1. Suggestions welcome here...
+
+    Use this class the same way you would use ``vpl.QtFigure`` (see there first.)
+    Each feature is added with a ``fig.add_***()`` method.
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        import numpy as np
+
+        # Create the figure. This as-is looks like just a QtFigure.
+        fig = vpl.QtFigure2()
+
+        # Add each feature you want. Pass arguments to customise each one.
+        fig.add_screenshot_button()
+        fig.add_preset_views()
+        fig.add_show_plot_table_button()
+        # Use ``fig.add_all()`` to add all them all.
+
+        # You will likely want to dump the above into a function. Or a class
+        # inheriting from ``vpl.QtFigure2``.
+
+        # The usual, plot something super exciting.
+        vpl.polygon(np.array([[1, 0, 0],
+                              [1, 1, 0],
+                              [0, 1, 1],
+                              [0, 0, 1]]), color="grey")
+
+        # Then either ``vpl.show()`` or
+        fig.show()
+
 
     """
     def __init__(self, name="qt vtk figure", parent=None):

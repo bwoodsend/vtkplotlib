@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Jul 21 20:32:50 2019
-
-@author: Brénainn Woodsend
-
-
-Lines.py
-Plots lines through some points.
-Copyright (C) 2019  Brénainn Woodsend
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
+# =============================================================================
+# Created on Sun Jul 21 20:32:50 2019
+#
+# @author: Brénainn Woodsend
+#
+#
+# Lines.py plots 3D lines through some points.
+# Copyright (C) 2019  Brénainn Woodsend
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# =============================================================================
 
 from builtins import super
 
@@ -39,20 +38,59 @@ from vtk.util.numpy_support import (
 
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot, _iter_colors, _iter_points, _iter_scalar
-from vtkplotlib import numpy_vtk, nuts_and_bolts
+from vtkplotlib import _numpy_vtk, nuts_and_bolts
 from vtkplotlib.plots.polydata import join_line_ends
 
 
 
 class Lines(ConstructedPlot):
-    """Plots a line going through an array of points. Optionally can be set to
-    join the last point with the first to create a polygon."""
+    """Plots a line passing through an array of points.
+
+    :param vertices: The points to plot through.
+    :type vertices: np.ndarray of shape (n, 3)
+
+    :param color: The color of the plot, defaults to white.
+    :type color: str, 3-tuple, 4-tuple, optional
+
+    :param opacity: The translucency of the plot, 0 is invisible, 1 is solid, defaults to solid.
+    :type opacity: float, optional
+
+    :param line_width: The thickness of the lines, defaults to 1.0.
+    :type line_width: float, optional
+
+    :param join_ends: If true, join the 1st and last points to form a closed loop, defaults to False.
+    :type join_ends: bool, optional
+
+    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
+    :type fig: vpl.figure, vpl.QtFigure, optional
+
+
+    :return: A lines object.
+    :rtype: vtkplotlib.plots.Lines.Lines
+
+    If `vertices` is 3D then multiple seperate lines are plotted. Currently it
+    can only do one color for the whole thing. This can be used to plot meshes
+    as wireframes.
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        from stl.mesh import Mesh
+
+        mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
+        vertices = mesh.vectors
+
+        vpl.plot(vertices, join_ends=True, color="dark red")
+        vpl.show()
+
+    """
+
     def __init__(self, vertices, color=None, opacity=None, line_width=1.0, join_ends=False, fig="gcf"):
         super().__init__(fig)
 
 
         shape = vertices.shape[:-1]
-        points = numpy_vtk.contiguous_safe(nuts_and_bolts.flatten_all_but_last(vertices))
+        points = _numpy_vtk.contiguous_safe(nuts_and_bolts.flatten_all_but_last(vertices))
         self.temp.append(points)
 
         args = nuts_and_bolts.flatten_all_but_last(np.arange(np.prod(shape)).reshape(shape))

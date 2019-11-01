@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Jul 21 15:29:19 2019
-
-@author: Brénainn Woodsend
-
-
-ScalarBar.py
-Adds a scalar/color bar.
-Copyright (C) 2019  Brénainn Woodsend
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
+# =============================================================================
+# Created on Sun Jul 21 15:29:19 2019
+#
+# @author: Brénainn Woodsend
+#
+#
+# ScalarBar.py adds a scalar/color bar.
+# Copyright (C) 2019  Brénainn Woodsend
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# =============================================================================
 
 from builtins import super
 
@@ -41,6 +40,25 @@ from vtkplotlib.plots.BasePlot import BasePlot
 
 
 class ScalarBar(BasePlot):
+    """Create a scalar bar. Also goes by the alias `colorbar`.
+
+    :param plot: The plot with scalars to draw a scalarbar for.
+
+    :param title: , defaults to ''.
+    :type title: str, optional
+
+    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
+    :type fig: vpl.figure, vpl.QtFigure, optional
+
+
+    :return: The scalarbar object.
+    :rtype: vtkplotlib.plots.ScalarBar.ScalarBar
+
+
+    The `plot` argument can be the output of any ``vpl.***`` command that takes
+    `scalars` as an argument.
+
+    """
     def __init__(self, plot, title="", fig="gcf"):
 
         super().__init__(fig)
@@ -59,7 +77,7 @@ class ScalarBar(BasePlot):
 
 
 #        self.fig += self
-        self.fig.render.AddActor2D(self.actor)
+        self.fig.renderer.AddActor2D(self.actor)
         self.fig.plots.add(self)
 
 

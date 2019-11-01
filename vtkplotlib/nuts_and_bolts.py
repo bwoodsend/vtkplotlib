@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon May 13 15:15:26 2019
-
-@author: Brénainn Woodsend
-
-nuts_and_bolts.py
-Dumping ground for various misc functions.
-Copyright (C) 2019  Brénainn Woodsend
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-"""
+# =============================================================================
+# Created on Mon May 13 15:15:26 2019
+#
+# @author: Brénainn Woodsend
+#
+# nuts_and_bolts.py is a dumping ground for various misc functions.
+# Copyright (C) 2019  Brénainn Woodsend
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# =============================================================================
 
 """Dumping ground for random bits and bobs. I use this for several projects so
 there will be a lot of irrelevant functions."""
@@ -46,10 +45,56 @@ def sep_last_ax(points):
     return tuple(points[..., i] for i in range(points.shape[-1]))
 
 def zip_axes(*axes):
-    import numpy as np
-    return np.concatenate([np.asarray(i)[..., np.newaxis] for i in axes], axis=-1)
+    """Convert vertex data from seperate arrays for x, y, z to a single
+    combined points array like most vpl functions require.
+
+    :param axes: Each seperate axis to combine.
+    :type axes: array_like or scalar
+
+    All `axes` must have the matching or broadcastable shapes. The number of
+    axes doesn't have to be 3.
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        import numpy as np
+
+        vpl.zip_axes(np.arange(10),
+                     4,
+                     np.arange(-5, 5))
+
+        # Out: array([[ 0,  4, -5],
+        #             [ 1,  4, -4],
+        #             [ 2,  4, -3],
+        #             [ 3,  4, -2],
+        #             [ 4,  4, -1],
+        #             [ 5,  4,  0],
+        #             [ 6,  4,  1],
+        #             [ 7,  4,  2],
+        #             [ 8,  4,  3],
+        #             [ 9,  4,  4]])
+
+    .. seealso:: ``vpl.unzip_axes`` for the reverse.
+
+    """
+
+    return np.concatenate([i[..., np.newaxis] for i in np.broadcast_arrays(*axes)], axis=-1)
 
 def unzip_axes(points):
+    """Seperate each component from an array of points.
+
+    :param points: Some points.
+    :type points: np.ndarray
+
+
+    :return: Each axis separately as a tuple.
+    :rtype: tuple of arrays
+
+    .. seealso ``vpl.zip_axes`` for the reverse.
+
+    """
+
+
     return sep_last_ax(points)
 
 def flatten_all_but_last(arr):

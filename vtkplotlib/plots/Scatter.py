@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Jul 21 00:51:34 2019
-
-@author: Brénainn Woodsend
-
-
-Scatter.py
-Create a scatter plot using spheres.
-Copyright (C) 2019  Brénainn Woodsend
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
+# =============================================================================
+# Created on Sun Jul 21 00:51:34 2019
+#
+# @author: Brénainn Woodsend
+#
+#
+# Scatter.py creates a scatter plot using spheres.
+# Copyright (C) 2019  Brénainn Woodsend
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# =============================================================================
 
 from builtins import super
 
@@ -117,6 +116,33 @@ class Cursor(SourcedPlot):
 
 
 def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig="gcf"):
+    """Scatter plot using little spheres or cursor objects.
+
+    :param points: The point(s) to place the marker(s) at.
+    :type points: np.array with ``points.shape[-1] == 3``
+
+    :param color: The color of the markers, can be singular or per marker, defaults to white.
+    :type color: str, 3-tuple, 4-tuple, np.array with same shape as `points`, optional
+
+    :param opacity: The translucencies of the plots, 0 is invisible, 1 is solid, defaults to solid.
+    :type opacity: float, np.array, optional
+
+    :param radius: The radius of each marker, defaults to 1.0.
+    :type radius: float, np.array, optional
+
+    :param use_cursors: If false use spheres, if true use cursors, defaults to False.
+    :type use_cursors: bool, optional
+
+    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
+    :type fig: vpl.figure, vpl.QtFigure, optional
+
+
+    :return: The marker or an array of markers.
+    :rtype: vtkplotlib.plots.Scatter.Sphere or vtkplotlib.plots.Scatter.Cursor or np.array
+
+
+    """
+
     points = np.asarray(points)
     out = np.empty(points.shape[:-1], object)
     out_flat = out.ravel()

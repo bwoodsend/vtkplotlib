@@ -1,28 +1,26 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Jul 20 21:21:20 2019
-
-@author: Brénainn Woodsend
-
-
-figures.py
-Provides/manages windows to render into.
-Copyright (C) 2019  Brénainn Woodsend
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-"""
+# =============================================================================
+# Created on Sat Jul 20 21:21:20 2019
+#
+# @author: Brénainn Woodsend
+#
+#
+# figures.py provides windows to render into.
+# Copyright (C) 2019  Brénainn Woodsend
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# =============================================================================
 
 from builtins import super
 
@@ -37,11 +35,16 @@ from .BaseFigure import BaseFigure
 
 
 class Figure(BaseFigure):
-    """The default figure class."""
-    def __init__(self, name="vtk figure"):
+    """Create a new figure. This will automatically be set as the current
+    working figure (returned by ``vpl.gcf()``).
 
-        super().__init__()
-        self.window_name = name
+    :param name: The window title, defaults to 'vtk figure'.
+    :type name: str, optional
+
+    """
+    def __init__(self, name=""):
+
+        super().__init__(name)
 
     def show(self, block=True):
         super().show(block)

@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Jul 20 23:55:28 2019
-
-@author: Brénainn Woodsend
-
-
-MeshPlot.py
-Plot a 3D stl (like) mesh.
-Copyright (C) 2019  Brénainn Woodsend
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
+# =============================================================================
+# Created on Sat Jul 20 23:55:28 2019
+#
+# @author: Brénainn Woodsend
+#
+#
+# MeshPlot.py plots a 3D stl (like) mesh.
+# Copyright (C) 2019  Brénainn Woodsend
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# =============================================================================
 
 from builtins import super
 
@@ -38,7 +37,7 @@ from vtk.util.numpy_support import (
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot
 from vtkplotlib.nuts_and_bolts import flatten_all_but_last
-from vtkplotlib import numpy_vtk
+from vtkplotlib import _numpy_vtk
 
 
 MESH_DATA_TYPE = \
@@ -119,7 +118,7 @@ def path_str_to_vectors(path, ignore_numpystl=False):
 
     # Otherwise try vtk's STL reader - however it's far from flawless.
 
-    # A lot of reduncy here.
+    # A lot of redundancy here.
     # -Read the STL using vtk's STLReader
     # -Extract the polydata
     # -Extract the vectors from the polydata
@@ -128,9 +127,8 @@ def path_str_to_vectors(path, ignore_numpystl=False):
 
     from vtkplotlib.plots.polydata import PolyData
     from vtkplotlib.unicode_paths import PathHandler
-    from vtkplotlib.vtk_errors import handler
+    from vtkplotlib._vtk_errors import handler
 
-    global path_handler
     with PathHandler(path) as path_handler:
         reader = vtk.vtkSTLReader()
         handler.attach(reader)
@@ -148,10 +146,10 @@ def path_str_to_vectors(path, ignore_numpystl=False):
         pd = PolyData(reader.GetOutput())
 
     # For some reason VTK just doesn't like some files. There are some vague
-    # warnings in their docs - this could be what they are on about. If it
-    # doesn't work `reader.GetOutput()` gives an empty polydata.
+    # warnings in their docs - this could be what they're on about. If it
+    # doesn't work ``reader.GetOutput()`` gives an empty polydata.
     if pd.vtk_polydata.GetNumberOfPoints() == 0:
-        raise RuntimeError("VTK's STLReader failed to read the STL file and no STL io backend is installed. VTK's STLReader is rather patchy. To read this file please `pip install numpy-stl` first.")
+        raise RuntimeError("VTK's STLReader failed to read the STL file and no STL io backend is installed. VTK's STLReader is rather patchy. To read this file please ``pip install numpy-stl`` first.")
 
     return normalise_mesh_type((pd.points, pd.polygons))
 
@@ -213,10 +211,160 @@ def normalise_mesh_type(mesh_data):
 
 
 class MeshPlot(ConstructedPlot):
-    """Plot an STL (like) surface composed of lots of little triangles. Accepts
-    mesh types from various 3rd party libraries. This was primarily written for
-    the numpy-stl library. Failing that can also take other more generic formats.
-    See __init__ for more info.
+    """To plot STL files you will need some kind of STL reader library. If you don't
+    have one then get this one `numpy-stl`_. Their Mesh class can be passed
+    directly to vpl.mesh_plot.
+
+    .. _numpy-stl: https://pypi.org/project/numpy-stl/
+
+    The following example assumes you have installed `numpy-stl`_.
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        from stl.mesh import Mesh
+
+        # path = "if you have an STL file then put it's path here."
+        # Otherwise vtkplotlib comes with a small STL file for demos/testing.
+        path = vpl.data.get_rabbit_stl()
+
+        # Read the STL using numpy-stl
+        mesh = Mesh.from_file(path)
+
+        # Plot the mesh
+        vpl.mesh_plot(mesh)
+
+        # Show the figure
+        vpl.show()
+
+
+
+    Unfortunately there are far too many mesh/STL libraries/classes out there to
+    support them all. To overcome this as best we can, mesh_plot has a flexible
+    constructor which accepts any of the following.
+
+
+    1.  Some kind of mesh class that has form 2) stored in mesh.vectors.
+        For example numpy-stl's stl.mesh.Mesh or pymesh's pymesh.stl.Stl
+
+
+    2.   An np.array with shape (n, 3, 3) in the form:
+
+        .. code-block:: python
+
+           np.array([[[x, y, z],  # corner 0  \
+                      [x, y, z],  # corner 1  | triangle 0
+                      [x, y, z]], # corner 2  /
+                     ...
+                     [[x, y, z],  # corner 0  \
+                      [x, y, z],  # corner 1  | triangle n-1
+                      [x, y, z]], # corner 2  /
+                    ])
+
+
+        Note it's not uncommon to have arrays of shape (n, 3, 4) or (n, 4, 3)
+        where the additional entries' meanings are usually irrelevant (often to
+        represent scalars but as STL has no color this is always uniform). Hence
+        to support mesh classes that have these, these arrays are allowed and the
+        extra entries are ignored.
+
+
+    3.  An np.array with shape (k, 3) of (usually unique) vertices in the form:
+
+        .. code-block:: python
+
+            np.array([[x, y, z],
+                      [x, y, z],
+                      ...
+                      [x, y, z],
+                      [x, y, z],
+                      ])
+
+        And a second argument of an np.array of integers with shape (n, 3) of point
+        args in the form
+
+        .. code-block:: python
+
+            np.array([[i, j, k],  # triangle 0
+                      ...
+                      [i, j, k],  # triangle n-1
+                      ])
+
+        where i, j, k are the indices of the points (in the vertices array)
+        representing each corner of a triangle.
+
+        Note that this form can be (and is) easily converted to form 2) using
+
+        .. code-block:: python
+
+            vertices = unique_vertices[point_args]
+
+
+
+    Hopefully this will cover most of the cases. If you are using or have written
+    an STL library (or any other format) that you want supported then let me know.
+    If it's numpy based then it's probably only a few extra lines to support. Or
+    you can have a go at writing it yourself, either `with mesh_plot`  or with the
+    ``vpl.PolyData`` class.
+
+
+
+    **Mesh plotting with scalars:**
+
+
+    To create a heat map like image use the `scalars` or `tri_scalars` options.
+
+
+    Use the `scalars` option to assign a scalar value to each point/corner:
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        from stl.mesh import Mesh
+
+        # Open an STL as before
+        path = vpl.data.get_rabbit_stl()
+        mesh = Mesh.from_file(path)
+
+        # Plot it with the z values as the scalars. scalars is 'per vertex' or 1
+        # value for each corner of each triangle and should have shape (n, 3).
+        plot = vpl.mesh_plot(mesh, scalars=mesh.z)
+
+        # Optionally the plot created by mesh_plot can be passed to color_bar
+        vpl.color_bar(plot, "Heights")
+
+        vpl.show()
+
+
+    Use the `tri_scalars` option to assign a scalar value to each triangle:
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        from stl.mesh import Mesh
+        import numpy as np
+
+        # Open an STL as before
+        path = vpl.data.get_rabbit_stl()
+        mesh = Mesh.from_file(path)
+
+        # `tri_scalars` must have one value per triangle and have shape (n,) or (n, 1).
+        # Create some scalars showing "how upwards facing" each triangle is.
+        tri_scalars = np.inner(mesh.units, np.array([0, 0, 1]))
+
+        vpl.mesh_plot(mesh, tri_scalars=tri_scalars)
+
+        vpl.show()
+
+
+    .. note:: `scalars` and `tri_scalars` overwrite each other and can't be used simultaneously.
+
+    .. seealso::
+
+        Having per-triangle-edge scalars doesn't fit well with VTK. So it got
+        its own seperate function ``vpl.mesh_plot_with_edge_scalar``.
+
+
     """
     def __init__(self, mesh_data, tri_scalars=None, scalars=None, color=None, opacity=None, fig="gcf"):
         super().__init__(fig)
@@ -268,7 +416,7 @@ class MeshPlot(ConstructedPlot):
         Calls self.set_scalars. See set_scalars for implications.
         """
         if tri_scalars is not None:
-            tri_scalars = numpy_vtk.contiguous_safe(tri_scalars.ravel())
+            tri_scalars = _numpy_vtk.contiguous_safe(tri_scalars.ravel())
     #        scalars = np.array([tri_scalars, tri_scalars, tri_scalars]).T
             assert tri_scalars.size == len(self.vectors)
             scalars = np.empty((len(tri_scalars), 3))
@@ -292,7 +440,7 @@ class MeshPlot(ConstructedPlot):
             if scalars.shape != (len(self.vectors), 3):
                 raise ValueError("Expected (n, 3) shape array. Got {}".format(scalars.shape))
 
-            scalars = numpy_vtk.contiguous_safe(scalars)
+            scalars = _numpy_vtk.contiguous_safe(scalars)
 
             self.polydata.vtk_polydata.GetPointData().SetScalars(numpy_to_vtk(scalars.ravel()))
             self.temp.append(scalars)
@@ -303,6 +451,59 @@ class MeshPlot(ConstructedPlot):
 
 
 def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", opacity=None, fig="gcf"):
+    r"""Like mesh_plot but able to add scalars per triangle's edge. By default,
+    the scalar value at centre of each triangle is taken to be the mean of the
+    scalars of its edges, but it can be far more visually effective to use the
+    ``centre_scalar=`` number option.
+
+
+    Edge scalars are very much not the way VTK likes it. Infact VTK doesn't
+    allow it. To overcome this, this function triple-ises each triangle. See
+    the diagram below to see how this is done:
+
+    .. code-block:: text
+
+        (The diagrams's tacky, I know)
+
+                   p1
+
+                 //|\\         Double lines represent the original triangle.
+                // | \\        The single lines represent the division lines that
+          l0   //  |  \\  l1   split the triangle into three.
+              //  / \  \\      The annotations show the order in which the
+             // /     \ \\     scalar for each edge must be provided.
+            ///~~~~~~~~~\\\
+        p0  ~~~~~~~~~~~~~~~  p2
+                  l2
+
+        (reST doesn't like it either)
+
+    Here is a usage example:
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        from stl.mesh import Mesh
+
+
+        path = vpl.data.get_rabbit_stl()
+        mesh = Mesh.from_file(path)
+
+        # This is the length of each side of each triangle.
+        edge_scalars = vpl.geometry.distance(mesh.vectors[:, np.arange(1, 4) % 3] - mesh.vectors)
+
+        vpl.mesh_plot_with_edge_scalars(_mesh, edge_scalars, centre_scalar=0)
+
+        vpl.show()
+
+
+
+
+    I wrote this orginally to visualise curvature.
+
+
+
+    """
 
     vectors = normalise_mesh_type(mesh_data)
     tri_centres = np.mean(vectors, 1)

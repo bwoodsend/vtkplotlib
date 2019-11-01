@@ -32,7 +32,7 @@ from vtk.util.numpy_support import (
                                     vtk_to_numpy,
                                     )
 
-from vtkplotlib import vtk_errors, nuts_and_bolts
+from vtkplotlib import _vtk_errors, nuts_and_bolts
 
 
 class VTKRenderer(object):
@@ -41,7 +41,7 @@ class VTKRenderer(object):
 
     This class handles creating and linking of:
         self.renWin = The outer box/window (with the close button)
-        self.render = Shows the actual 2D image of the plot
+        self.renderer = Shows the actual 2D image of the plot
         self.iren = The interactor is in charge of responding to clicking on the plot
 
     """
@@ -57,12 +57,12 @@ class VTKRenderer(object):
 #            self.renWin = window
 
         # Create a renderer
-        self.render = vtk.vtkRenderer()
+        self.renderer = vtk.vtkRenderer()
 
         self.background_color = "light grey"#20, 50, 100
 
 
-        self.camera = self.render.GetActiveCamera()
+        self.camera = self.renderer.GetActiveCamera()
 
 
 
@@ -77,13 +77,13 @@ class VTKRenderer(object):
         return iren
 
     def connect(self):
-        self.renWin.AddRenderer(self.render)
+        self.renWin.AddRenderer(self.renderer)
 
         self.iren.SetRenderWindow(self.renWin)
 
 
-        vtk_errors.handler.attach(self.renWin)
-        vtk_errors.handler.attach(self.render)
+        _vtk_errors.handler.attach(self.renWin)
+        _vtk_errors.handler.attach(self.renderer)
 
 
     def _start_interactive(self):
@@ -110,7 +110,7 @@ class VTKRenderer(object):
         self._show_window()
 
         if reset_camera:
-            self.render.ResetCamera()
+            self.renderer.ResetCamera()
 
 
         if block:
@@ -121,7 +121,7 @@ class VTKRenderer(object):
 
     def finalise(self):
         self.renWin.Finalize()
-        self.renWin.RemoveRenderer(self.render)
+        self.renWin.RemoveRenderer(self.renderer)
         del self.renWin
         del self.iren
 
@@ -133,15 +133,15 @@ class VTKRenderer(object):
 
 
     def _add_actor(self, actor):
-        self.render.AddActor(actor)
+        self.renderer.AddActor(actor)
 
     def _remove_actor(self, actor):
-        self.render.RemoveActor(actor)
+        self.renderer.RemoveActor(actor)
 
 
     @property
     def background_color(self):
-        return self.render.GetBackground()
+        return self.renderer.GetBackground()
 
     @background_color.setter
     def background_color(self, color):
@@ -149,15 +149,15 @@ class VTKRenderer(object):
 
         color, opacity = process_color(color)
         if color is not None:
-            self.render.SetBackground(*color)
+            self.renderer.SetBackground(*color)
         if opacity is not None:
-            self.render.SetBackgroundAlpha(opacity)
+            self.renderer.SetBackgroundAlpha(opacity)
 
 
     def __del__(self):
         # This prevents a vtk error dialog from popping up.
-        self.render.RemoveAllViewProps()
-        del self.render
+        self.renderer.RemoveAllViewProps()
+        del self.renderer
 
         self.renWin.Finalize()
         del self.renWin
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
     self = vpl.figures.render_window.VTKRenderer()
 
-    [self._add_actor(i.actor) for i in vpl._quick_test_plot()]
+    [self._add_actor(i.actor) for i in vpl.quick_test_plot()]
     self.start()
 
     self.finalise()

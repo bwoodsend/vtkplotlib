@@ -1,35 +1,35 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Jun 19 18:59:14 2019
+# =============================================================================
+# Created on Wed Jun 19 18:59:14 2019
+#
+# @author: Brénainn
+#
+#
+# __init__.py collects all the relevant parts and renames the classes to look like functions.
+# Copyright (C) 2019  Brénainn Woodsend
+#
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# =============================================================================
 
-@author: Brénainn
-
-
-__init__.py
-Collects all the relevant parts and renames the classes to look like functions
-Copyright (C) 2019  Brénainn Woodsend
-
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
 
 from ._history import figure_history
 
 from .figures import (Figure as figure,
                       gcf,
                       scf,
-                      set_auto_fig,
+                      auto_figure,
                       show,
                       view,
                       reset_camera,
@@ -61,7 +61,20 @@ from . import data
 
 color_bar = scalar_bar
 
-def _quick_test_plot(fig="gcf"):
+def quick_test_plot(fig="gcf"):
+    """A quick laziness function to create 30 random spheres.
+
+    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
+    :type fig: vpl.figure, vpl.QtFigure, optional
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+
+        vpl.quick_test_plot()
+        vpl.show()
+
+    """
     import numpy as np
     return scatter(np.random.uniform(-30, 30, (30, 3)), np.random.rand(30, 3), fig=fig)
 

@@ -33,5 +33,3 @@ goto end
 
 :end
 popd
-
-copy source\index.rst ..\README.rst

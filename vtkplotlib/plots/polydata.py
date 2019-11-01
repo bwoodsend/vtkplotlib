@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Aug 27 17:44:33 2019
-
-@author: Brénainn Woodsend
-
-
-one line to give the program's name and a brief idea of what it does.
-Copyright (C) 2019  Brénainn Woodsend
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-"""
+# =============================================================================
+# Created on Tue Aug 27 17:44:33 2019
+#
+# @author: Brénainn Woodsend
+#
+#
+# polydata.py exposes the PolyData wrapper class.
+# Copyright (C) 2019  Brénainn Woodsend
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# =============================================================================
 
 
 import numpy as np
@@ -194,6 +194,92 @@ def unpack_lengths(arr):
 
 
 class PolyData(object):
+    """The polydata is a key building block to making customised plot objects. A
+    lot of vtkplotlib plot commands use one of these under the hood.
+
+    :param vtk_polydata: An original vtkPolyData to build on top of, defaults to None.
+    :type vtk_polydata: vtk.vtkPolyData, optional
+
+    This is a wrapper around VTK's vtkPolyData object. This class is
+    incomplete. I still need to sort colors/scalars properly. And I want to add
+    functions to build from vtkSource objects.
+
+    A polydata consists of:
+
+    1. points
+    2. lines
+    3. polygons
+    4. scalar, texturemap coordinates or direct color information
+
+    or combinations of the four.
+
+    :param self.points: All the vertices used for all points, lines and polygons. These points aren't visible. To create some kind of points plot use vpl.scatter.
+    :type self.points: np.ndarray of floats with shape (`number_of_vertices`, `3`)
+
+    :param self.lines: The arg of each vertex from `self.points` the line should pass through. Each row represents a seperate line.
+    :type self.lines: np.ndarray of ints with shape (`number_of_lines`, `points_per_line`)
+
+    :param self.polygons: Each row represents a polygon. Each cell contains the arg of a vertex from `self.points` that is to be a corner of that polygon.
+    :type self.polygons: np.ndarray of ints with shape (`number_of_polygons`, `corners_per_polygon`)
+
+    Lines and polyons can be interchanged to switch from solid surface to
+    wire-frame.
+
+
+    Here is an example to create a single triangle
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        import numpy as np
+
+
+        polydata = vpl.PolyData()
+
+        polydata.points = np.array([[1, 0, 0],
+                                    [0, 1, 0],
+                                    [0, 0, 1]], float)
+
+        # Create a wire-frame triangle passing points [0, 1, 2, 0].
+        polydata.lines = np.array([[0, 1, 2, 0]])
+
+        # Create a solid triangle with points [0, 1, 2] as it's corners.
+        polydata.polygons = np.array([[0, 1, 2]])
+
+        # The polydata can be quickly inspected using
+        polydata.quick_show()
+
+        # When you are happy with it, it can be turned into a proper plot
+        # object like those output from other ``vpl.***()`` commands. It will be
+        # automatically added to ``vpl.gcf()`` unless told otherwise.
+        plot = polydata.to_plot()
+        vpl.show()
+
+
+
+
+    The original vtkPolyData object is difficult to use, can't directly work
+    with numpy and is full of pot-holes that can cause unexplained crashes if
+    not carefully avoided. This wrapper class seeks to solve those issues by
+    acting as an intermediate layer between you and VTK. This class consists
+    mainly of properties that
+
+    - handle the numpy-vtk conversions
+    - ensure proper shape checking
+    - hides VTK's rather awkward compound array structures
+    - automatically sets scalar mode/range parameters in the mapper
+
+    A `vpl.PolyData` can be constructed from scratch or from an existing
+    `vtkPolyData` object.
+
+    It also provides convenience methods ``self.to_plot()`` and
+    ``self.quick_show()`` for quick one-line visualising the current state.
+
+
+
+
+
+    """
     def __init__(self, vtk_polydata=None):
         self.vtk_polydata = vtk_polydata or vtk.vtkPolyData()
 

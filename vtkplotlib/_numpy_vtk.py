@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
-# Created on Wed Jul 31 02:29:27 2019
+# Created on Tue Aug 13 17:50:57 2019
 #
 # @author: Brénainn Woodsend
 #
 #
-# data.__init__.py handles paths to the data folder in vtkplotlib.
+# _numy_vtk.py currently does nothing.
 # Copyright (C) 2019  Brénainn Woodsend
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,32 +24,24 @@
 
 
 import numpy as np
-import sys
-import os
-from pathlib2 import Path
+from vtk.util.numpy_support import numpy_to_vtk
 
+# try:
+    # numpy_to_vtk(np.arange(4).reshape(2, 2).T)
+    # ARRAYS_MUST_BE_CONTIGUOUS = False
+# except:
+    # ARRAYS_MUST_BE_CONTIGUOUS = True
 
-import pkg_resources
+ARRAYS_MUST_BE_CONTIGUOUS = True
 
-DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")) / "data"
-
-MODELS_FOLDER = DATA_FOLDER / "models"
-
-def get_rabbit_stl():
-#    print("This is not my rabbit file. See README.txt and LICENSE.txt in\n{}\nfor details.".format(folder))
-    return str(MODELS_FOLDER / "rabbit" / "rabbit.stl")
-
-ICONS_FOLDER = DATA_FOLDER / "icons"
-
-ICONS = {i.stem: str(i) for i in ICONS_FOLDER.glob("*")}
+if ARRAYS_MUST_BE_CONTIGUOUS:
+    contiguous_safe = np.ascontiguousarray
+else:
+    contiguous_safe = lambda x:x
 
 
 
 
-def assert_ok():
-    assert ICONS_FOLDER.is_dir()
-    assert MODELS_FOLDER.is_dir()
-    assert os.path.isfile(get_rabbit_stl())
 
 if __name__ == "__main__":
-    assert_ok()
+    print(ARRAYS_MUST_BE_CONTIGUOUS)
