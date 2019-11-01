@@ -7,10 +7,15 @@ Created on Wed Jun 19 19:00:26 2019
 
 from setuptools import setup, find_packages
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(name='vtkplotlib',
-      version='1.1',
-      description='3d plotting using vtk',
-      url='https://github.com/bwoodsend/vtkplotlib',
+      version='1.1.1',
+      description='High level 3D graphics and plotting',
+      long_description=long_description,
+      long_description_content_type="text/markdown",
+      url='https://vtkplotlib.readthedocs.io/en/latest/index.html',
       author='Brénainn Woodsend',
       author_email='bwoodsend@gmail.com',
       license='GNU version 3.0',
@@ -27,7 +32,6 @@ setup(name='vtkplotlib',
              "pathlib2",
              "matplotlib",
              "future",
-             # "PyQt5",
               ],
       zip_safe=False,
       test_suite='nose.collector',
