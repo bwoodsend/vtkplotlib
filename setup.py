@@ -8,7 +8,7 @@ Created on Wed Jun 19 19:00:26 2019
 from setuptools import setup, find_packages
 
 setup(name='vtkplotlib',
-      version='0.1',
+      version='1.1',
       description='3d plotting using vtk',
       url='https://github.com/bwoodsend/vtkplotlib',
       author='Brénainn Woodsend',
