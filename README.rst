@@ -7,7 +7,5 @@ Welcome to vtkplotlib's github page!
 ====================================
 
 
-External hyperlinks, like
-
 Our homepage is hosted on `readthedocs
 <https://vtkplotlib.readthedocs.io/en/latest/index.html>`_.
