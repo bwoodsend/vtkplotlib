@@ -28,10 +28,16 @@ import sys
 import os
 from pathlib2 import Path
 
-
 import pkg_resources
 
-DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")) / "data"
+if getattr( sys, 'frozen', False ) :
+    # running in a bundle
+    DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")).parent / "vpl-data"
+else :
+    # running live
+    DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")) / "data"
+
+
 
 MODELS_FOLDER = DATA_FOLDER / "models"
 
