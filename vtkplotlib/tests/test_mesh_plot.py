@@ -6,7 +6,7 @@
 # @author: Brénainn Woodsend
 #
 #
-# test_mesh_plot.py tests the contents of vtplotlib.plots.MeshPlot.py.
+# test_mesh_plot.py tests the contents of vtkplotlib.plots.MeshPlot.py.
 # Copyright (C) 2019  Brénainn Woodsend
 #
 # This program is free software: you can redistribute it and/or modify
