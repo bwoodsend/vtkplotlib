@@ -37,6 +37,7 @@ from vtkplotlib.plots.polydata import PolyData
 
 
 
+
 class BasePlot(object):
     """A base class for all plots in vtkplotlib. This tries to handle all the
     common steps involved in constructing and linking the vtk pipeline. Also
@@ -93,6 +94,8 @@ class BasePlot(object):
 
     @opacity.setter
     def opacity(self, x):
+        if x is None:
+            x = 1
         self.property.SetOpacity(x)
 
     @property
@@ -143,6 +146,16 @@ class ConstructedPlot(BasePlot):
         if range is None:
             range = self.polydata.point_colors
         self.mapper.SetScalarRange(np.nanmin(range), np.nanmax(range))
+
+
+    def quick_show(self):
+        from vtkplotlib import gcf, scf, figure
+        old_gcf = gcf(False)
+        fig = figure(name=repr(self))
+        fig += self
+        fig.show()
+        scf(old_gcf)
+
 
 #    @property
 #    def scalar_mode(self):
