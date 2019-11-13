@@ -334,7 +334,7 @@ def screenshot_fig(magnification=1, pixels=None, fig="gcf"):
 
 
 
-def save_fig(path, magnification=1, pixels=None, fig="gcf"):
+def save_fig(path, magnification=1, pixels=None, fig="gcf", **imsave_plotargs):
     """Take a screenshot and saves it to a file.
 
     :param path: The path, including extension, to save to.
@@ -351,7 +351,7 @@ def save_fig(path, magnification=1, pixels=None, fig="gcf"):
 
 
     This just calls ``vpl.screenshot_fig`` then passes it to matplotlib's
-    imsave function. See those for more information.
+    ``pylab.imsave`` function. See those for more information.
 
     The available file formats are determined by matplotlib's choice of
     backend. For JPEG, you will likely need to install PILLOW. JPEG has
@@ -359,7 +359,7 @@ def save_fig(path, magnification=1, pixels=None, fig="gcf"):
 
     """
     from matplotlib.pylab import imsave
-    imsave(str(path), screenshot_fig(magnification, pixels, fig))
+    imsave(str(path), screenshot_fig(magnification, pixels, fig), **imsave_plotargs)
 
 
 
