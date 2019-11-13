@@ -41,6 +41,7 @@ except ImportError:
 
 from vtkplotlib.figures import QtFigure, save_fig, view
 from vtkplotlib.data import ICONS_FOLDER
+from vtkplotlib import geometry
 
 SCREENSHOT_ICON_PATH = ICONS_FOLDER / "screenshot.png"
 
@@ -74,7 +75,7 @@ class QtFigure2(QtFigure):
         fig = vpl.QtFigure2()
 
         # Add each feature you want. Pass arguments to customise each one.
-        fig.add_screenshot_button()
+        fig.add_screenshot_button(pixels=1080)
         fig.add_preset_views()
         fig.add_show_plot_table_button()
         # Use ``fig.add_all()`` to add all them all.
@@ -102,6 +103,8 @@ class QtFigure2(QtFigure):
 
         self.plot_table = None
 
+        self.save_fig_kargs = {}
+
 
 
     def add_preset_views(self, names=None, view_params=None, icons=()):
@@ -114,9 +117,15 @@ class QtFigure2(QtFigure):
 
         return self
 
+    def add_preset_views_from_directions(self, directions, ups, mirrors=True):
+        self.view_buttons = ViewButtons.from_directions(directions, ups,
+                                                        mirrors=mirrors, figure=self)
+        self.menu.addLayout(self.view_buttons.to_layout())
+        return self
 
 
-    def add_screenshot_button(self):
+
+    def add_screenshot_button(self, **save_fig_kargs):
 
         self.default_screenshot_path = Path() / (self.window_name + ".jpg")
 
@@ -124,6 +133,7 @@ class QtFigure2(QtFigure):
                                         self.screenshot,
                                         SCREENSHOT_ICON_PATH)
         self.menu.addWidget(self.screenshot_button)
+        self.save_fig_kargs = save_fig_kargs
 
 
 
@@ -134,7 +144,7 @@ class QtFigure2(QtFigure):
                                                      "(*.jpg);;(*.png)")[0]
 
         if path:
-            save_fig(path, fig=self)
+            save_fig(path, fig=self, **self.save_fig_kargs)
 
 
     def add_show_plot_table_button(self):
@@ -262,26 +272,38 @@ class ViewButtons(object):
     @classmethod
     def default(cls, figure):
 
-        names = ["Right", "Left", "Front", "Back", "Top", "Bottom"]
 
         directions = np.array([[1, 0, 0],
-                               [-1, 0, 0],
                                [0, 1, 0],
-                               [0, -1, 0],
-                               [0, 0, 1],
-                               [0, 0, -1]])
+                               [0, 0, 1]])
 
         ups = np.array([[0, 0, 1],
                         [0, 1, 0]])
 
+        return cls.from_directions(directions, ups, figure)
+
+
+    @classmethod
+    def from_directions(cls, directions, ups, figure, mirrors=True):
+        names = ["Right", "Left", "Front", "Back", "Top", "Bottom"]
+
+        if mirrors:
+            signs = (1, -1)
+        else:
+            signs = (1,)
+
         view_params = []
-        for d in directions:
+        for d_ in directions:
+            for sign in signs:
+                d = d_ * sign
                 args = {"camera_position": d}
 
                 for up in ups:
-                    if not (d & up).any():
+                    if np.cross(d, up).any():
                         args["up_view"] = up
                         break
+                else:
+                    raise ValueError("All `up_views` are parallel to direction {}".format(d))
                 view_params.append(args)
 
         paths = [ICONS_FOLDER / (i + ".jpg") for i in names]
