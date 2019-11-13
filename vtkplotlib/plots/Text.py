@@ -80,9 +80,7 @@ class Text(BasePlot):
 
         self.actor = vtk.vtkTextActor()
 
-        if not isinstance(text_str, str):
-            text_str = str(text_str)
-        self.actor.SetInput(text_str)
+        self.text = text_str
 
         self.use_pixels = use_pixels
 
@@ -113,7 +111,15 @@ class Text(BasePlot):
 #        else:
 #            self._position = tuple(int(i * j) for (i, j) in zip(position, self.fig.render_size))
 
-#    def
+    @property
+    def text(self):
+        self.actor.GetInput()
+
+    @text.setter
+    def text(self, text_str):
+        if not isinstance(text_str, str):
+            text_str = str(text_str)
+        self.actor.SetInput(text_str)
 
 
 def resize_event_cb(*args):
