@@ -383,6 +383,11 @@ def close(fig="gcf"):
         scf(None)
 
 
+def test_view():
+    import vtkplotlib as vpl
+    vpl.quiver(np.zeros((3, 3)), np.eye(3), color=np.eye(3))
+    vpl.view()
+    vpl.show()
 
 if __name__ == "__main__":
     pass

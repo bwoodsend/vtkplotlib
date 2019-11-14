@@ -11,7 +11,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='vtkplotlib',
-      version='1.1.1',
+      version='1.1.2',
       description='High level 3D graphics and plotting',
       long_description=long_description,
       long_description_content_type="text/markdown",
