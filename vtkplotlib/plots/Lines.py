@@ -49,8 +49,8 @@ class Lines(ConstructedPlot):
     :param vertices: The points to plot through.
     :type vertices: np.ndarray of shape (n, 3)
 
-    :param color: The color of the plot, defaults to white.
-    :type color: str, 3-tuple, 4-tuple, optional
+    :param color: The color(s) of the plot, defaults to white.
+    :type color: str, 3-tuple, 4-tuple, np.ndarray optional
 
     :param opacity: The translucency of the plot, 0 is invisible, 1 is solid, defaults to solid.
     :type opacity: float, optional
@@ -72,6 +72,7 @@ class Lines(ConstructedPlot):
     can only do one color for the whole thing. This can be used to plot meshes
     as wireframes.
 
+
     .. code-block:: python
 
         import vtkplotlib as vpl
@@ -83,31 +84,102 @@ class Lines(ConstructedPlot):
         vpl.plot(vertices, join_ends=True, color="dark red")
         vpl.show()
 
+    If `color` is an `np.ndarray` then a color per vertex is implied. The shape
+    of `color` relative to the shape of `vertices` determines whether the
+    colors should be interpreted as scalars, texture coordinates or RGB values.
+    If `color` is either a list, tuple, or str then it is one color for the
+    whole plot.
+
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        import numpy as np
+
+        # Create an octogon, using `t` as scalar values.
+
+        t = np.arange(0, 1, .125) * 2 * np.pi
+        vertices = vpl.zip_axes(np.cos(t),
+                                np.sin(t),
+                                0)
+
+        vpl.plot(vertices,
+                 line_width=6,
+                 join_ends=True,
+                 color=t)
+
+        vpl.show()
+
     """
 
     def __init__(self, vertices, color=None, opacity=None, line_width=1.0, join_ends=False, fig="gcf"):
         super().__init__(fig)
 
 
-        shape = vertices.shape[:-1]
-        points = _numpy_vtk.contiguous_safe(nuts_and_bolts.flatten_all_but_last(vertices))
-        self.temp.append(points)
+        self.shape = ()
+        self.join_ends = join_ends
 
-        args = nuts_and_bolts.flatten_all_but_last(np.arange(np.prod(shape)).reshape(shape))
-
-        self.polydata.points = points
-        if join_ends:
-            self.polydata.lines = join_line_ends(args)
-        else:
-            self.polydata.lines = args
+        self.vertices = vertices
 
 #        assert np.array_equal(points[args], vertices)
 
 
         self.add_to_plot()
 
-        self.color_opacity(color, opacity)
-        self.property.SetLineWidth(line_width)
+        self.opacity = opacity
+        self.color = color
+        self.line_width = line_width
+
+
+    @property
+    def line_width(self):
+        return self.property.GetLineWidth()
+
+    @line_width.setter
+    def line_width(self, width):
+        self.property.SetLineWidth(width)
+
+    @property
+    def vertices(self):
+        return self.polydata.points.reshape(self.shape)
+
+    @vertices.setter
+    def vertices(self, vertices):
+        self.polydata.points = vertices.reshape((-1, 3))
+
+        if vertices.shape == self.shape:
+            return
+
+        self.shape = vertices.shape
+        args = np.arange(np.prod(self.shape[:-1])).reshape((-1, self.shape[-2]))
+
+        if self.join_ends:
+            self.polydata.lines = join_line_ends(args)
+        else:
+            self.polydata.lines = args
+
+    @property
+    def color(self):
+        colors = self.polydata.point_colors
+        if colors is not None:
+            return colors.reshape(self.shape[:-1] + (-1,))
+
+        return super().color
+
+    @color.setter
+    def color(self, c):
+        if isinstance(c, np.ndarray):
+            if c.shape == self.shape[:-1]:
+                c = c[..., np.newaxis]
+            assert self.shape[:-1] == c.shape[:-1]
+            self.polydata.point_colors = c.reshape((-1, c.shape[-1]))
+            self.set_scalar_range(c)
+            self.mapper.SetScalarModeToUsePointData()
+        else:
+            ConstructedPlot.color.fset(self, c)
+            self.polydata.point_colors = None
+
+
 
 
 
@@ -121,17 +193,24 @@ def test():
     vertices = np.array([vertices, vertices + 2])
 
     t = np.arange(0, 1, .125) * 2 * np.pi
-    vertices = np.array([np.cos(t), np.sin(t), np.zeros_like(t)]).T
+    vertices = vpl.zip_axes(np.cos(t),
+                            np.sin(t),
+                            0)
 
 #    vertices = np.random.uniform(-30, 30, (3, 3))
-    self = vpl.plot(vertices, color="green", line_width=6, join_ends=True)
+#    color = np.broadcast_to(t, vertices.shape[:-1])
+
+    self = vpl.plot(vertices, line_width=6, join_ends=True,
+                    color=t)
 #    self.polydata.point_scalars = vpl.geometry.distance(vertices)
-    self.polydata.point_scalars = t
+#    self.polydata.point_colors = t
     fig = vpl.gcf()
     fig.background_color = "grey"
     self.add_to_plot()
     vpl.show()
 
+    return self
+
 
 if __name__ == "__main__":
-    test()
+    self = test()

@@ -81,8 +81,9 @@ class TestFigures(TestCase):
                 os.mkdir(str(path.parent))
                 vpl.save_fig(path)
                 self.assertTrue(path.exists())
-                os.remove(str(path))
             finally:
+                if path.exists():
+                    os.remove(str(path))
                 if path.parent.exists():
                     os.rmdir(str(path.parent))
 
