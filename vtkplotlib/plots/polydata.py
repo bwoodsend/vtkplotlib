@@ -353,6 +353,10 @@ class PolyData(object):
         import pickle
         return pickle.loads(pickle.dumps(self))
 
+    def copy(self):
+        import pickle
+        return pickle.loads(pickle.dumps(self))
+
     def quick_show(self):
         import vtkplotlib as vpl
         old_fig = vpl.gcf(create_new=False)

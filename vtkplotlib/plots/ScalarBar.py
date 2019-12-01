@@ -35,11 +35,11 @@ from vtk.util.numpy_support import (
                                     vtk_to_numpy,
                                     )
 
-from vtkplotlib.plots.BasePlot import BasePlot
+from vtkplotlib.plots.BasePlot import Actor2Base
 
 
 
-class ScalarBar(BasePlot):
+class ScalarBar(Actor2Base):
     """Create a scalar bar. Also goes by the alias `colorbar`.
 
     :param plot: The plot with scalars to draw a scalarbar for.
@@ -68,6 +68,8 @@ class ScalarBar(BasePlot):
 
         self.actor.SetNumberOfLabels(6)
 
+        self.__actor2d_init__()
+
         self.lookup_table = plot.mapper.GetLookupTable()
         if self.lookup_table.GetTable().GetNumberOfTuples() == 0:
             # ForceBuild resets it as well as building it. Thus overwriting any
@@ -80,6 +82,10 @@ class ScalarBar(BasePlot):
         self.fig.renderer.AddActor2D(self.actor)
         self.fig.plots.add(self)
 
+        self.set_horizontal = self.actor.SetOrientationToHorizontal
+        self.set_vertical = self.actor.SetOrientationToVertical
+
+
 
 
 def test():
@@ -89,9 +95,11 @@ def test():
     mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
     plot = vpl.mesh_plot(mesh, scalars=mesh.x)
 
-    vpl.scalar_bar(plot)
+    self = vpl.scalar_bar(plot, "X Values")
 
     vpl.show()
+
+    globals().update(locals())
 
 
 if __name__ == "__main__":

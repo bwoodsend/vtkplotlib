@@ -265,7 +265,7 @@ def reset_camera(fig="gcf"):
     fig.renderer.ResetCamera()
 
 
-def screenshot_fig(magnification=1, pixels=None, fig="gcf"):
+def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, fig="gcf"):
     """Take a screenshot of a figure. The image is returned as an array. To
     save a screenshot directly to a file, see vpl.save_fig.
 
@@ -277,6 +277,9 @@ def screenshot_fig(magnification=1, pixels=None, fig="gcf"):
 
     :param pixels: Image dimensions in pixels, defaults to None.
     :type pixels: int or a (width, height) tuple of ints, optional
+
+    :param trim_pad_width: Optionally auto crop to contents, this specifies how much space to give it, defaults to None for no cropping.
+    :type trim_pad_width: positive int for padding in pixels, float from 0.0 - 1.0 for pad width relative to original size.
 
     :param fig: The figure screenshot, defaults to vpl.gcf().
     :type fig: vpl.figure, vpl.QtFigure
@@ -296,7 +299,8 @@ def screenshot_fig(magnification=1, pixels=None, fig="gcf"):
     .. note::
 
         And no I have no idea why it spins. But vtk's example in the docs does
-        it as well so I think it's safe to say the problem is on their side.
+        it as well so I think it's safe to say there's not much we can do about
+        it.
 
     """
     fig = gcf_check(fig, "screenshot_fig")
@@ -318,9 +322,10 @@ def screenshot_fig(magnification=1, pixels=None, fig="gcf"):
     if pixels is not None:
         magnification = tuple(pixels[i] // fig.render_size[i] for i in range(2))
 
-    try:
+    # Depends on VTK version.
+    if hasattr(win_to_image_filter, "SetScale"):
         win_to_image_filter.SetScale(*magnification)
-    except AttributeError:
+    else:
         if magnification[0] != magnification[1]:
             print("This version of VTK doesn't support seperate magnifications for height and width")
             magnification = (magnification[0], magnification[0])
@@ -330,11 +335,13 @@ def screenshot_fig(magnification=1, pixels=None, fig="gcf"):
 
     # Read the image as an array
     from vtkplotlib import image_io
-    return image_io.vtkimagedata_to_array(win_to_image_filter.GetOutput())
+    arr = image_io.vtkimagedata_to_array(win_to_image_filter.GetOutput())
+    arr = image_io.trim_image(arr, fig.background_color, trim_pad_width)
+    return arr
 
 
 
-def save_fig(path, magnification=1, pixels=None, fig="gcf", **imsave_plotargs):
+def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, fig="gcf", **imsave_plotargs):
     """Take a screenshot and saves it to a file.
 
     :param path: The path, including extension, to save to.
@@ -359,7 +366,11 @@ def save_fig(path, magnification=1, pixels=None, fig="gcf", **imsave_plotargs):
 
     """
     from matplotlib.pylab import imsave
-    imsave(str(path), screenshot_fig(magnification, pixels, fig), **imsave_plotargs)
+    imsave(str(path), screenshot_fig(magnification=magnification,
+                                     pixels=pixels,
+                                     fig=fig,
+                                     trim_pad_width=trim_pad_width),
+            **imsave_plotargs)
 
 
 

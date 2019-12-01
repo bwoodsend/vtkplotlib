@@ -25,6 +25,7 @@
 from builtins import super
 
 import vtk
+import operator
 import numpy as np
 import os
 import sys
@@ -107,6 +108,13 @@ class BasePlot(object):
     def visible(self, x):
         self.actor.SetVisibility(x)
 
+    def quick_show(self):
+        from vtkplotlib import gcf, scf, figure
+        old_gcf = gcf(False)
+        fig = figure(name=repr(self))
+        fig += self
+        fig.show()
+        scf(old_gcf)
 
 
 
@@ -119,6 +127,11 @@ class SourcedPlot(BasePlot):
     def add_to_plot(self):
         super().add_to_plot()
         self.mapper.SetInputConnection(self.source.GetOutputPort())
+
+    @property
+    def polydata(self):
+        self.source.Update()
+        return PolyData(self.source.GetOutput())
 
 
 class ConstructedPlot(BasePlot):
@@ -147,14 +160,6 @@ class ConstructedPlot(BasePlot):
             range = self.polydata.point_colors
         self.mapper.SetScalarRange(np.nanmin(range), np.nanmax(range))
 
-
-    def quick_show(self):
-        from vtkplotlib import gcf, scf, figure
-        old_gcf = gcf(False)
-        fig = figure(name=repr(self))
-        fig += self
-        fig.show()
-        scf(old_gcf)
 
 
 #    @property
@@ -193,6 +198,31 @@ class ConstructedPlot(BasePlot):
 
 
 
+
+class Actor2Base(BasePlot):
+    def __actor2d_init__(self):
+
+        self.actor.GetPositionCoordinate().SetCoordinateSystemToNormalizedDisplay()
+        self.actor.GetPosition2Coordinate().SetCoordinateSystemToNormalizedDisplay()
+
+
+    @property
+    def position(self):
+        """The 2D position of the left bottom corner."""
+        return np.array(self.actor.GetPositionCoordinate().GetValue())
+
+    @position.setter
+    def position(self, position):
+        self.actor.GetPositionCoordinate().SetValue(*position)
+
+    @property
+    def size(self):
+        """The 2D position of the left bottom corner."""
+        return np.array(self.actor.GetPosition2Coordinate().GetValue())
+
+    @size.setter
+    def size(self, size):
+        self.actor.GetPosition2Coordinate().SetValue(*size)
 
 
 

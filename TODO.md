@@ -2,7 +2,6 @@
 
 - DOCS
 - Make `vpl.view` less useless.
-- Multi-colors for `vpl.plot`.
 - Add type and array shape checking.
 - Use resize events in `vpl.text` so that it scales with the window.
 - Edit `TextureMap` so that it doesn't flip the image. Or better, use VTK's.

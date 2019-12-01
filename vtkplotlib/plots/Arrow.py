@@ -141,7 +141,9 @@ def arrow(start, end, length=None, width_scale=1., color=None, opacity=None, fig
 
         out_flat[i] = Arrow(s, e, l, width_scale, c, opacity, fig)
 
-    return out_flat
+    if out.ndim == 0:
+        return out.item()
+    return out
 
 
 def quiver(point, gradient, length=None, length_scale=1., width_scale=1., color=None, opacity=None, fig="gcf"):

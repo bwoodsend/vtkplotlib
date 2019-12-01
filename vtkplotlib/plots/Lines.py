@@ -145,6 +145,7 @@ class Lines(ConstructedPlot):
 
     @vertices.setter
     def vertices(self, vertices):
+        vertices = np.asarray(vertices)
         self.polydata.points = vertices.reshape((-1, 3))
 
         if vertices.shape == self.shape:

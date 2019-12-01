@@ -228,11 +228,20 @@ def annotate(points, text, direction, text_color="w", arrow_color="k", distance=
     """
 
     point = geom.highest(points, direction)
-    text_point = point + distance * direction
-    return (Arrow(text_point, point,
-                  color=arrow_color, fig=fig),
-            Text3D(text, text_point,
-                   color=text_color, scale=text_size, fig=fig))
+
+    arrow = Arrow(point + (distance - .5 * text_size) * direction,
+                  point,
+                  color=arrow_color,
+                  fig=fig)
+
+    text = Text3D(text,
+                  point + distance * direction,
+                  color=text_color,
+                  scale=text_size,
+                  fig=fig)
+
+    return (arrow, text)
+
 
 
 def test():

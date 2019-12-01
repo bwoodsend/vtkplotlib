@@ -134,6 +134,7 @@ class QtFigure2(QtFigure):
                                         SCREENSHOT_ICON_PATH)
         self.menu.addWidget(self.screenshot_button)
         self.save_fig_kargs = save_fig_kargs
+        return self
 
 
 
@@ -179,6 +180,7 @@ class QtFigure2(QtFigure):
         self.add_preset_views()
         self.add_screenshot_button()
         self.add_show_plot_table_button()
+        return self
 
 
 
