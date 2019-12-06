@@ -6,8 +6,10 @@ Created on Wed Jun 19 19:00:26 2019
 """
 
 from setuptools import setup, find_packages
+from os import path
 
-with open("README.md", "r") as fh:
+
+with open(path.join(path.split(__file__)[0], "README.md"), "r") as fh:
     long_description = fh.read()
 
 setup(name='vtkplotlib',
@@ -27,7 +29,7 @@ setup(name='vtkplotlib',
                   # ('models', ['data/models/*'])],
       include_package_data=True,
       install_requires=[
-             "vtk",
+             "vtk<8.2.0",
              "numpy",
              "pathlib2",
              "matplotlib",
