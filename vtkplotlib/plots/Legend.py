@@ -23,7 +23,8 @@
 # =============================================================================
 """
 """
-
+from __future__ import print_function
+from builtins import super
 
 import numpy as np
 import vtk
@@ -32,28 +33,197 @@ from vtkplotlib.plots.BasePlot import Actor2Base, BasePlot, process_color, PolyD
 
 
 class Legend(Actor2Base):
-    def __init__(self,
-                 fig="gcf",
-                 position=(.7, .7),
-                 size=(.3, .3),
-                 color="grey"):
+    """Creates a legend to label plots.
 
-        self.legend = vtk.vtkLegendBoxActor()
-        self.color = color
+    :param plots_source: Plots to use in the legend, can be None, defaults to `fig.plots`.
+    :type plots_source: iterable of plots or None, optional
+
+    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
+    :type fig: vpl.figure, vpl.QtFigure, optional
+
+    :param position: Position (relative to the size of the figure) of the bottom left corner, defaults to (0.7, 0.7).
+    :type position: tuple pair of floats, optional
+
+    :param size: Size (relative to the size of the figure) of the legend, defaults to (0.3, 0.3).
+    :type size: tuple pair of floats, optional
+
+    :param color: The background color of the legend, defaults to 'grey'.
+    :type color: str, 3-tuple, 4-tuple, optional
+
+    :param allow_no_label: Allow plots that have no label to have label None, only applicable if entries are added automatically, defaults to False.
+    :type allow_no_label: bool, optional
+
+    :param allow_non_polydata_plots: Allow plots that have no polydata to represented with a box, only applicable if entries are added automatically, defaults to False.
+    :type allow_non_polydata_plots: bool, optional
+
+
+    :return: The legend created.
+    :rtype: vtkplotlib.plots.Legend.Legend
+
+
+    Elements can be added to the legend automatically or explicitly. Most plot
+    commands have an optional `label` argument. If this is used then they will
+    be added automatically. Multiple plots with the same label will be grouped.
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        import numpy as np
+
+        # Create some plots with labels
+        vpl.scatter([0, 0, 0], color="red", label="Red Ball")
+        vpl.scatter(vpl.zip_axes(5, np.arange(0, 10, 4), 0), color="yellow", label="Yellow Ball")
+
+        # A plot without a label will not be included in the legend.
+        vpl.scatter([10, 0, 0], color="green")
+
+        # Create the legend
+        vpl.legend()
+        # Unless told otherwise this internally calls
+        # legend.add_plots(vpl.gcf().plots)
+
+        vpl.show()
+
+
+    The legend uses a tabular format.
+
+    +--------+------+------------+
+    | Symbol | Icon | Text Label |
+    +--------+------+------------+
+    | Symbol | Icon | Text Label |
+    +--------+------+------------+
+    | Symbol | Icon | Text Label |
+    +--------+------+------------+
+
+    - A *symbol* is a 2D representation of the original plot. VTK can generate
+      these flattened snapshots from a polydata object which most plots either
+      have or can generate. These are accessible via ``plot.polydata``.
+
+    - An *icon* is just a 2D image. Note that VTK only supports greyscale icons
+      in legends.
+
+    - The *text label*, as the name suggests, is just a piece of text.
+
+    All three columns are optional. If a column is never used throughout the
+    legend then the contents adjusts to close the space. Color can only be
+    applied per-row. i.e the symbol, icon and text of an entry are always the
+    same color.
+
+    The following example shows how to set the entries explicitly.
+
+    .. code-block :: python
+
+        import vtkplotlib as vpl
+
+        # Create a legend and don't allow it to fill itself.
+        legend = vpl.legend(plots_source=None)
+
+
+        # A labelled plot contains all the information it needs to add itself.
+        sphere = vpl.scatter([0, 5, 10], color="g", label="Green Ball")
+        # Add it like so.
+        legend.set_entry(sphere)
+
+        # Written explicitly the above is equivalent to:
+        # legend.set_entry(symbol=sphere.polydata, color=sphere.color, label=sphere.label)
+
+
+        # Not all plots can have a polydata. If one isn't provided then a by
+        # default a square is used.
+        legend.set_entry(label="Blue Square", color="blue")
+
+        # Alternatively, if explicitly given ``symbol=None``, then the symbol
+        # space is left blank.
+        legend.set_entry(symbol=None, label="Just Text")
+
+
+        # Most plots can be used.
+        legend.set_entry(vpl.mesh_plot(vpl.data.get_rabbit_stl()), label="Rabbit")
+
+
+        # To use an icon, pass a string path, array, PIL image or vtkImageData
+        # to the `icon` argument. The image is converted to greyscale
+        # automatically.
+        legend.set_entry(None, label="Shark", icon=vpl.data.ICONS["Right"])
+
+
+        vpl.show()
+
+
+
+    ``legend.set_entry`` has an optional argument `index` which can be used to
+    overwrite rows. Otherwise it defaults to appending a row.
+
+    Some caveats / potential sources of confusion:
+
+    - Long and thin plots such as vpl.quiver tend to mess up the spacing
+      (which) is seemingly non configurable.
+
+    - Be careful of vpl.scatter and vpl.quiver which return an array of plots
+      rather than a single plot.
+
+    - Plots based on lines such as the output of vpl.plot tend not to show
+      well as the lines are less than one pixel wide.
+
+    - Automatic setting of color can only work for uniformly colored plots.
+      any colors derived from scalars are ignored.
+
+
+    To some extent, the text labels can be customised via
+    ``legend.text_options`` which holds the vtkTextProperty (bucket class for
+    settings like font). However, a lot of its methods do nothing. Most
+    notebely, ``legend.text_options.SetFontSize(size)`` has no effect.
+
+    """
+    def __init__(self, plots_source="fig", fig="gcf", position=(.7, .7), size=(.3, .3),
+                 color="grey", opacity=None, allow_non_polydata_plots=False, allow_no_label=False):
 
         super().__init__(fig)
-        self.actor = self.legend
+        self.actor = self.legend = vtk.vtkLegendBoxActor()
 
         self.__actor2d_init__()
 
-        self.position = position
-        self.size = size
+        self.__setstate__(locals())
 
 
         self.legend.UseBackgroundOn()
+        self.text_options = self.legend.GetEntryTextProperty()
 
         if self.fig is not None:
             self.fig += self
+
+            if plots_source == "fig":
+                plots_source = self.fig.plots
+
+        if plots_source is not None and plots_source != "fig":
+            self.add_plots(plots_source,
+                           allow_no_label=allow_no_label,
+                           allow_non_polydata_plots=allow_non_polydata_plots)
+
+
+    def add_plots(self, plots, allow_non_polydata_plots=False, allow_no_label=False):
+        by_label = {}
+        for plot in plots:
+            label = plot.label
+            if label is None and not allow_no_label:
+                continue
+
+            if isinstance(plot, Legend):
+                # ignore the legend as a plot.
+                continue
+            elif hasattr(plot, "polydata"):
+                # The symbol in the can be automatically generated from the
+                # polydata if the plot has one.
+                by_label[label] = plot
+
+            elif allow_non_polydata_plots and label not in by_label:
+                by_label[label] = plot
+
+        for (label, plot) in by_label.items():
+            if hasattr(plot, "polydata"):
+                self.set_entry(plot)
+            else:
+                self.set_entry(label=label, color=plot.color)
 
 
     @property
@@ -83,66 +253,119 @@ class Legend(Actor2Base):
     __len__ = length.fget
 
 
-    def set_entry(self, plot_data="box", label="from plot", color=None, icon="from plot", index="append"):
+    def set_entry(self, symbol="box", label="from plot", color=None, icon=None, index="append"):
         if index == "append":
             index = self.length
             self.length += 1
+        self._check_length(index)
 
-        if plot_data == "box" and icon == "from plot":
+        if symbol == "box":
             legendBox = vtk.vtkCubeSource()
             legendBox.Update()
-            plot_data = legendBox.GetOutput()
+            symbol = legendBox.GetOutput()
 
-
-        if isinstance(plot_data, BasePlot):
+        elif isinstance(symbol, BasePlot):
 
             if label == "from plot":
-                label = plot_data.label
+                label = symbol.label
 
             if color is None:
-                color = plot_data.color
-
-            if icon == "from plot":
-                plot_data = plot_data.polydata.vtk_polydata
-
-        if isinstance(plot_data, vtk.vtkPolyData):
-            icon = plot_data
-
-            bounds = np.reshape(icon.GetBounds(), (3, 2))
-            centre = bounds.mean(1)
-            if np.abs(centre).max() > bounds.std(1).max() * .1:
-                polydata = PolyData(icon).copy()
-                polydata.points -= centre[np.newaxis]
-                icon = polydata.vtk_polydata
+                color = symbol.color
+                if isinstance(color, np.ndarray):
+                    # If color is actually scalars, or an array of RGBs from a
+                    # PolyData based plot, ignore color.
+                    color = None
 
 
         if color is not None:
-            color = process_color(color)[0]
-            self.legend.SetEntryColor(index, color)
+            self.set_entry_color(index, color)
 
-
-#        self.legend.SetEntryIcon(index, color)
         if label != "from plot" and label is not None:
-            self.legend.SetEntryString(index, label)
+            self.set_entry_text(index, label)
 
-        if icon != "from plot" and icon is not None:
-            print(index, repr(icon))
-            self.legend.SetEntrySymbol(index, icon)
+        if symbol is not None:
+            self.set_entry_symbol(index, symbol)
+
+        if icon is not None:
+            self.set_entry_icon(index, icon)
+
+
+    def set_entry_icon(self, index, icon):
+        self._check_length(index)
+        from vtkplotlib import image_io
+        # ! Icons must be greyscale !
+        icon = image_io.as_vtkimagedata(icon, ndim=2)
+        self.legend.SetEntryIcon(index, icon)
+
+
+    def set_entry_symbol(self, index, symbol):
+        self._check_length(index)
+
+        if isinstance(symbol, np.ndarray) and symbol.dtype == object:
+            print("Warning - Legend.set_entry_symbol received an array of plots rather than a single plot.")
+            symbol = symbol.item(0)
+
+        polydata = symbol
+
+        if isinstance(polydata, BasePlot):
+            polydata = symbol.polydata
+        if isinstance(polydata, PolyData):
+            polydata = polydata.vtk_polydata
+
+        if not isinstance(polydata, vtk.vtkPolyData):
+            raise TypeError("symbol must be a vpl.PolyData, vtk.vtkPolyData or the output of a vpl method such as vpl.plot. Received type {}".format(type(symbol)))
+
+        # If the polydata is not already positioned at the origin then the
+        # generated icon moves with it. This finds the polydata's position
+        # and shifts a copy back to the origin if needed.
+
+        # Find the centre of the polydata
+        bounds = np.reshape(polydata.GetBounds(), (3, 2))
+        centre = bounds.mean(1)
+
+        # If not already near enough to the origin
+        if np.abs(centre).max() > bounds.std(1).max() * .1:
+
+            polydata = PolyData(polydata).copy()
+            polydata.points -= centre[np.newaxis]
+            polydata = polydata.vtk_polydata
+
+        self.legend.SetEntrySymbol(index, polydata)
+
+
+    def set_entry_color(self, index, color):
+        self._check_length(index)
+        color = process_color(color)[0]
+        self.legend.SetEntryColor(index, color)
+
+
+    def set_entry_text(self, index, text):
+        self._check_length(index)
+        self.legend.SetEntryString(index, str(text))
+
+    def _check_length(self, index):
+        if index >= self.length:
+            self.length = index + 1
+
 
 
 def test():
     import vtkplotlib as vpl
 
-    self = Legend()
+    self = vpl.legend(None)
 
 
     self.set_entry(label="Blue Square", color="blue")
 
-    sphere = vpl.scatter([0, 5, 10], color="g", fig=None)
+    sphere = vpl.scatter([0, 5, 10], color="g", fig=None, label="Ball")
+    self.set_entry(sphere, color="b")
     self.set_entry(sphere, "Green ball", )
 
     self.set_entry(vpl.mesh_plot(vpl.data.get_rabbit_stl()), "rabbit")
-    self.set_entry(vpl.quiver(np.zeros(3), np.array([-1, 0, 1])), "right")
+#    self.set_entry(vpl.quiver(np.zeros(3), np.array([-1, 0, 1])), "right")
+    self.set_entry(None, label="shark", icon=vpl.data.ICONS["Right"])
+    self.size = (.3, .3)
+    self.position = np.array(1) - self.size
 
     vpl.show()
     globals().update(locals())

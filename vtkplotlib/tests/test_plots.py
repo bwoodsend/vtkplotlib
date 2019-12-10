@@ -80,10 +80,11 @@ class TestPlots(TestCase):
         for i in range(100):
     #        self.color = np.random.random(3)
     #        print(self.color)
-            self.set_tri_scalars((_mesh.x[:, 0] + 3 * i) % 20 )
+            self.tri_scalars = (_mesh.x[:, 0] + 3 * i) % 20
             _mesh.rotate(np.ones(3), .1, np.mean(_mesh.vectors, (0, 1)))
+            self.vectors = _mesh.vectors
             fig.update()
-            self.update_points()
+
     #        time.sleep(.01)
             if (time.time() - t0) > 1:
                 break
@@ -123,7 +124,7 @@ class TestPlots(TestCase):
         y = np.sin(thi) * np.sin(theta)
         z = np.cos(theta)
 
-        vpl.surface(x, y, z, scalars=x.ravel()).set_scalar_range()
+        vpl.surface(x, y, z, scalars=x.ravel())
         vpl.show()
 
 
@@ -131,8 +132,11 @@ class TestPlots(TestCase):
         vpl.plots.Surface.test()
 
 
-#    def test_polydata(self):
-#        pd = vpl.PolyData()
+    def test_polydata(self):
+        vpl.plots.polydata.test()
+        vpl.plots.polydata.test_packing()
 
+    def test_legend(self):
+        vpl.plots.Legend.test()
 
 

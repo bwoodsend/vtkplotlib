@@ -111,6 +111,8 @@ class QtFigure(BaseFigure, QWidget):
 
         import vtkplotlib as vpl
         from PyQt5 import QtWidgets
+        import numpy as np
+        import sys
 
         # python 2 compatibility
         from builtins import super
@@ -137,11 +139,12 @@ class QtFigure(BaseFigure, QWidget):
 
 
             def button_pressed_cb(self):
-                # Plot commands can be called in callbacks. The current working
-                # figure is still self.figure and will remain so until a new
-                # figure is created explicitly. So the ``fig=self.figure``
-                # arguments below aren't necessary but are recommended for
-                # larger, more complex scenarios.
+                \"""Plot commands can be called in callbacks. The current working
+                figure is still self.figure and will remain so until a new
+                figure is created explicitly. So the ``fig=self.figure``
+                arguments below aren't necessary but are recommended for
+                larger, more complex scenarios.
+                \"""
 
                 # Randomly place a ball.
                 vpl.scatter(np.random.uniform(-30, 30, 3),
@@ -178,19 +181,26 @@ class QtFigure(BaseFigure, QWidget):
     def __init__(self, name="qt vtk figure", parent=None):
 
         self.qapp = QApplication.instance() or QApplication(sys.argv)
+#        print(self.qapp)
+#        print("qw init")
         QWidget.__init__(self, parent)
 
+#        print("name")
         self.window_name = name
 
+#        print("layout")
         self.vl = QVBoxLayout()
-        self.vtkWidget = QVTKRenderWindowInteractor(self)
+#        print("vtkwidget")
+        self.vtkWidget = QVTKRenderWindowInteractor()
+#        print("addWidget")
         self.vl.addWidget(self.vtkWidget)
+#        print("renwon")
         self.renWin
         iren = self.iren
 
 
         self.data_holder = []
-
+#        print("basefig init")
         BaseFigure.__init__(self)
         iren.SetInteractorStyle(vtk.vtkInteractorStyleTrackballCamera())
 
@@ -226,7 +236,7 @@ class QtFigure(BaseFigure, QWidget):
 
 
     def finalise(self):
-#        Very important that original finalise gets overwritten. This gets
+#        Very important that BaseFigure.finalise gets overwritten. This gets
 #        called immediately after self.iren.Start(). The original performs resets
 #        that stop the QtFigure from responding.
         pass

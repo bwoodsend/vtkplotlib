@@ -13,13 +13,11 @@ Introduction
 
 
 A simple library to make 3D graphics using easy. Built on top of VTK. Whilst
-VTK is a very versatile library, it still only has a rather low level API. Even the
-simplest examples require the construction and linking of a large number of
-complicated internal components. This and other factors make writing in it slow
-and painful. This library seeks to overcome that by wrapping the all ugliness
-into numpy friendly functions to create a 3D equivalent of matplotlib. All the
-VTK components/functionality are still accessible but by default are already
-setup for you.
+VTK is a very versatile library, the learning curve is steep and writing in it
+is slow and painful. This library seeks to overcome that by wrapping the all
+ugliness into numpy friendly functions to create a 3D equivalent of matplotlib.
+All the VTK components/functionality are still accessible but by default are
+already setup for you.
 
 Key features
 ------------
@@ -40,8 +38,10 @@ Requirements for installing:
  - `vtk`_
  - `future`_
 
-There is no VTK version for Windows users with python 2.7 on PyPi. But you can
-get a .whl from `here <https://www.lfd.uci.edu/~gohlke/pythonlibs/#vtk>`_.
+It can take VTK a few weeks to release to PyPi for a new Python version so
+using the absolute latest Python is not recomended. There is no VTK version for
+Windows users with python 2.7 on PyPi. But you can get a .whl from
+`here <https://www.lfd.uci.edu/~gohlke/pythonlibs/#vtk>`_.
 
 
 

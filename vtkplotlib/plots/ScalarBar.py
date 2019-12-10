@@ -26,14 +26,6 @@ from builtins import super
 
 import vtk
 import numpy as np
-import os
-import sys
-from pathlib2 import Path
-from vtk.util.numpy_support import (
-                                    numpy_to_vtk,
-                                    numpy_to_vtkIdTypeArray,
-                                    vtk_to_numpy,
-                                    )
 
 from vtkplotlib.plots.BasePlot import Actor2Base
 

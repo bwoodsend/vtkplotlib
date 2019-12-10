@@ -62,6 +62,10 @@ class TestExtras(TestCase):
     def test_data(self):
         vpl.data.assert_ok()
 
+    def test_screenshot_trim(self):
+        from vtkplotlib import image_io
+        image_io.test_trim_image()
+
 
 
 

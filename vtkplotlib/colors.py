@@ -285,8 +285,8 @@ class TextureMap(object):
 converted_cmaps = {}
 temp = []
 
-def vtk_cmap(cmap):
-    if isinstance(cmap, str):
+def as_vtk_cmap(cmap, cache=True):
+    if cache and isinstance(cmap, str):
         if cmap in converted_cmaps:
             return converted_cmaps[cmap]
         cmap = cm.get_cmap(cmap)
@@ -294,7 +294,7 @@ def vtk_cmap(cmap):
     if isinstance(cmap, vtk.vtkLookupTable):
         return cmap
 
-    if isinstance(cmap, (colors.ListedColormap, colors.LinearSegmentedColormap)):
+    if cache and isinstance(cmap, (colors.ListedColormap, colors.LinearSegmentedColormap)):
         name = cmap.name
         if name in converted_cmaps:
             return converted_cmaps[name]
@@ -316,44 +316,44 @@ def vtk_cmap(cmap):
         table.SetTable(numpy_to_vtk(cmap))
 
         temp.append(cmap)
-#        if name is not None:
-#            converted_cmaps[name] = table
+        if name is not None:
+            converted_cmaps[name] = table
         return table
 
     else:
-        raise ValueError()
+        raise ValueError("`cmap` should have shape (n, 3) or (n, 4). Received {}.".format(cmap.shape))
 
 
 
 
 
 
-if __name__ == "__main__":
-    import vtkplotlib as vpl
-    for args in [((.3, .4, .6), .2),
-                 ([5, 8, 10], None),
-                 ("red", ),
-                 ("orange red", .5),
-                 ("Orange_Red", ),
-                 ("or33ange_rEd", ),
-                 ]:
-        print("process_color", args, "->", process_color(*args), "\n")
-
-    path = Path('C:/Users/Brénainn/Downloads/3dm/duck/Bird_v1_L2.123ca5dbb1bc-8ef6-44e4-b558-3e6e2bbc7dd7/12248_Bird_v1_diff.jpg')
-
-    self = TextureMap(path)
-    self.interpolate = True
-
-    n = 1000
-    t = np.linspace(0, 1, n)
-    uv = vpl.nuts_and_bolts.zip_axes(*np.meshgrid(t, t))
-
-#    plt.figure(figsize=(n // 72,) * 2)
-#    plt.imshow(self(uv))
-#    plt.show()
-
-    from PIL import Image
-    im = Image.fromarray((self(uv) * 255).astype(np.uint8))
+#if __name__ == "__main__":
+#    import vtkplotlib as vpl
+#    for args in [((.3, .4, .6), .2),
+#                 ([5, 8, 10], None),
+#                 ("red", ),
+#                 ("orange red", .5),
+#                 ("Orange_Red", ),
+#                 ("or33ange_rEd", ),
+#                 ]:
+#        print("process_color", args, "->", process_color(*args), "\n")
+#
+#    path = Path('C:/Users/Brénainn/Downloads/3dm/duck/Bird_v1_L2.123ca5dbb1bc-8ef6-44e4-b558-3e6e2bbc7dd7/12248_Bird_v1_diff.jpg')
+#
+#    self = TextureMap(path)
+#    self.interpolate = True
+#
+#    n = 1000
+#    t = np.linspace(0, 1, n)
+#    uv = vpl.nuts_and_bolts.zip_axes(*np.meshgrid(t, t))
+#
+##    plt.figure(figsize=(n // 72,) * 2)
+##    plt.imshow(self(uv))
+##    plt.show()
+#
+#    from PIL import Image
+#    im = Image.fromarray((self(uv) * 255).astype(np.uint8))
 #    im.show()
 
 #    cmap = plt.get_cmap("Blues")

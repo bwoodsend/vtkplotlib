@@ -5,7 +5,7 @@
 #@author: Brénainn Woodsend
 #
 #
-# image_io.py performs image read/write operations.
+# image_io.py performs image read/write operations and conversions to vtkimage types.
 # Copyright (C) 2019  Brénainn Woodsend
 #
 # This program is free software: you can redistribute it and/or modify
@@ -27,6 +27,16 @@ import numpy as np
 import sys
 import os
 from pathlib2 import Path
+
+try:
+    PathLike = os.PathLike
+except AttributeError:
+    PathLike = Path
+
+try:
+    from PIL.Image import Image
+except ImportError:
+    Image = None
 
 import vtk
 from vtk.util.numpy_support import vtk_to_numpy, numpy_to_vtk
@@ -69,7 +79,7 @@ def vtkimagedata_from_array(arr, image_data=None):
     pd = image_data.GetPointData()
     new_arr = np.transpose(arr[::-1], (2, 0, 1)).ravel()
     pd.SetScalars(numpy_to_vtk(new_arr))
-    pd._numpy_refernce = new_arr.data
+    pd._numpy_reference = new_arr.data
 
     return image_data
 
@@ -125,6 +135,10 @@ def trim_image(arr, background_color, crop_padding):
 
 
 def test_trim_image():
+    import vtkplotlib as vpl
+    import matplotlib.pylab as plt
+
+
     vpl.quick_test_plot()
     fig = vpl.gcf()
     arr = vpl.screenshot_fig()
@@ -139,16 +153,38 @@ def test_trim_image():
     plt.show()
 
 
+def as_vtkimagedata(x, ndim=None):
+    if isinstance(x, Path):
+        x = str(x)
+    if isinstance(x, str):
+        try:
+            from matplotlib.pylab import imread
+            x = imread(x)
+        except Exception:
+            x = read(x)
+    if Image and isinstance(x, Image):
+        x = np.array(x)
+    if isinstance(x, np.ndarray):
+        if x.ndim == 2 and ndim == 3:
+            x = x[:, :, np.newaxis]
+        elif x.ndim == 3 and ndim == 2:
+            x = x.mean(-1).astype(x.dtype)
+        x = vtkimagedata_from_array(x)
+    if isinstance(x, vtk.vtkImageData):
+        return x
+    raise TypeError("Unable to convert type {} to vtkImageData".format(type(x)))
+
+
 
 if __name__ == "__main__":
-    import vtkplotlib as vpl
-    from vtkplotlib import image_io
-    import matplotlib.pylab as plt
-
-    path = vpl.data.ICONS["Right"]
-
-    plt.imshow(image_io.read(path))
-    plt.show()
+#    import vtkplotlib as vpl
+#    from vtkplotlib import image_io
+#    import matplotlib.pylab as plt
+#
+#    path = vpl.data.ICONS["Right"]
+#
+#    plt.imshow(image_io.read(path))
+#    plt.show()
 
     test_trim_image()
 

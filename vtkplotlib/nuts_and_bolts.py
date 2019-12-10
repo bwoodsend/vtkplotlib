@@ -26,9 +26,6 @@
 there will be a lot of irrelevant functions."""
 
 import numpy as np
-import sys
-import os
-
 
 
 
@@ -164,6 +161,7 @@ def init_when_called(func):
             delattr(self, priv_attr)
 
     return property(getter, None, deleter, func.__doc__)
+
 
 
 #def repeat(x=None, n):

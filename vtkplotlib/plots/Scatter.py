@@ -39,16 +39,13 @@ from vtkplotlib.plots.BasePlot import SourcedPlot, _iter_colors, _iter_points, _
 
 class Sphere(SourcedPlot):
     """Plot an individual sphere."""
-    def __init__(self, point, color=None, opacity=None, radius=1., fig="gcf"):
+    def __init__(self, point, color=None, opacity=None, radius=1., fig="gcf", label=None):
         super().__init__(fig)
 
         self.source = vtk.vtkSphereSource()
-        self.point = point
-        self.radius = radius
+        self.connect()
 
-        self.add_to_plot()
-
-        self.color_opacity(color, opacity)
+        self.__setstate__(locals())
 
     @property
     def point(self):
@@ -68,23 +65,16 @@ class Sphere(SourcedPlot):
 
 
 class Cursor(SourcedPlot):
-    def __init__(self, point, color=None, opacity=None, radius=1, fig="gcf"):
+    def __init__(self, point, color=None, opacity=None, radius=1, fig="gcf", label=None):
         super().__init__(fig)
 
         self.source = vtk.vtkCursor3D()
         self.source.SetTranslationMode(True)
         self.source.OutlineOff()
 
+        self.connect()
+        self.__setstate__(locals())
 
-        self.add_to_plot()
-
-        self.radius = radius
-
-
-        self.point = point
-
-
-        self.color_opacity(color, opacity)
 
     @property
     def point(self):
@@ -115,7 +105,7 @@ class Cursor(SourcedPlot):
 
 
 
-def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig="gcf"):
+def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig="gcf", label=None):
     """Scatter plot using little spheres or cursor objects.
 
     :param points: The point(s) to place the marker(s) at.
@@ -136,6 +126,9 @@ def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig=
     :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
     :type fig: vpl.figure, vpl.QtFigure, optional
 
+    :param label: Give the plot a label to use in legends, defaults to None.
+    :type label: str, optional
+
 
     :return: The marker or an array of markers.
     :rtype: vtkplotlib.plots.Scatter.Sphere or vtkplotlib.plots.Scatter.Cursor or np.array
@@ -146,16 +139,17 @@ def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig=
     points = np.asarray(points)
     out = np.empty(points.shape[:-1], object)
     out_flat = out.ravel()
-    for (i, (xyz, c, r)) in enumerate(zip(_iter_points(points),
-                                         _iter_colors(color, points.shape[:-1]),
-                                         _iter_scalar(radius, points.shape[:-1]))):
+    for (i, (xyz, c, r, l)) in enumerate(zip(_iter_points(points),
+                                             _iter_colors(color, points.shape[:-1]),
+                                             _iter_scalar(radius, points.shape[:-1]),
+                                             _iter_scalar(label, points.shape[:-1]))):
 
         if use_cursors:
             cls = Cursor
         else:
             cls = Sphere
 
-        out_flat[i] = cls(xyz, c, opacity, r, fig)
+        out_flat[i] = cls(xyz, c, opacity, r, fig, l)
 
     if out.ndim:
         return out

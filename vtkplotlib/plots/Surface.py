@@ -77,8 +77,15 @@ class Surface(ConstructedPlot):
     :param opacity: The translucency of the plot, 0 is invisible, 1 is solid, defaults to solid.
     :type opacity: float, optional
 
+    :param cmap: Colormap to use for scalars, defaults to `rainbow`.
+    :type cmap: str, 2D np.ndarray, matplotlib colormap, vtkLookupTable, optional
+
     :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
     :type fig: vpl.figure, vpl.QtFigure, optional
+
+    :param label: Give the plot a label to use in legends, defaults to None.
+    :type label: str, optional
+
 
 
     :return: The surface object.
@@ -111,20 +118,15 @@ class Surface(ConstructedPlot):
 
     .. seealso:: A parametrically constructed object plays well with a TextureMap.
 
-
-
-
-
-
     """
-    def __init__(self, x, y, z, scalars=None, color=None, opacity=None, texture_map=None, fig="gcf"):
+    def __init__(self, x, y, z, scalars=None, color=None, opacity=None, texture_map=None, cmap=None, fig="gcf", label=None):
         super().__init__(fig)
 
         points = nuts_and_bolts.zip_axes(x, y, z)
         flat_points = nuts_and_bolts.flatten_all_but_last(points)
 
         shape = points.shape[:-1]
-        unflatten_map = np.arange(np.prod(shape)).reshape(shape)
+        unflatten_map = np.arange(np.prod(shape), dtype=self.polydata.ID_ARRAY_DTYPE).reshape(shape)
 
 
         corners = (unflatten_map[:-1, :-1],
@@ -140,9 +142,12 @@ class Surface(ConstructedPlot):
         self.polydata.polygons = args
         self.polydata.texture_map = texture_map
         self.colors = scalars
+        self.cmap = cmap
 
-        self.add_to_plot()
+        self.connect()
         self.color_opacity(color, opacity)
+        self.label = label
+        self.scalar_range = Ellipsis
 
 
     @property
@@ -171,9 +176,10 @@ def test():
     self.polydata.texture_map = vpl.TextureMap(path, interpolate=True)
     self.colors = (vpl.zip_axes(phi * 3, theta * 5) / np.pi) % 1.
 
-    self.add_to_plot()
+    self.connect()
     vpl.gcf().add_plot(self)
     vpl.show()
+
 
 if __name__ == "__main__":
     test()

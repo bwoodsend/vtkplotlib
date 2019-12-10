@@ -159,19 +159,19 @@ class Imshow(Actor2Base):
 if __name__ == "__main__":
     pass
 
-import vtkplotlib as vpl
+    import vtkplotlib as vpl
 
 
-arr = plt.imread(vpl.data.ICONS["Right"])
-arr = image_io.trim_image(arr, arr[0, 0], 10)
+    arr = plt.imread(vpl.data.ICONS["Right"])
+    arr = image_io.trim_image(arr, arr[0, 0], 10)
 
-#image_data = vtk.vtkImageData()
-#
-#image_data.SetDimensions(arr.shape[1], arr.shape[0], arr.shape[2])
-#
-#pd = image_data.GetPointData()
-#pd.SetScalars(numpy_to_vtk(np.transpose(arr[::-1], (2, 0, 1)).ravel()))
+    #image_data = vtk.vtkImageData()
+    #
+    #image_data.SetDimensions(arr.shape[1], arr.shape[0], arr.shape[2])
+    #
+    #pd = image_data.GetPointData()
+    #pd.SetScalars(numpy_to_vtk(np.transpose(arr[::-1], (2, 0, 1)).ravel()))
 
 
-self = Imshow(arr)
-vpl.show()
+    self = Imshow(arr)
+    vpl.show()

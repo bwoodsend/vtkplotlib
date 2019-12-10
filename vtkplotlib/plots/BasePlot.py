@@ -35,7 +35,7 @@ from vtkplotlib.figures import gcf
 from vtkplotlib.colors import process_color
 from vtkplotlib import nuts_and_bolts
 from vtkplotlib.plots.polydata import PolyData
-
+from vtkplotlib.nuts_and_bolts import init_when_called
 
 
 
@@ -46,17 +46,33 @@ class BasePlot(object):
     """
 
     def __init__(self, fig="gcf"):
-        if fig == "gcf":
-          fig = gcf()
-        self.fig = fig
-        self.temp = []
+#        self.temp = []
 
-        self.mapper = vtk.vtkPolyDataMapper()
+        self.fig = fig
+        self.label = None
+
+#        self.mapper =
 
         self.actor = vtk.vtkActor()
 
+    @property
+    def fig(self):
+        return self._fig
 
-    def add_to_plot(self):
+    @fig.setter
+    def fig(self, fig):
+        if fig == "gcf":
+          fig = gcf()
+        self._fig = fig
+
+    def __setstate__(self, state):
+        [setattr(self, key, val) for (key, val) in state.items() if key != "self" and val is not None]
+
+    @init_when_called
+    def mapper(self):
+        return vtk.vtkPolyDataMapper()
+
+    def connect(self):
         self.actor.SetMapper(self.mapper)
 
         self.property = self.actor.GetProperty()
@@ -116,6 +132,10 @@ class BasePlot(object):
         fig.show()
         scf(old_gcf)
 
+#    @property
+#    def polydata(self):
+#        raise TypeError("{} type objects can't produce a polydata object.".format(type(self)))
+
 
 
 class SourcedPlot(BasePlot):
@@ -124,8 +144,8 @@ class SourcedPlot(BasePlot):
     further down the pipeline. E.g a sphere or an arrow. The source provides
     it's own conversion to triangles with source.GetOutputPort(). This class
     is just to handle the slightly different way of connecting the pipeline."""
-    def add_to_plot(self):
-        super().add_to_plot()
+    def connect(self):
+        super().connect()
         self.mapper.SetInputConnection(self.source.GetOutputPort())
 
     @property
@@ -142,61 +162,32 @@ class ConstructedPlot(BasePlot):
     def __init__(self, fig="gcf"):
         super().__init__(fig)
         self.polydata = PolyData()
+        self._freeze_scalar_range = False
 
 
-    def add_to_plot(self):
-        super().add_to_plot()
-        if self.polydata._scalar_mode != 1:
-            self.mapper.SetColorMode(vtk.VTK_COLOR_MODE_DIRECT_SCALARS)
+    def connect(self):
+        super().connect()
 
         if vtk.VTK_MAJOR_VERSION <= 5:
             self.mapper.SetInput(self.polydata.vtk_polydata)
         else:
             self.mapper.SetInputData(self.polydata.vtk_polydata)
 
+    @property
+    def mapper(self):
+        return self.polydata.mapper
 
-    def set_scalar_range(self, range=None):
-        if range is None:
-            range = self.polydata.point_colors
-        self.mapper.SetScalarRange(np.nanmin(range), np.nanmax(range))
+    @property
+    def scalar_range(self):
+        return self.polydata.scalar_range
 
+    @scalar_range.setter
+    def scalar_range(self, range):
+        self.polydata.scalar_range = range
+        if range is not None or range is not Ellipsis:
+            self._freeze_scalar_range = True
 
-
-#    @property
-#    def scalar_mode(self):
-#        return self.mapper.GetScalarModeAsString()
-#
-#    @property
-#    def color_mode(self):
-#        return self.mapper.GetColorModeAsString()
-
-#    SCALAR_MODES = {vtk.VTK_SCALAR_MODE_INDEX: "index???",
-#                    vtk.VTK_SCALAR_MODE_USE_POINT_DATA: "point_scalars",
-#                    vtk.VTK_SCALAR_MODE_USE_CELL_DATA: "polygon_scalars",
-#                    }
-
-
-#    @property
-#    def point_scalars(self):
-#        if self.scalar_mode == "point_scalars":
-#            return self.polydata.point_scalars
-#
-#    @point_scalars.setter
-#    def point_scalars(self, scalars):
-#        self.mapper.SetScalarModeToUsePointData()
-#        self.polydata.point_scalars = scalars
-#
-#    @property
-#    def polygon_scalars(self):
-#        if self.scalar_mode == "polygon_scalars":
-#            return self.polydata.polygon_scalars
-#
-#    @polygon_scalars.setter
-#    def polygon_scalars(self, scalars):
-#        self.mapper.SetScalarModeToUseCellData()
-#        self.polydata.polygon_scalars = scalars
-
-
+    cmap = PolyData.cmap
 
 
 class Actor2Base(BasePlot):
@@ -259,11 +250,11 @@ def _iter_colors(colors, shape):
 def _iter_scalar(s, shape):
     size = int(np.prod(shape))
 
-    s = np.asarray(s)
-    if s.shape == ():
+    arr = np.asarray(s)
+    if arr.shape == ():
         return (s for i in range(size))
     else:
-        return s.flat
+        return arr.flat
 
 
 

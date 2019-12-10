@@ -49,16 +49,21 @@ class TestMeshPlot(TestCase):
         points = np.array(sorted(unique_points, key=points_enum.get))
         point_args = np.apply_along_axis(lambda x: points_enum[tuple(x)], -1, vectors)
 
+        vpl.plots.MeshPlot.NUMPY_STL_AVAILABLE = False
+
         for fmt in (path, mesh, vectors, (points, point_args)):
-            normalised = vpl.plots.MeshPlot.normalise_mesh_type(fmt)
+            normalised = vpl.mesh_plot(fmt).vectors
             self.assertTrue(np.array_equal(normalised, vectors))
 
-        for i in range(2):
-            try:
-                normalised = vpl.plots.MeshPlot.path_str_to_vectors(path, i)
-                self.assertTrue(np.array_equal(normalised, vectors))
-            except RuntimeError as ex:
-                print(repr(ex))
+        vpl.plots.MeshPlot.NUMPY_STL_AVAILABLE = True
+
+        vpl.close()
+
+        vpl.plots.MeshPlot.test()
+
+
+
+
 
 
 

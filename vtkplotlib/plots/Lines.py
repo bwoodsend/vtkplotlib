@@ -24,21 +24,10 @@
 
 from builtins import super
 
-import vtk
 import numpy as np
-import os
-import sys
-from pathlib2 import Path
-from vtk.util.numpy_support import (
-                                    numpy_to_vtk,
-                                    numpy_to_vtkIdTypeArray,
-                                    vtk_to_numpy,
-                                    )
 
 
-
-from vtkplotlib.plots.BasePlot import ConstructedPlot, _iter_colors, _iter_points, _iter_scalar
-from vtkplotlib import _numpy_vtk, nuts_and_bolts
+from vtkplotlib.plots.BasePlot import ConstructedPlot
 from vtkplotlib.plots.polydata import join_line_ends
 
 
@@ -49,7 +38,7 @@ class Lines(ConstructedPlot):
     :param vertices: The points to plot through.
     :type vertices: np.ndarray of shape (n, 3)
 
-    :param color: The color(s) of the plot, defaults to white.
+    :param color: The color(s) of the lines, defaults to white.
     :type color: str, 3-tuple, 4-tuple, np.ndarray optional
 
     :param opacity: The translucency of the plot, 0 is invisible, 1 is solid, defaults to solid.
@@ -61,17 +50,21 @@ class Lines(ConstructedPlot):
     :param join_ends: If true, join the 1st and last points to form a closed loop, defaults to False.
     :type join_ends: bool, optional
 
+    :param cmap: Colormap to use for scalars, defaults to `rainbow`.
+    :type cmap: str, 2D np.ndarray, matplotlib colormap, vtkLookupTable, optional
+
     :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
     :type fig: vpl.figure, vpl.QtFigure, optional
+
+    :param label: Give the plot a label to use in legends, defaults to None.
+    :type label: str, optional
 
 
     :return: A lines object.
     :rtype: vtkplotlib.plots.Lines.Lines
 
-    If `vertices` is 3D then multiple seperate lines are plotted. Currently it
-    can only do one color for the whole thing. This can be used to plot meshes
-    as wireframes.
-
+    If `vertices` is 3D then multiple seperate lines are plotted. This can be
+    used to plot meshes as wireframes.
 
     .. code-block:: python
 
@@ -96,39 +89,40 @@ class Lines(ConstructedPlot):
         import vtkplotlib as vpl
         import numpy as np
 
-        # Create an octogon, using `t` as scalar values.
+        # Create an octagon, using `t` as scalar values.
 
         t = np.arange(0, 1, .125) * 2 * np.pi
         vertices = vpl.zip_axes(np.cos(t),
                                 np.sin(t),
                                 0)
 
+        # Plot the octagon.
         vpl.plot(vertices,
-                 line_width=6,
-                 join_ends=True,
-                 color=t)
+                 line_width=6,   # use a chunky (6pt) line
+                 join_ends=True, # join the first and last points
+                 color=t,        # use `t` as scalar values to color it
+                 )
+
+        # use a dark background for contrast
+        fig = vpl.gcf()
+        fig.background_color = "grey"
 
         vpl.show()
 
     """
 
-    def __init__(self, vertices, color=None, opacity=None, line_width=1.0, join_ends=False, fig="gcf"):
+    def __init__(self, vertices, color=None, opacity=None, line_width=1.0, join_ends=False, cmap=None, fig="gcf", label=None):
         super().__init__(fig)
-
+        self.connect()
 
         self.shape = ()
         self.join_ends = join_ends
-
         self.vertices = vertices
-
-#        assert np.array_equal(points[args], vertices)
-
-
-        self.add_to_plot()
-
-        self.opacity = opacity
-        self.color = color
-        self.line_width = line_width
+#        self.opacity = opacity
+#        self.color = color
+#        self.line_width = line_width
+        del vertices
+        self.__setstate__(locals())
 
 
     @property
@@ -152,7 +146,8 @@ class Lines(ConstructedPlot):
             return
 
         self.shape = vertices.shape
-        args = np.arange(np.prod(self.shape[:-1])).reshape((-1, self.shape[-2]))
+        args = np.arange(np.prod(self.shape[:-1]), dtype=self.polydata.ID_ARRAY_DTYPE)\
+                    .reshape((-1, self.shape[-2]))
 
         if self.join_ends:
             self.polydata.lines = join_line_ends(args)
@@ -174,9 +169,12 @@ class Lines(ConstructedPlot):
                 c = c[..., np.newaxis]
             assert self.shape[:-1] == c.shape[:-1]
             self.polydata.point_colors = c.reshape((-1, c.shape[-1]))
-            self.set_scalar_range(c)
-            self.mapper.SetScalarModeToUsePointData()
+
+            if not self._freeze_scalar_range:
+                self.scalar_range = Ellipsis
+
         else:
+            # can't use `super().color = color` sadly
             ConstructedPlot.color.fset(self, c)
             self.polydata.point_colors = None
 
@@ -207,8 +205,10 @@ def test():
 #    self.polydata.point_colors = t
     fig = vpl.gcf()
     fig.background_color = "grey"
-    self.add_to_plot()
+
     vpl.show()
+
+    globals().update(locals())
 
     return self
 

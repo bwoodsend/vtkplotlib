@@ -27,76 +27,11 @@ from builtins import super
 import vtk
 import numpy as np
 from pathlib2 import Path
-from vtk.util.numpy_support import (
-                                    numpy_to_vtk,
-                                    numpy_to_vtkIdTypeArray,
-                                    vtk_to_numpy,
-                                    )
-
 
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot
-from vtkplotlib.nuts_and_bolts import flatten_all_but_last
-from vtkplotlib import _numpy_vtk
+from vtkplotlib.plots.Lines import Lines
 
-
-MESH_DATA_TYPE = \
-"""'mesh_data' must be any of the following forms:
-
-1)  Some kind of mesh class that has form 2) stored in mesh.vectors.
-    For example numpy-stl's stl.mesh.Mesh or pymesh's pymesh.stl.Stl
-
-
-2)   An np.array with shape (n, 3, 3) in the form:
-
-       np.array([[[x, y, z],  # corner 0  \\
-                  [x, y, z],  # corner 1  | triangle 0
-                  [x, y, z]], # corner 2  /
-                 ...
-                 [[x, y, z],  # corner 0  \\
-                  [x, y, z],  # corner 1  | triangle n-1
-                  [x, y, z]], # corner 2  /
-                ])
-
-    Note it's not uncommon to have arrays of shape (n, 3, 4) or (n, 4, 3)
-    where the additional entries' meanings are usually irrelevant (often to
-    represent scalars but as stl has no color this is always uniform). Hence
-    to support mesh classes that have these, these arrays are allowed and the
-    extra entries are ignored.
-
-
-
-3)  A tuple containing:
-        An np.array with shape (k, 3) of (usually unique) vertices in the form:
-
-            np.array([[x, y, z],
-                      [x, y, z],
-                      ...
-                      [x, y, z],
-                      [x, y, z],
-                      ])
-
-    And an np.array of integers with shape (n, 3) of point
-        args in the form
-
-            np.array([[i, j, k],  # triangle 0
-                      ...
-                      [i, j, k],  # triangle n-1
-                      ])
-
-        where i, j, k are the indices of the points (in the vertices array)
-        representing each corner of a triangle.
-
-    Note that this form can (and is) easily converted to form 2) using
-
-        vertices = unique_vertices[point_args]
-
-
-If you are using or have written an stl library that you want supported then
-let me know. If it's numpy based then it's probably only a few extra lines to
-support.
-
-"""
 
 try:
     from stl.mesh import Mesh as NumpyMesh
@@ -106,24 +41,18 @@ except ImportError:
     NUMPY_STL_AVAILABLE = False
 
 
-MESH_DATA_TYPE_EX = lambda msg :ValueError("Invalid mesh_data type\n{}\n{}"\
-                                           .format(MESH_DATA_TYPE, msg))
+MESH_DATA_TYPE_EX = lambda msg :ValueError("Invalid mesh_data argument. {}"\
+                                           .format(msg))
 
 
-def path_str_to_vectors(path, ignore_numpystl=False):
+def set_from_path(self, path, ignore_numpystl=False):
 
     # Ideally let numpy-stl open the file if it is installed.
     if NUMPY_STL_AVAILABLE and not ignore_numpystl:
-        return NumpyMesh.from_file(path).vectors
+        self.vectors = NumpyMesh.from_file(path).vectors
+        return
 
-    # Otherwise try vtk's STL reader - however it's far from flawless.
-
-    # A lot of redundancy here.
-    # -Read the STL using vtk's STLReader
-    # -Extract the polydata
-    # -Extract the vectors from the polydata
-    # This can then be given to mesh_plot which will convert it straight
-    # back again to a polydata.
+    # Otherwise try vtk's STL reader - however it's not as reliable.
 
     from vtkplotlib.plots.polydata import PolyData
     from vtkplotlib.unicode_paths import PathHandler
@@ -134,16 +63,11 @@ def path_str_to_vectors(path, ignore_numpystl=False):
         handler.attach(reader)
         reader.SetFileName(path_handler.access_path)
 
-        # vtk does a really good job of point merging but it's really not
-        # worth the hassle to use it just to save a bt of RAM as everything
-        # else in this script assumes an (n, 3, 3) table of vectors. Disable it
-        # for speed.
-    #        reader.SetMerging(False)
-
         # Normally Reader doesn't do any reading until it's been plotted.
         # Update forces it to read.
         reader.Update()
         pd = PolyData(reader.GetOutput())
+
 
     # For some reason VTK just doesn't like some files. There are some vague
     # warnings in their docs - this could be what they're on about. If it
@@ -151,11 +75,11 @@ def path_str_to_vectors(path, ignore_numpystl=False):
     if pd.vtk_polydata.GetNumberOfPoints() == 0:
         raise RuntimeError("VTK's STLReader failed to read the STL file and no STL io backend is installed. VTK's STLReader is rather patchy. To read this file please ``pip install numpy-stl`` first.")
 
-    return normalise_mesh_type((pd.points, pd.polygons))
+    self.polydata = pd
+    self.connect()
 
 
-
-def vertices_args_pair_to_vectors(mesh_data):
+def set_vertices_index_pair(self, mesh_data):
     vertices, args = mesh_data
     if not isinstance(vertices, np.ndarray):
         raise MESH_DATA_TYPE_EX("First argument is of invalid type {}"\
@@ -176,38 +100,47 @@ def vertices_args_pair_to_vectors(mesh_data):
     if args.dtype.kind not in "iu":
         raise MESH_DATA_TYPE_EX("Second argument must be an int dtype array")
 
-    return vertices[args]
+    self.vertices = vertices
+    self.indices = args
 
 
 
-def normalise_mesh_type(mesh_data):
+def normalise_mesh_type(self, mesh_data):
     """Try to support as many of the mesh libraries out there as possible
     without having all of those libraries as dependencies.
     """
+    # If string or Path then read from file.
     if isinstance(mesh_data, Path):
         mesh_data = str(mesh_data)
     if isinstance(mesh_data, str):
-        vectors = path_str_to_vectors(mesh_data)
+        set_from_path(self, mesh_data)
+        return
 
-    elif isinstance(mesh_data, tuple) and len(mesh_data) == 2:
-        vectors = vertices_args_pair_to_vectors(mesh_data)
+    # If in (vertices, indices) format.
+    if isinstance(mesh_data, tuple) and len(mesh_data) == 2:
+        set_vertices_index_pair(self, mesh_data)
+        return
 
+    # If already an array then great.
+    if isinstance(mesh_data, np.ndarray):
+        vectors = mesh_data
+    # If a mesh class that has the vectors in mesh.vectors as is conventional.
+    elif hasattr(mesh_data, "vectors"):
+        vectors = mesh_data.vectors
     else:
-        if isinstance(mesh_data, np.ndarray):
-            vectors = mesh_data
+        raise MESH_DATA_TYPE_EX("")
 
-        elif hasattr(mesh_data, "vectors"):
-            vectors = mesh_data.vectors
-            if vectors.shape[1:] != (3, 3):
-                vectors = vectors[:, :3, :3]
 
-        else:
-            raise MESH_DATA_TYPE_EX("")
+    # Check shapes
 
-        if vectors.shape[1:] != (3, 3):
-            raise MESH_DATA_TYPE_EX("mesh_data is invalid shape {}".format(vectors.shape))
+    if vectors.shape[1:] != (3, 3):
+        # Sometimes there are extra entries. pymesh has them. No idea why.
+        vectors = vectors[:, :3, :3]
 
-    return vectors
+    if vectors.shape[1:] != (3, 3):
+        raise MESH_DATA_TYPE_EX("mesh_data is invalid shape {}".format(vectors.shape))
+
+    self.vectors = vectors
 
 
 class MeshPlot(ConstructedPlot):
@@ -216,6 +149,35 @@ class MeshPlot(ConstructedPlot):
     directly to vpl.mesh_plot.
 
     .. _numpy-stl: https://pypi.org/project/numpy-stl/
+
+    :param mesh_data: The mesh to plot.
+    :type mesh_data: An STL (like) object (see below)
+
+    :param tri_scalars: Per-triangle scalar, texture-coordinates or RGB values, defaults to None.
+    :type tri_scalars: np.ndarray, optional
+
+    :param scalars: Per-vertex scalar, texture-coordinates or RGB values, defaults to None.
+    :type scalars: np.ndarray, optional
+
+    :param color: The color of the whole plot, ignored if scalars are used, defaults to white.
+    :type color: str, 3-tuple, 4-tuple, optional
+
+    :param opacity: The translucency of the plot, 0 is invisible, 1 is solid, defaults to solid.
+    :type opacity: float, optional
+
+    :param cmap: Colormap to use for scalars, defaults to `rainbow`.
+    :type cmap: str, 2D np.ndarray, matplotlib colormap, vtkLookupTable, optional
+
+    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
+    :type fig: vpl.figure, vpl.QtFigure, optional
+
+    :param label: Give the plot a label to use in legends, defaults to None.
+    :type label: str, optional
+
+
+    :return: A meshplot object.
+    :rtype: vtkplotlib.plots.MeshPlot.MeshPlot
+
 
     The following example assumes you have installed `numpy-stl`_.
 
@@ -366,95 +328,140 @@ class MeshPlot(ConstructedPlot):
 
 
     """
-    def __init__(self, mesh_data, tri_scalars=None, scalars=None, color=None, opacity=None, fig="gcf"):
+    def __init__(self, mesh_data, tri_scalars=None, scalars=None, color=None, opacity=None, cmap=None, fig="gcf", label=None):
         super().__init__(fig)
+        self.connect()
+        self.shape = (0, 3, 3)
+        self._last_used_default_indices = False
 
 
-        self.vectors = np.ascontiguousarray(normalise_mesh_type(mesh_data))
+        self.set_mesh_data(mesh_data)
+#        self.vectors = np.ascontiguousarray(normalise_mesh_type(mesh_data))
+        del mesh_data
 
-        triangles = np.empty((len(self.vectors), 4), np.int64)
-        triangles[:, 0] = 3
-        for i in range(3):
-            triangles[:, i+1] = np.arange(i, len(self.vectors) * 3, 3)
+        self.__setstate__(locals())
 
-        triangles = triangles.ravel()
+    set_mesh_data = normalise_mesh_type
 
-        points = self.points = vtk.vtkPoints()
-        self.update_points()
+    @property
+    def vectors(self):
+        if self._last_used_default_indices:
+            return self.polydata.points.reshape(self.shape)
+        else:
+            return self.vertices[self.indices]
 
-        self.polydata.vtk_polydata.SetPoints(points)
+    @vectors.setter
+    def vectors(self, vectors):
+        vectors = np.asarray(vectors)
+        self.polydata.points = vectors.reshape((-1, 3))
 
-        cells = vtk.vtkCellArray()
-        cells.SetCells(len(triangles), numpy_to_vtkIdTypeArray(triangles))
-        self.polydata.vtk_polydata.SetPolys(cells)
+        # Ideally try to avoid rewriting the indices table.
+        # ``self.vectors += tranlation`` shouldn't require a rewrite.
+        # This is only safe to do if the user isn't directly playing with
+        # self.indices. self._last_used_default_indices tests that.
 
-        self.add_to_plot()
+        if vectors.shape == self.shape and self._last_used_default_indices:
+            # If shape not changed, indices should be identical.
+            return
 
-        self.temp.append(triangles)
+#        print("rewrite indices")
+        self.shape = vectors.shape
+
+        if len(vectors) < self.shape[0] and self._last_used_default_indices:
+            # If the mesh has been cropped, then the indices table can be
+            # cropped.
+            args = self.polydata.polygons[:len(vectors)]
+
+        else:
+            # Otherwise it has to be rewritten.
+            args = np.arange(np.prod(self.shape[:-1]), dtype=self.polydata.ID_ARRAY_DTYPE)\
+                        .reshape((-1, self.shape[-2]))
+
+        self.polydata.polygons = args
+        self._last_used_default_indices = True
 
 
-        self.set_scalars(scalars)
-        self.set_tri_scalars(tri_scalars)
-        self.color_opacity(color, opacity)
+    @property
+    def vertices(self):
+        return self.polydata.points
+    @vertices.setter
+    def vertices(self, v):
+        self.polydata.points = v
 
-    __init__.__doc__ = (__init__.__doc__ or "") + MESH_DATA_TYPE
+    @property
+    def indices(self):
+        return self.polydata.polygons
+    @indices.setter
+    def indices(self, i):
+        self.polydata.polygons = i
+        self.shape = i.shape + (3,)
+        self._last_used_default_indices = False
 
-    def update_points(self):
-        """If self.vectors has been modified (either resigned to a new array or
-        the array's contents have been altered) then this be called after."""
-        vertices = flatten_all_but_last(self.vectors)
-        self.temp.append(vertices)
 
-        self.points.SetData(numpy_to_vtk(vertices))
+    scalars = Lines.color
 
-
-    def set_tri_scalars(self, tri_scalars, min=None, max=None):
+    @property
+    def tri_scalars(self):
         """Sets a scalar for each triangle for generating heatmaps.
 
         tri_scalars should be an 1D np.array of length n.
 
         Calls self.set_scalars. See set_scalars for implications.
         """
+        return self.polydata.polygon_colors.reshape((self.shape[0], -1))
+
+    @tri_scalars.setter
+    def tri_scalars(self, tri_scalars):
         if tri_scalars is not None:
-            tri_scalars = _numpy_vtk.contiguous_safe(tri_scalars.ravel())
-    #        scalars = np.array([tri_scalars, tri_scalars, tri_scalars]).T
-            assert tri_scalars.size == len(self.vectors)
-            scalars = np.empty((len(tri_scalars), 3))
-            for i in range(3):
-                scalars[:, i] = tri_scalars
+            if len(tri_scalars) != self.shape[0]:
+                raise ValueError("`tri_scalars` should have the same length as `self.vectors` or `self.args` to be one value per triangle.")
 
-            self.set_scalars(scalars, min, max)
+            reshaped = tri_scalars.reshape((self.shape[0], -1))
+            if (1 <= reshaped.shape[1] <= 3):
+                tri_scalars = reshaped
+            else:
+                raise ValueError("`tri_scalars` should have shape ({0},), ({0}, 1), ({0}, 2) or ({0}, 3). Received {1}".format(self.shape[0], tri_scalars.shape))
 
+        self.polydata.polygon_colors = tri_scalars
 
-    def set_scalars(self, scalars, min=None, max=None):
-        """Sets a scalar for each corner of each triangle for generating heatmaps.
+        if not self._freeze_scalar_range:
+            self.scalar_range = Ellipsis
 
-        scalars should be an array with shape (n, 3).
-
-        self.set_scalars and self.set_tri_scalars will overwrite each other.
-        If either form of scalars is used then self.color is ignored.
-        """
-
-        if scalars is not None:
-    #        scalars[~np.isfinite(scalars)] = np.nanmean(scalars)
-            if scalars.shape != (len(self.vectors), 3):
-                raise ValueError("Expected (n, 3) shape array. Got {}".format(scalars.shape))
-
-            scalars = _numpy_vtk.contiguous_safe(scalars)
-
-            self.polydata.vtk_polydata.GetPointData().SetScalars(numpy_to_vtk(scalars.ravel()))
-            self.temp.append(scalars)
-
-            min = min or np.nanmin(scalars)
-            max = max or np.nanmax(scalars)
-            self.mapper.SetScalarRange(min, max)
+    @tri_scalars.deleter
+    def tri_scalars(self):
+        del self.polydata.polygon_colors
 
 
-def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", opacity=None, fig="gcf"):
-    r"""Like mesh_plot but able to add scalars per triangle's edge. By default,
+def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", opacity=None, cmap=None, fig="gcf", label=None):
+    """Like mesh_plot but able to add scalars per triangle's edge. By default,
     the scalar value at centre of each triangle is taken to be the mean of the
     scalars of its edges, but it can be far more visually effective to use the
     ``centre_scalar=`` number option.
+
+    :param mesh_data: The mesh to plot.
+    :type mesh_data: An STL (like) object (see below)
+
+    :param edge_scalars: Per-edge scalar, texture-coordinates or RGB values.
+    :type edge_scalars: np.ndarray
+
+    :param centre_scalar: Scalar value(s) for the centre of each triangle, defaults to 'mean'.
+    :type centre_scalar: str, optional
+
+    :param opacity: The translucency of the plot, 0 is invisible, 1 is solid, defaults to solid.
+    :type opacity: float, optional
+
+    :param cmap: Colormap to use for scalars, defaults to `rainbow`.
+    :type cmap: str, 2D np.ndarray, matplotlib colormap, vtkLookupTable, optional
+
+    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
+    :type fig: vpl.figure, vpl.QtFigure, optional
+
+    :param label: Give the plot a label to use in legends, defaults to None.
+    :type label: str, optional
+
+
+    :return: A meshplot object.
+    :rtype: vtkplotlib.plots.MeshPlot.MeshPlot
 
 
     Edge scalars are very much not the way VTK likes it. Infact VTK doesn't
@@ -467,12 +474,12 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", o
 
                    p1
 
-                 //|\\         Double lines represent the original triangle.
-                // | \\        The single lines represent the division lines that
-          l0   //  |  \\  l1   split the triangle into three.
-              //  / \  \\      The annotations show the order in which the
-             // /     \ \\     scalar for each edge must be provided.
-            ///~~~~~~~~~\\\
+                 //|\\\\         Double lines represent the original triangle.
+                // | \\\\        The single lines represent the division lines that
+          l0   //  |  \\\\  l1   split the triangle into three.
+              //  / \\  \\\\      The annotations show the order in which the
+             // /     \\ \\\\     scalar for each edge must be provided.
+            ///~~~~~~~~~\\\\\\
         p0  ~~~~~~~~~~~~~~~  p2
                   l2
 
@@ -483,29 +490,108 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", o
     .. code-block:: python
 
         import vtkplotlib as vpl
+        from vtkplotlib import geometry
         from stl.mesh import Mesh
+        import numpy as np
 
 
         path = vpl.data.get_rabbit_stl()
         mesh = Mesh.from_file(path)
 
         # This is the length of each side of each triangle.
-        edge_scalars = vpl.geometry.distance(mesh.vectors[:, np.arange(1, 4) % 3] - mesh.vectors)
+        edge_scalars = geometry.distance(mesh.vectors[:, np.arange(1, 4) % 3] - mesh.vectors)
 
-        vpl.mesh_plot_with_edge_scalars(_mesh, edge_scalars, centre_scalar=0)
+        vpl.mesh_plot_with_edge_scalars(mesh, edge_scalars, centre_scalar=0, cmap="Greens")
 
         vpl.show()
 
 
 
+    I wrote this orginally to visualise curvature. The calculation is ugly, but
+    on the off chance someone needs it, here it is.
 
-    I wrote this orginally to visualise curvature.
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        from vtkplotlib import geometry
+        from stl.mesh import Mesh
+        import numpy as np
+
+
+        path = vpl.data.get_rabbit_stl()
+        mesh = Mesh.from_file(path)
+
+        def astype(arr, dtype):
+            return np.frombuffer(arr.tobytes(), dtype)
+
+        def build_tri2tri_map(mesh):
+            \"""This creates an (n, 3) array that maps each triangle to its 3
+            adjacent triangles. It takes advantage of each triangles vertices
+            being consistently ordered anti-clockwise. If triangle A shares an
+            edge with triangle B then both A and B have the edges ends as
+            vertices but in opposite order. Looking for this helps reduce the
+            complexity of the problem.
+            \"""
+
+            # The most efficient way to make a pair of points hashable is to
+            # take its binary representation.
+            dtype = np.array(mesh.vectors[0, :2].tobytes()).dtype
+
+            vectors_rolled = mesh.vectors[:, np.arange(1, 4) % 3]
+
+            # Get all point pairs going one way round.
+            pairs = np.concatenate((mesh.vectors, vectors_rolled), -1)
+
+            # Get all point pairs going the other way round.
+            pairs_rev = np.concatenate((vectors_rolled, mesh.vectors), -1)
+
+            bin_pairs = astype(pairs, dtype).reshape(-1, 3)
+            bin_pairs_rev = astype(pairs_rev, dtype).reshape(-1, 3)
+
+            # Use a dictionary to find all the matching pairs.
+            mapp = dict(zip(bin_pairs.ravel(), np.arange(bin_pairs.size) // 3))
+            args = np.fromiter(map(mapp.get, bin_pairs_rev.flat), dtype=float, count=bin_pairs.size).reshape(-1, 3)
+
+            # Triangles with a missing adjacent edge come out as nans.
+            # Convert mapping to ints and nans to -1s.
+            mask = np.isfinite(args)
+            tri2tri_map = np.empty(args.shape, int)
+            tri2tri_map[mask] = args[mask]
+            tri2tri_map[~mask] = -1
+
+            return tri2tri_map
+
+
+        tri2tri_map = build_tri2tri_map(mesh)
+
+        tri_centres = np.mean(mesh.vectors, axis=1)
+        curves = np.cross(mesh.units[tri2tri_map], mesh.units[:, np.newaxis])
+        displacements = tri_centres[tri2tri_map] - tri_centres[:, np.newaxis]
+        curvatures = curves / geometry.distance(displacements, keepdims=True)
+
+        curvature_signs = np.sign(geometry.inner_product(mesh.units[:, np.newaxis],
+                                                         displacements)) * -1
+
+        signed_curvatures = geometry.distance(curvatures) * curvature_signs
+
+        # And finally, to plot it.
+        plot = vpl.mesh_plot_with_edge_scalars(mesh, signed_curvatures)
+
+        # Curvature must be clipped to prevent anomilies overwidenning the
+        # scalar range.
+        plot.scalar_range = -.1, .1
+
+        # Red represents an inside corner, blue represents an outside corner.
+        plot.cmap = "coolwarm_r"
+
+        vpl.show()
 
 
 
     """
 
-    vectors = normalise_mesh_type(mesh_data)
+    self = MeshPlot(mesh_data, fig=fig)
+    vectors = self.vectors
     tri_centres = np.mean(vectors, 1)
 
     new_vectors = np.empty((len(vectors) * 3, 3, 3), vectors.dtype)
@@ -528,11 +614,17 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", o
     for i in range(3):
         new_scalars[i::3, 2] = centre_scalars
 
-    return MeshPlot(new_vectors, scalars=new_scalars, opacity=opacity, fig=fig)
+    self.vectors = new_vectors
+    self.scalars = new_scalars
+    self.opacity = opacity
+    self.fig = fig
+    self.label = label
+    self.cmap = cmap
+
+    return self
 
 
-if __name__ == "__main__":
-    import time
+def test():
     import vtkplotlib as vpl
     from stl.mesh import Mesh
 
@@ -550,23 +642,11 @@ if __name__ == "__main__":
     edge_scalars = vpl.geometry.distance(_mesh.vectors[:, np.arange(1, 4) % 3] - _mesh.vectors)
 
     self = vpl.mesh_plot_with_edge_scalars(_mesh, edge_scalars, centre_scalar=0)
-
-    mesh_data = _mesh
-
-
+    self.cmap = "Reds"
+#    mesh_data = _mesh
     fig.show()
+    globals().update(locals())
 
 
-#def test_args_based_mesh(_mesh):
-#    vectors = _mesh.vectors
-#
-#    unique_points = set(tuple(i) for i in vectors.reshape(len(vectors) * 3, 3))
-#    points_enum = {point: i for (i, point) in enumerate(unique_points)}
-#
-#    points = np.array(sorted(unique_points, key=points_enum.get))
-#    point_args = np.apply_along_axis(lambda x: points_enum[tuple(x)], -1, vectors)
-#
-#    assert np.array_equal(points[point_args], vectors)
-#
-#    vpl.mesh_plot((points, point_args))
-#    vpl.show()
+if __name__ == "__main__":
+    test()

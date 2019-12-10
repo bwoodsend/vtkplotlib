@@ -27,18 +27,14 @@ from builtins import super
 
 import vtk
 import numpy as np
-from vtk.util.numpy_support import (
-                                    numpy_to_vtk,
-                                    numpy_to_vtkIdTypeArray,
-                                    vtk_to_numpy,
-                                    )
 
 from vtkplotlib.plots.BasePlot import SourcedPlot, _iter_colors, _iter_points, _iter_scalar
 from vtkplotlib import geometry as geom
 
 
 class Arrow(SourcedPlot):
-    def __init__(self, start, end, length=None, width_scale=1, color=None, opacity=None, fig="gcf"):
+    """Draw a single arrow from `start` to `end`."""
+    def __init__(self, start, end, length=None, width_scale=1, color=None, opacity=None, fig="gcf", label=None):
         super().__init__(fig)
 
         diff = end - start
@@ -73,14 +69,15 @@ class Arrow(SourcedPlot):
 
         self.source = arrowSource
 
-        self.add_to_plot()
+        self.connect()
         self.actor.SetUserMatrix(transform.GetMatrix())
 
         self.color_opacity(color, opacity)
+        self.label = label
 
 
 
-def arrow(start, end, length=None, width_scale=1., color=None, opacity=None, fig="gcf"):
+def arrow(start, end, length=None, width_scale=1., color=None, opacity=None, fig="gcf", label=None):
     """Draw (an) arrow(s) from `start` to `end`.
 
     :param start: The starting point(s) of the arrow(s).
@@ -104,6 +101,9 @@ def arrow(start, end, length=None, width_scale=1., color=None, opacity=None, fig
     :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
     :type fig: vpl.figure, vpl.QtFigure
 
+    :param label: Give the plot a label to use in legends, defaults to None.
+    :type label: str, optional
+
 
     :return: arrow or array of arrows
     :rtype: vtkplotlib.plots.Arrow.Arrow, np.array of Arrows
@@ -117,7 +117,7 @@ def arrow(start, end, length=None, width_scale=1., color=None, opacity=None, fig
 
     .. note::
 
-        arrays are supported only for convenience and just use a python for
+        Arrays are supported only for convenience and just use a python for
         loop. There is no speed bonus to using numpy or trying to plot in bulk
         here.
 
@@ -130,14 +130,17 @@ def arrow(start, end, length=None, width_scale=1., color=None, opacity=None, fig
 
     assert start.shape == end.shape
 
-    out = np.empty(start.shape[:-1], object)
+    shape = start.shape[:-1]
+    out = np.empty(shape, object)
     out_flat = out.ravel()
 
-    for (i, s, e, l, c) in zip(range(out.size),
+
+    for (i, s, e, l, c, lab) in zip(range(out.size),
                                 _iter_points(start),
                                 _iter_points(end),
-                                _iter_scalar(length, start.shape[:-1]),
-                                _iter_colors(color, start.shape[:-1])):
+                                _iter_scalar(length, shape),
+                                _iter_colors(color, shape),
+                                _iter_scalar(label, shape)):
 
         out_flat[i] = Arrow(s, e, l, width_scale, c, opacity, fig)
 
@@ -146,11 +149,11 @@ def arrow(start, end, length=None, width_scale=1., color=None, opacity=None, fig
     return out
 
 
-def quiver(point, gradient, length=None, length_scale=1., width_scale=1., color=None, opacity=None, fig="gcf"):
-    """Create an arrow from 'point' towards a direction given by 'gradient'.
-    This is intended to make field/quiver plots. Arrow lengths by default are
-    the magnitude of 'gradient but can be scaled with 'length_scale' or
-    frozen with 'length'. See arrow's docs for more detail.
+def quiver(point, gradient, length=None, length_scale=1., width_scale=1., color=None, opacity=None, fig="gcf", label=None):
+    """Create arrow(s) from 'point' towards a direction given by 'gradient' to
+    make field/quiver plots. Arrow lengths by default are the magnitude of
+    'gradient but can be scaled with 'length_scale' or frozen with 'length'.
+    See arrow's docs for more detail.
 
     :param point: The starting point of the arrow(s).
     :type point: np.ndarray
@@ -176,9 +179,14 @@ def quiver(point, gradient, length=None, length_scale=1., width_scale=1., color=
     :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
     :type fig: vpl.figure, vpl.QtFigure
 
+    :param label: Give the plot a label to use in legends, defaults to None.
+    :type label: str, optional
+
 
     :return: arrow or array of arrows
     :rtype: vtkplotlib.plots.Arrow.Arrow, np.array of Arrows
+
+    .. seealso:: ``vpl.arrow`` to draw arrows from a start point to an end point.
 
     """
 
@@ -187,7 +195,7 @@ def quiver(point, gradient, length=None, length_scale=1., width_scale=1., color=
     if length_scale != 1:
         length *= length_scale
 
-    return arrow(point, point + gradient, length, width_scale, color, opacity, fig)
+    return arrow(point, point + gradient, length, width_scale, color, opacity, fig, label)
 
 
 
@@ -196,7 +204,7 @@ if __name__ == "__main__":
     import vtkplotlib as vpl
 
     t = np.linspace(0, 2 * np.pi)
-    points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
+    points = vpl.zip_axes([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
     grads = np.roll(points, 10)
 
     arrows = quiver(points, grads, width_scale=.3, color=grads)

@@ -24,21 +24,10 @@
 
 from builtins import super
 
-import vtk
 import numpy as np
-import os
-import sys
-from pathlib2 import Path
-from vtk.util.numpy_support import (
-                                    numpy_to_vtk,
-                                    numpy_to_vtkIdTypeArray,
-                                    vtk_to_numpy,
-                                    )
 
 
-
-from vtkplotlib.plots.BasePlot import ConstructedPlot, _iter_colors, _iter_points, _iter_scalar
-from vtkplotlib import nuts_and_bolts, _numpy_vtk
+from vtkplotlib.plots.BasePlot import ConstructedPlot
 
 
 
@@ -60,6 +49,9 @@ class Polygon(ConstructedPlot):
     :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
     :type fig: vpl.figure, vpl.QtFigure, optional
 
+    :param label: Give the plot a label to use in legends, defaults to None.
+    :type label: str, optional
+
 
     :return: A polygon object
     :rtype: vtkplotlib.plots.Polygon.Polygon
@@ -70,22 +62,21 @@ class Polygon(ConstructedPlot):
     many sides, the fragmentation doesn't look too great.
 
     """
-    def __init__(self, vertices, color=None, opacity=None, fig="gcf"):
+    def __init__(self, vertices, scalars=None, color=None, opacity=None, fig="gcf", label=None):
         super().__init__(fig)
 
         # The implementation of this is actually exactly the same as Lines plot
         # but sets args to polydata.polygons rather than polydata.lines
-        shape = vertices.shape[:-1]
-        points = _numpy_vtk.contiguous_safe(nuts_and_bolts.flatten_all_but_last(vertices))
-        self.temp.append(points)
 
-        args = nuts_and_bolts.flatten_all_but_last(np.arange(np.prod(shape)).reshape(shape))
+        self.shape = vertices.shape[:-1]
 
-        self.polydata.points = points
+        args = np.arange(np.prod(self.shape)).reshape(self.shape)
+
+        self.polydata.points = vertices.reshape((-1, 3))
         self.polydata.polygons = args
 
-
-        self.add_to_plot()
+        self.label = label
+        self.connect()
 
         self.color_opacity(color, opacity)
 
@@ -100,6 +91,8 @@ def test():
     self = vpl.polygon(points, color="r")
 
     vpl.show()
+
+    globals().update(locals())
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ with open(path.join(path.split(__file__)[0], "README.md"), "r") as fh:
     long_description = fh.read()
 
 setup(name='vtkplotlib',
-      version='1.1.3',
+      version='1.2.0',
       description='High level 3D graphics and plotting',
       long_description=long_description,
       long_description_content_type="text/markdown",
@@ -29,7 +29,7 @@ setup(name='vtkplotlib',
                   # ('models', ['data/models/*'])],
       include_package_data=True,
       install_requires=[
-             "vtk<8.2.0",
+             "vtk",
              "numpy",
              "pathlib2",
              "matplotlib",

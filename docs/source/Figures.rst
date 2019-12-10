@@ -21,12 +21,14 @@ use any. The figure is shown using ``vpl.show()`` or ``fig.show()``. After the
 shown figure is closed the current working figure is deleted.
 
 
+---------------
 
 vtkplotlib.show
 ---------------
 
 .. autofunction:: vtkplotlib.figures.figure_manager.show
 
+-----------------
 
 vtkplotlib.figure
 -----------------
@@ -34,11 +36,15 @@ vtkplotlib.figure
 .. autoclass:: vtkplotlib.figures.figure.Figure
 
 
+--------------
+
 vtkplotlib.gcf
 --------------
 
 .. autofunction:: vtkplotlib.figures.figure_manager.gcf
 
+
+--------------
 
 vtkplotlib.scf
 --------------
@@ -46,11 +52,15 @@ vtkplotlib.scf
 .. autofunction:: vtkplotlib.figures.figure_manager.scf
 
 
+-----------------------
+
 vtkplotlib.reset_camera
 -----------------------
 
 .. autofunction:: vtkplotlib.figures.figure_manager.reset_camera
 
+
+-------------------
 
 vtkplotlib.save_fig
 -------------------
@@ -58,11 +68,15 @@ vtkplotlib.save_fig
 .. autofunction:: vtkplotlib.figures.figure_manager.save_fig
 
 
+---------------
+
 vtkplotlib.view
 ---------------
 
 .. autofunction:: vtkplotlib.figures.figure_manager.view
 
+
+----------------
 
 vtkplotlib.close
 ----------------
@@ -70,23 +84,31 @@ vtkplotlib.close
 .. autofunction:: vtkplotlib.figures.figure_manager.close
 
 
+-------------------------
+
 vtkplotlib.figure_history
 -------------------------
 
 .. autodata:: vtkplotlib._history.figure_history
 
 
+----------------------
+
 vtkplotlib.auto_figure
------------------------
+----------------------
 
 .. autofunction:: vtkplotlib.figures.figure_manager.auto_figure
 
+
+-------------------
 
 vtkplotlib.QtFigure
 -------------------
 
 .. autoclass:: vtkplotlib.figures.QtFigure.QtFigure
 
+
+--------------------
 
 vtkplotlib.QtFigure2
 --------------------

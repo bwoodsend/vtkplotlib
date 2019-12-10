@@ -53,7 +53,7 @@ from .plots.Scatter import scatter
 from .plots.Surface import Surface as surface
 from .plots.Text import Text as text
 from .plots.Text3D import Text3D as text3d, annotate
-from .plots.Legend import Legend
+from .plots.Legend import Legend as legend
 
 from .plots import BasePlot
 from .plots.polydata import PolyData

@@ -323,6 +323,7 @@ class ViewButtons(object):
 class PlotTable(QtWidgets.QWidget):
     def __init__(self, figure):
         super().__init__()
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
         self.figure = figure
         self.plots = self.figure.plots
         self.rows = dict()

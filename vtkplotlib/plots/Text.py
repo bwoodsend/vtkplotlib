@@ -26,15 +26,6 @@ from builtins import super
 
 import vtk
 import numpy as np
-from matplotlib import colors
-import os
-import sys
-from pathlib2 import Path
-from vtk.util.numpy_support import (
-                                    numpy_to_vtk,
-                                    numpy_to_vtkIdTypeArray,
-                                    vtk_to_numpy,
-                                    )
 
 
 
@@ -129,7 +120,6 @@ def resize_event_cb(*args):
 
 if __name__ == "__main__":
     import vtkplotlib as vpl
-    import vtk
 
     fig = vpl.figure()
     fig.renWin.AddObserver(vtk.vtkCommand.ModifiedEvent, resize_event_cb)

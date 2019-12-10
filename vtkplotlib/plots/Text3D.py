@@ -26,20 +26,9 @@ from builtins import super
 
 import vtk
 import numpy as np
-from matplotlib import colors
-import os
-import sys
-from pathlib2 import Path
-from vtk.util.numpy_support import (
-                                    numpy_to_vtk,
-                                    numpy_to_vtkIdTypeArray,
-                                    vtk_to_numpy,
-                                    )
 
 
-
-from vtkplotlib.plots.BasePlot import SourcedPlot, _iter_colors, _iter_points, _iter_scalar
-from vtkplotlib.figures import gcf, show
+from vtkplotlib.plots.BasePlot import SourcedPlot
 from vtkplotlib import geometry as geom
 from vtkplotlib.plots.Arrow import Arrow
 
@@ -70,6 +59,9 @@ class Text3D(SourcedPlot):
     :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
     :type fig: vpl.figure, vpl.QtFigure, optional
 
+    :param label: Give the plot a label to use in legends, defaults to None.
+    :type label: str, optional
+
 
     :return: text3D plot object
     :rtype: vtkplotlib.plots.Text3D.Text3D
@@ -86,7 +78,7 @@ class Text3D(SourcedPlot):
 
 
     """
-    def __init__(self, text, position=(0, 0, 0), follow_cam=True, scale=1, color=None, opacity=None, fig="gcf"):
+    def __init__(self, text, position=(0, 0, 0), follow_cam=True, scale=1, color=None, opacity=None, fig="gcf", label=None):
         super().__init__(fig)
         # Create the 3D text and the associated mapper and follower (a type of
         # actor). Position the text so it is displayed over the origin of the
@@ -94,25 +86,18 @@ class Text3D(SourcedPlot):
 
 
         self.source = vtk.vtkVectorText()
-        self.text = text
-
-
         # This chunk is different to how most plots objects construct
-        # themselves. So super().add_to_plot() wont work unfortunately.
-
+        # themselves. So super().connect() wont work unfortunately.
         self.actor = vtk.vtkFollower()
-        self.scale = scale
-        self.position = position
-
-        self.mapper = vtk.vtkPolyDataMapper()
         self.actor.SetMapper(self.mapper)
-
         self.property = self.actor.GetProperty()
         self.mapper.SetInputConnection(self.source.GetOutputPort())
 
 
+        self.__setstate__(locals())
+
+
         self.fig += self
-        self.color_opacity(color, opacity)
 
         if follow_cam:
             self.actor.SetCamera(self.fig.renderer.GetActiveCamera())
@@ -252,7 +237,7 @@ def test():
     point = np.array([1, 2, 3])
     vpl.scatter(point)
 
-    arrow, text = vpl.annotate(point, point, np.array([0, 0, 1]))
+    arrow, self = vpl.annotate(point, point, np.array([0, 0, 1]), text_color="green", arrow_color="purple")
 
     globals().update(locals())
 
