@@ -3,3 +3,4 @@ sphinx-copybutton==0.2.5
 sphinx-rtd-theme==0.4.3
 sphinxcontrib-websupport==1.1.0
 PyQt5==5.12.2
+m2r==0.2.1

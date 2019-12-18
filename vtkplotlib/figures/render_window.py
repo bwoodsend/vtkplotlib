@@ -145,9 +145,9 @@ class VTKRenderer(object):
 
     @background_color.setter
     def background_color(self, color):
-        from vtkplotlib.colors import process_color
+        from vtkplotlib.colors import as_rgb_a
 
-        color, opacity = process_color(color)
+        color, opacity = as_rgb_a(color)
         if color is not None:
             self.renderer.SetBackground(*color)
         if opacity is not None:

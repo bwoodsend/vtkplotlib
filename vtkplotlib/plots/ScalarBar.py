@@ -86,6 +86,7 @@ def test():
 
     mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
     plot = vpl.mesh_plot(mesh, scalars=mesh.x)
+#    plot.scalar_range = -1, 2
 
     self = vpl.scalar_bar(plot, "X Values")
 

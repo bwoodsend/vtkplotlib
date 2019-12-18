@@ -51,7 +51,7 @@ for dic in (colors.CSS4_COLORS, colors.TABLEAU_COLORS, colors.XKCD_COLORS):
         mpl_colors[key.split(":")[-1]] = colors.hex2color(val)
 
 
-def process_color(color=None, opacity=None):
+def as_rgb_a(color=None, opacity=None):
     """This is designed to handle all the different ways a color and/or
     opacity can be given.
 
@@ -84,7 +84,7 @@ def process_color(color=None, opacity=None):
             if color[0] == "#":
                 # allow #RRGGBB hex colors
                 # mpl's hex2rgb doesn't allow opacity. Otherwise I'd just use that
-                return process_color(tuple(int(color[i: 2 + i], 16) for i in range(1, len(color), 2)),
+                return as_rgb_a(tuple(int(color[i: 2 + i], 16) for i in range(1, len(color), 2)),
                                      opacity)
             else:
                 # use matplotlib's color library
@@ -314,6 +314,7 @@ def as_vtk_cmap(cmap, cache=True):
         cmap = np.ascontiguousarray((colors.to_rgba_array(cmap) * 255).astype(np.uint8))
         table = vtk.vtkLookupTable()
         table.SetTable(numpy_to_vtk(cmap))
+        table._numpy_ref = cmap
 
         temp.append(cmap)
         if name is not None:
@@ -324,6 +325,31 @@ def as_vtk_cmap(cmap, cache=True):
         raise ValueError("`cmap` should have shape (n, 3) or (n, 4). Received {}.".format(cmap.shape))
 
 
+def cmap_from_list(colors, opacities=None, scalars=None, resolution=None):
+    from vtkplotlib.plots.BasePlot import _iter_scalar
+    from vtkplotlib.nuts_and_bolts import zip_axes, unzip_axes
+    n = len(colors)
+
+    rgbas = np.empty((len(colors), 4))
+
+    for (i, color, opacity) in zip(range(n), colors, _iter_scalar(opacities, n)):
+        color, opacity = as_rgb_a(color, opacity)
+        rgbas[i, :3], rgbas[i:, 3] = color, 1. if opacity is None else opacity
+
+    if scalars is None:
+        scalars = np.arange(n)
+
+    if resolution is None:
+        resolution = (n - 1) * 256
+
+    ts = np.linspace(scalars[0], scalars[-1], resolution)
+
+    arr = zip_axes(*(np.interp(ts, scalars, i) for i in unzip_axes(rgbas)))
+
+    return arr
+
+
+#plt.imshow(np.broadcast_to(arr[:, np.newaxis], (len(arr), 100, 4)))
 
 
 
@@ -337,7 +363,7 @@ def as_vtk_cmap(cmap, cache=True):
 #                 ("Orange_Red", ),
 #                 ("or33ange_rEd", ),
 #                 ]:
-#        print("process_color", args, "->", process_color(*args), "\n")
+#        print("as_rgb_a", args, "->", as_rgb_a(*args), "\n")
 #
 #    path = Path('C:/Users/Brénainn/Downloads/3dm/duck/Bird_v1_L2.123ca5dbb1bc-8ef6-44e4-b558-3e6e2bbc7dd7/12248_Bird_v1_diff.jpg')
 #

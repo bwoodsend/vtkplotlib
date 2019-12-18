@@ -191,7 +191,7 @@ class QtFigure(BaseFigure, QWidget):
 #        print("layout")
         self.vl = QVBoxLayout()
 #        print("vtkwidget")
-        self.vtkWidget = QVTKRenderWindowInteractor()
+        self.vtkWidget = QVTKRenderWindowInteractor(self)
 #        print("addWidget")
         self.vl.addWidget(self.vtkWidget)
 #        print("renwon")
@@ -242,9 +242,34 @@ class QtFigure(BaseFigure, QWidget):
         pass
 
 
+def test():
+    import vtkplotlib as vpl
+
+    self = QtFigure("a qt widget figure")
+
+    assert self is vpl.gcf()
+
+    direction = np.array([1, 0, 0])
+    vpl.quiver(np.array([0, 0, 0]), direction)
+    vpl.view(camera_direction=direction)
+    vpl.reset_camera()
+
+#    vpl.show()
+    self.show()
+    self.__init__()
+    self.show()
+#    self.vtkWidget.show()
+#    self.update()
+#    self.show(False)
+#    self.update()
+#    self.vtkWidget.show()
+#    self.qapp.exec_()
+
+
+    globals().update(locals())
 
 
 
 if __name__ == "__main__":
-    pass
+    test()
 

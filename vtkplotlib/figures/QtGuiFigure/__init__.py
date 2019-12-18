@@ -264,17 +264,33 @@ class ViewButton(Button):
 
 
 class ViewButtons(object):
-    def __init__(self, names, view_params, fig, icons=()):
+    DEFAULT_NAMES = ("Right", "Left", "Front", "Back", "Top", "Bottom")
+    DEFAULT_ICONS = tuple(ICONS_FOLDER / (i + ".jpg") for i in DEFAULT_NAMES)
+    def __init__(self, fig,
+                 names=DEFAULT_NAMES,
+                 view_params=(),
+                 icons=DEFAULT_ICONS):
+
         self.buttons = []
 
         for (name, args, icon) in zip_longest(names, view_params, icons):
-            button = ViewButton(name, fig, icon, args)
+            button = ViewButton(name, fig, icon)
+            if args is not None:
+                button.args = args
+
             self.buttons.append(button)
+
 
     @classmethod
     def default(cls, figure):
 
+        self = cls(figure)
+        self.init_default()
 
+        return self
+
+
+    def init_default(self):
         directions = np.array([[1, 0, 0],
                                [0, 1, 0],
                                [0, 0, 1]])
@@ -282,12 +298,11 @@ class ViewButtons(object):
         ups = np.array([[0, 0, 1],
                         [0, 1, 0]])
 
-        return cls.from_directions(directions, ups, figure)
+        self.init_from_directions(directions, ups)
 
 
-    @classmethod
-    def from_directions(cls, directions, ups, figure, mirrors=True):
-        names = ["Right", "Left", "Front", "Back", "Top", "Bottom"]
+
+    def init_from_directions(self, directions, ups, mirrors=True):
 
         if mirrors:
             signs = (1, -1)
@@ -308,15 +323,20 @@ class ViewButtons(object):
                     raise ValueError("All `up_views` are parallel to direction {}".format(d))
                 view_params.append(args)
 
-        paths = [ICONS_FOLDER / (i + ".jpg") for i in names]
-
-        return cls(names, view_params, figure, icons=paths)
+        for (button, args) in zip_longest(self.buttons, view_params):
+            button.args = args
 
 
     def to_layout(self, parent=None):
         out = QtWidgets.QHBoxLayout(parent)
         [out.addWidget(i) for i in self.buttons]
         return out
+
+    def rotate(self, M):
+        for button in self.buttons:
+            args = button.args
+            for key in args:
+                args[key] = M @ args[key]
 
 
 
@@ -404,24 +424,31 @@ class QLabel_alterada(QtWidgets.QLabel):
         self.released.emit()
 
 
-#if __name__ == "__main__":
-#    import vtkplotlib as vpl
-#    from stl.mesh import Mesh
-#
-#    app = None
-#    app = QtWidgets.QApplication(sys.argv)
-#
-#    self = vpl.QtFigure2("Rabbits")
-##    vpl.scatter(np.random.uniform(-5, 5, (5, 3)), fig=self)
-##    vpl.quiver(np.zeros((3, 3)), np.eye(3) * 5, color=np.eye(3))
-#
-#    plot = vpl.mesh_plot(Mesh.from_file(vpl.data.get_rabbit_stl()))
+if __name__ == "__main__":
+    import vtkplotlib as vpl
+    from stl.mesh import Mesh
+
+    app = None
+    app = QtWidgets.QApplication(sys.argv)
+
+    self = vpl.QtFigure2("Rabbits")
+#    vpl.scatter(np.random.uniform(-5, 5, (5, 3)), fig=self)
+#    vpl.quiver(np.zeros((3, 3)), np.eye(3) * 5, color=np.eye(3))
+
+    plot = vpl.mesh_plot(Mesh.from_file(vpl.data.get_rabbit_stl()))
 #    plot.name = "rabbit"
 #    mesh_2 = Mesh.from_file(vpl.data.get_rabbit_stl())
 #    mesh_2.translate(np.array([100, 0, 0]))
-##    vpl.scatter(np.random.uniform(-100, 100, (3, 3)))
-#
-#    self.add_all()
+#    vpl.scatter(np.random.uniform(-100, 100, (3, 3)))
+
+    self.add_all()
+    fig, self = self, self.view_buttons
+
+#    M = np.roll(np.eye(3), 1, 0)
+#    self.rotate(M)
+
+
+    fig.show()
 #
 ##    self.show(False)
 #

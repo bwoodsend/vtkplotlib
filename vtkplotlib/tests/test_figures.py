@@ -158,16 +158,8 @@ class TestFigures(TestCase):
 
     @skipUnless(vpl.PyQt5_AVAILABLE, "PyQt5 not installed")
     def test_qfigure(self):
-        fig = vpl.QtFigure("a qt widget figure")
-
-        self.assertIs(fig, vpl.gcf())
-
-        direction = np.array([1, 0, 0])
-        vpl.quiver(np.array([0, 0, 0]), direction)
-        vpl.view(camera_direction=direction)
-        vpl.reset_camera()
-
-        vpl.show()
+        from vtkplotlib.figures.QtFigure import test
+        test()
 
 
     @skipUnless(vpl.PyQt5_AVAILABLE, "PyQt5 not installed")

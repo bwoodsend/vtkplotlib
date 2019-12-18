@@ -32,7 +32,7 @@ import sys
 from pathlib2 import Path
 
 from vtkplotlib.figures import gcf
-from vtkplotlib.colors import process_color
+from vtkplotlib.colors import as_rgb_a
 from vtkplotlib import nuts_and_bolts
 from vtkplotlib.plots.polydata import PolyData
 from vtkplotlib.nuts_and_bolts import init_when_called
@@ -83,7 +83,7 @@ class BasePlot(object):
     def color_opacity(self, color=None, opacity=None):
         prop = self.property
 
-        color, opacity = process_color(color, opacity)
+        color, opacity = as_rgb_a(color, opacity)
 
         if opacity is not None:
             prop.SetOpacity(opacity)

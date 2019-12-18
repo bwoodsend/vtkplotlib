@@ -29,7 +29,7 @@ from builtins import super
 import numpy as np
 import vtk
 
-from vtkplotlib.plots.BasePlot import Actor2Base, BasePlot, process_color, PolyData
+from vtkplotlib.plots.BasePlot import Actor2Base, BasePlot, as_rgb_a, PolyData
 
 
 class Legend(Actor2Base):
@@ -232,7 +232,7 @@ class Legend(Actor2Base):
 
     @color.setter
     def color(self, color):
-        color, opacity = process_color(color)
+        color, opacity = as_rgb_a(color)
         self.legend.SetBackgroundColor(color)
         if opacity is not None:
             self.legend.SetBackgroundOpacity(opacity)
@@ -335,7 +335,7 @@ class Legend(Actor2Base):
 
     def set_entry_color(self, index, color):
         self._check_length(index)
-        color = process_color(color)[0]
+        color = as_rgb_a(color)[0]
         self.legend.SetEntryColor(index, color)
 
 

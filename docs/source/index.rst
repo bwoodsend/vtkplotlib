@@ -16,6 +16,7 @@ Welcome to vtkplotlib's documentation!
     Plots
     Figures
     Extras
+    Contributing
 
 
 

@@ -21,14 +21,14 @@
 
 
 
-**To request a feature**, either create an issue or just ping me at <bwoodsend@gmail.com>. This library has rather grown organically as I need new features for other projects. Other features are generally not included because I haven't needed them yet rather than because they would be too much hassle. There are loads of VTK classes which I haven't ported over but would be easy (couple of hours work max) from me to do so. You can search online for `vtk [feature_name] example` (it'll likely be in C++ which is OK) or rummage around in the VTK namespace to see if one exists. If it doesn't then submit an issue anyway and I'll see what I can do. If you want to specific or just to help you can sketch out the function. Something like the following would help. It doesn't need to be properly typeset.
+**To request a feature**, either create an issue or just ping me at <bwoodsend@gmail.com>. This library has rather grown organically as I need new features for other projects. Other features are generally not included because I haven't needed them yet rather than because they would be too much hassle. There are loads of VTK classes which I haven't ported over but would be easy (couple of hours work max) from me to do so. You can search online for `vtk [feature_name] example` (it'll likely be in C++ which is OK) or rummage around in the VTK namespace to see if one exists. If it doesn't then submit an issue anyway and I'll see what I can do. If you want to be specific or just to help you can sketch out the function. Something like the following would help. It doesn't need to be properly typeset.
 
 ```python
 def exciting_new_feature(some, key, parameters, or, options, you, think, youll, need):
     # Some vague info about the types, desired effect, defaults of each parameter from
     # above. Doesn't have to be complete.
     
-    # Any handy little (type) abstractions/ you can think of/would like. Such as:
+    # Any handy little (type) abstractions you can would like. Such as:
     if not isinstance(text_parameter, str):
         text_parameter = str(text_parameter)
 	# It doesn't have to be proper code.
@@ -47,7 +47,7 @@ Or whatever you feel makes the point...
 
 
 
-**To write your own feature**, you are welcome to, but if it's a one off and you're not already familiar with VTK, then you're probably better off just to request it. The learning curve for VTK is steep, and the internals of vtkplotlib are pretty unorganised. But if you're determined then don't let me stop you. One day I'll get round to documenting all the core base classes used to add new features, but until then, feel free to ping me <bwoodsend@gmail.com> first for guidance. I have a few features half-prepped hidden away and unexposed so you may not need to start from scratch. 
+**To write your own feature**, you are welcome to, but if it's a one off and you're not already familiar with VTK, then you're probably better off just to request it. The learning curve for VTK is steep, and the internals of vtkplotlib are pretty unorganized. But if you're determined then don't let me stop you. One day I'll get round to documenting all the core base classes used to add new features, but until then, feel free to ping me <bwoodsend@gmail.com> first for guidance. I have a few features half-prepped hidden away and unexposed so you may not need to start from scratch. 
 
 If you do know VTK, then you may find it easier to write a pure VTK proof of concept script and I'll handle the rest.
 
