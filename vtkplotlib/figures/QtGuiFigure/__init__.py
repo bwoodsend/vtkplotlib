@@ -336,7 +336,7 @@ class ViewButtons(object):
         for button in self.buttons:
             args = button.args
             for key in args:
-                args[key] = M @ args[key]
+                args[key] = args[key] @ M
 
 
 
