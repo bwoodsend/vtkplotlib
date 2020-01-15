@@ -577,7 +577,7 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", o
         # And finally, to plot it.
         plot = vpl.mesh_plot_with_edge_scalars(mesh, signed_curvatures)
 
-        # Curvature must be clipped to prevent anomilies overwidenning the
+        # Curvature must be clipped to prevent anomalies overwidenning the
         # scalar range.
         plot.scalar_range = -.1, .1
 
