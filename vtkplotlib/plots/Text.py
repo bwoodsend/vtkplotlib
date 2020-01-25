@@ -24,7 +24,7 @@
 
 from builtins import super
 
-import vtk
+from vtkplotlib._get_vtk import vtk
 import numpy as np
 
 

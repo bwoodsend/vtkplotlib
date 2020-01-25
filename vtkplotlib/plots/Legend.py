@@ -27,7 +27,7 @@ from __future__ import print_function
 from builtins import super
 
 import numpy as np
-import vtk
+from vtkplotlib._get_vtk import vtk
 
 from vtkplotlib.plots.BasePlot import Actor2Base, BasePlot, as_rgb_a, PolyData
 

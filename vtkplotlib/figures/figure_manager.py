@@ -29,8 +29,7 @@ import numpy as np
 import os
 from pathlib2 import Path
 
-import vtk
-from vtk.util.numpy_support import vtk_to_numpy
+from vtkplotlib._get_vtk import vtk, vtk_to_numpy
 
 try:
     # Doing this allows the current figure to be remembered if vtkplotlib get's

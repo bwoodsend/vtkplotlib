@@ -143,7 +143,7 @@ class PathHandler(object):
 def test_path(path):
 #    from vtkplotlib.unicode_paths import PathHandler
     import vtkplotlib as vpl
-    import vtk
+    from vtkplotlib._get_vtk import vtk
 
 
     path.parent.mkdir(parents=True, exist_ok=True)

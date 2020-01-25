@@ -13,8 +13,8 @@ with open(path.join(path.split(__file__)[0], "README.md"), "r") as fh:
     long_description = fh.read()
 
 setup(name='vtkplotlib',
-      version='1.2.0',
-      description='High level 3D graphics and plotting',
+      version='1.2.1',
+      description='High level 3D graphics and plotting powered by VTK',
       long_description=long_description,
       long_description_content_type="text/markdown",
       url='https://vtkplotlib.readthedocs.io/en/latest/index.html',

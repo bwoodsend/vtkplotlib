@@ -38,8 +38,7 @@ try:
 except ImportError:
     Image = None
 
-import vtk
-from vtk.util.numpy_support import vtk_to_numpy, numpy_to_vtk
+from vtkplotlib._get_vtk import vtk, vtk_to_numpy, numpy_to_vtk
 
 from vtkplotlib.unicode_paths import PathHandler
 

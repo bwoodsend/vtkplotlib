@@ -24,13 +24,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-import vtk
+from vtkplotlib._get_vtk import (vtk,
+                                 numpy_to_vtk,
+                                 numpy_to_vtkIdTypeArray,
+                                 vtk_to_numpy)
 import numpy as np
-from vtk.util.numpy_support import (
-                                    numpy_to_vtk,
-                                    numpy_to_vtkIdTypeArray,
-                                    vtk_to_numpy,
-                                    )
 
 from vtkplotlib import _vtk_errors, nuts_and_bolts
 

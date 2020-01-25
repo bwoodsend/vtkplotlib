@@ -24,7 +24,7 @@
 
 
 import numpy as np
-from vtk.util.numpy_support import numpy_to_vtk
+from vtkplotlib._get_vtk import numpy_to_vtk
 
 # try:
     # numpy_to_vtk(np.arange(4).reshape(2, 2).T)

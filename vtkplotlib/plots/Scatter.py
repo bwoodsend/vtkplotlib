@@ -24,16 +24,10 @@
 
 from builtins import super
 
-import vtk
 import numpy as np
-from vtk.util.numpy_support import (
-                                    numpy_to_vtk,
-                                    numpy_to_vtkIdTypeArray,
-                                    vtk_to_numpy,
-                                    )
 
 
-
+from vtkplotlib._get_vtk import vtk
 from vtkplotlib.plots.BasePlot import SourcedPlot, _iter_colors, _iter_points, _iter_scalar
 
 

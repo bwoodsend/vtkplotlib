@@ -27,12 +27,12 @@ import numpy as np
 import sys
 import os
 from pathlib2 import Path
-import vtk
+from vtkplotlib._get_vtk import vtk, QVTKRenderWindowInteractor
 
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vtkplotlib.figures.BaseFigure import BaseFigure, VTKRenderer
 from vtkplotlib import nuts_and_bolts
+from vtkplotlib._vtk_errors import handler
 
 
 class QtFigure(BaseFigure, QWidget):
@@ -198,6 +198,11 @@ class QtFigure(BaseFigure, QWidget):
         self.renWin
         iren = self.iren
 
+        # try to prevent error pop-up windows
+        handler.attach(self.vtkWidget)
+        handler.attach(self.iren)
+        handler.attach(self.renWin)
+
 
         self.data_holder = []
 #        print("basefig init")
@@ -256,8 +261,8 @@ def test():
 
 #    vpl.show()
     self.show()
-    self.__init__()
-    self.show()
+#    self.__init__()
+#    self.show()
 #    self.vtkWidget.show()
 #    self.update()
 #    self.show(False)

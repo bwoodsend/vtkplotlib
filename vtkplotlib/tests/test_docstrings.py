@@ -27,7 +27,7 @@
 
 from unittest import TestCase, skipUnless
 
-from vtkplotlib import PyQt5_AVAILABLE
+from vtkplotlib import PyQt5_AVAILABLE, NUMPY_STL_AVAILABLE
 
 class TestDocs(TestCase):
     """These are automatically extracted from the docstrings."""
@@ -146,6 +146,7 @@ class TestDocs(TestCase):
         fig.show()
 
 
+    @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_03(self):
         import vtkplotlib as vpl
         from stl.mesh import Mesh
@@ -182,6 +183,7 @@ class TestDocs(TestCase):
         vpl.show()
 
 
+    @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_05(self):
         import vtkplotlib as vpl
         from stl.mesh import Mesh
@@ -200,6 +202,7 @@ class TestDocs(TestCase):
         vpl.show()
 
 
+    @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_06(self):
         import vtkplotlib as vpl
         from stl.mesh import Mesh
@@ -218,6 +221,7 @@ class TestDocs(TestCase):
         vpl.show()
 
 
+    @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_07(self):
         import vtkplotlib as vpl
         from stl.mesh import Mesh
@@ -236,6 +240,7 @@ class TestDocs(TestCase):
         vpl.show()
 
 
+    @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_08(self):
         import vtkplotlib as vpl
         from stl.mesh import Mesh

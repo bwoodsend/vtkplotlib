@@ -29,8 +29,7 @@ from future.utils import string_types, as_native_str
 import numpy as np
 from matplotlib import colors, cm
 from pathlib2 import Path
-import vtk
-from vtk.util.numpy_support import numpy_to_vtk, vtk_to_numpy
+from vtkplotlib._get_vtk import vtk, numpy_to_vtk, vtk_to_numpy
 
 
 try:

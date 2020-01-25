@@ -31,9 +31,7 @@ import sys
 import os
 from pathlib2 import Path
 
-import vtk
-from vtk.util.numpy_support import numpy_to_vtk
-
+from vtkplotlib._get_vtk import vtk, numpy_to_vtk
 
 
 #points = vtk_to_numpy(image_data.GetPointData().GetArray(0))

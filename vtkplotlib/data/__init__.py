@@ -23,20 +23,20 @@
 # =============================================================================
 
 
-import numpy as np
 import sys
-import os
 from pathlib2 import Path
 
 import pkg_resources
 
+
 if getattr( sys, 'frozen', False ) :
-    # running in a bundle
+    # running in a pyinstaller bundle
     DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")).parent / "vpl-data"
 else :
-    # running live
+    # running normally
     DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")) / "data"
 
+ROOT = DATA_FOLDER.parent
 
 
 MODELS_FOLDER = DATA_FOLDER / "models"
@@ -55,7 +55,7 @@ ICONS = {i.stem: str(i) for i in ICONS_FOLDER.glob("*")}
 def assert_ok():
     assert ICONS_FOLDER.is_dir()
     assert MODELS_FOLDER.is_dir()
-    assert os.path.isfile(get_rabbit_stl())
+    assert Path(get_rabbit_stl()).exists()
 
 if __name__ == "__main__":
     assert_ok()

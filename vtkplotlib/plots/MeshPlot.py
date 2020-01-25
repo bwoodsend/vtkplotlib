@@ -24,7 +24,7 @@
 
 from builtins import super
 
-import vtk
+from vtkplotlib._get_vtk import vtk
 import numpy as np
 from pathlib2 import Path
 
@@ -45,15 +45,7 @@ MESH_DATA_TYPE_EX = lambda msg :ValueError("Invalid mesh_data argument. {}"\
                                            .format(msg))
 
 
-def set_from_path(self, path, ignore_numpystl=False):
-
-    # Ideally let numpy-stl open the file if it is installed.
-    if NUMPY_STL_AVAILABLE and not ignore_numpystl:
-        self.vectors = NumpyMesh.from_file(path).vectors
-        return
-
-    # Otherwise try vtk's STL reader - however it's not as reliable.
-
+def vtk_read_stl(path):
     from vtkplotlib.plots.polydata import PolyData
     from vtkplotlib.unicode_paths import PathHandler
     from vtkplotlib._vtk_errors import handler
@@ -75,7 +67,18 @@ def set_from_path(self, path, ignore_numpystl=False):
     if pd.vtk_polydata.GetNumberOfPoints() == 0:
         raise RuntimeError("VTK's STLReader failed to read the STL file and no STL io backend is installed. VTK's STLReader is rather patchy. To read this file please ``pip install numpy-stl`` first.")
 
-    self.polydata = pd
+    return pd
+
+
+def set_from_path(self, path, ignore_numpystl=False):
+
+    # Ideally let numpy-stl open the file if it is installed.
+    if NUMPY_STL_AVAILABLE and not ignore_numpystl:
+        self.vectors = NumpyMesh.from_file(path).vectors
+        return
+
+    # Otherwise try vtk's STL reader - however it's not as reliable.
+    self.polydata = vtk_read_stl(path)
     self.connect()
 
 
