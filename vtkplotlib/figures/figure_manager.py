@@ -364,12 +364,27 @@ def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, fig="gcf",
     considerably better file size than PNG.
 
     """
-    from matplotlib.pylab import imsave
-    imsave(str(path), screenshot_fig(magnification=magnification,
-                                     pixels=pixels,
-                                     fig=fig,
-                                     trim_pad_width=trim_pad_width),
-            **imsave_plotargs)
+    array = screenshot_fig(magnification=magnification,
+                           pixels=pixels,
+                           fig=fig,
+                           trim_pad_width=trim_pad_width)
+
+    try:
+        from matplotlib.pylab import imsave
+        imsave(str(path), array, **imsave_plotargs)
+        return
+    except ImportError:
+        pass
+    try:
+        from PIL import Image
+        Image.fromarray(array).save(str(path), **imsave_plotargs)
+        return
+    except ImportError:
+        pass
+    from vtkplotlib.image_io import write
+    if write(array, path) is NotImplemented:
+        raise ValueError("No writer for format '{}' could be found. Try installing PIL for more formats."\
+                         .format(Path(path).ext))
 
 
 

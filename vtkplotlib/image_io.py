@@ -22,6 +22,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
+"""The image_io subpackage provides tools for working with VTK's revolting
+vtkImageData class which is used to represent 2D images. Unfortunately the
+vtkImageData is not primarly for 2D images - rather it is for volume plots
+(which are currently not implemented in vtkplotlib) which makes it a lot more
+awkward and counteruitive than you would expect it to be. Whenever vtkplotlib
+works with images it converts implicitly to/from numpy arrays using methods from
+here so you should only ever need these methods if you are exploring regions of
+VTK that are uncovered by vtkplotlib.
+"""
 
 import numpy as np
 import sys
@@ -38,12 +47,22 @@ try:
 except ImportError:
     Image = None
 
-from vtkplotlib._get_vtk import vtk, vtk_to_numpy, numpy_to_vtk
+from vtkplotlib._get_vtk import vtk, vtk_to_numpy, numpy_to_vtk, numpy_support
 
 from vtkplotlib.unicode_paths import PathHandler
 
 
-def read(path):
+def read(path, convert_to_array=True):
+    """Read an image from a file using one of VTK's ``vtkFormatReader`` classes
+    where ``Format`` is replaced by JPEG or PNG.
+
+    Unless specified not to using the `convert_to_array` argument, the output
+    is converted to a 3D numpy array. Otherwise a vtkImageData is returned.
+
+    .. note: `path` must be a filename and not a BytesIO or similar psuedo file object.
+
+
+    """
     ext = Path(path).suffix[1:].upper()
     if ext == "JPG":
         ext = "JPEG"
@@ -57,26 +76,76 @@ def read(path):
         reader.SetFileName(path_handler.access_path)
         reader.Update()
         im_data = reader.GetOutput()
-        return vtkimagedata_to_array(im_data)
+        if convert_to_array:
+            return vtkimagedata_to_array(im_data)
+        return im_data
+
+
+def write(arr, path):
+    """Write an image from a file using one of VTK's ``vtkFormatWriter`` classes
+    where ``Format`` is replaced by JPEG or PNG.
+
+    `arr` can be a ``vtkImageData`` or a numpy array.
+
+    .. note: `path` must be a filename and not a BytesIO or similar psuedo file object.
+
+    """
+    ext = Path(path).suffix[1:].upper()
+    if ext == "JPG":
+        ext = "JPEG"
+    try:
+        Writer = getattr(vtk, "vtk{}Writer".format(ext))
+    except AttributeError:
+        return NotImplemented
+    im_data = as_vtkimagedata(arr)
+    im_data.Modified()
+
+    writer = Writer()
+    with PathHandler(path, "w") as path_handler:
+        writer.SetFileName(path_handler.access_path)
+        writer.SetInputDataObject(im_data)
+        writer.Update()
+        writer.Write()
+
 
 
 def vtkimagedata_to_array(image_data):
-    points = vtk_to_numpy(image_data.GetPointData().GetArray(0))
-    shape = image_data.GetDimensions()[:-1]
-    shape = shape[::-1] + (points.shape[-1], )
+    """Convert a vtkImageData to numpy array.
+
+    .. see-also: vtkimagedata_from_array for the opposite.
+
+    """
+    points = vtk_to_numpy(image_data.GetPointData().GetScalars())
+    shape = image_data.GetDimensions()
+    # Be careful here. shape[2] isn't the number of values per pixel as you'd
+    # expect. Rather it is a 3rd dimension as vtkImagedata is
+    # supposed to hold volumes. `image_data.GetNumberOfScalarComponents()` gets
+    # the right value (usually 3 for RGB).
+    # Additionally vtk uses cartesian coordinates in images which isn't the
+    # norm - hence the axes swapping and mirroring.
+    shape = (shape[1], shape[0], image_data.GetNumberOfScalarComponents())
     return points.reshape(shape)[::-1]
 
+
 def vtkimagedata_from_array(arr, image_data=None):
+    """Convert a numpy array to a vtkImageData.
+
+    .. see-also: vtkimagedata_to_array for the opposite.
+
+    """
+    assert arr.dtype == np.uint8
+
     if image_data is None:
         image_data = vtk.vtkImageData()
 
     if arr.ndim == 2:
         arr = arr[..., np.newaxis]
 
-    image_data.SetDimensions(arr.shape[1], arr.shape[0], arr.shape[2])
+    image_data.SetDimensions(arr.shape[1], arr.shape[0], 1)
+    image_data.SetNumberOfScalarComponents(arr.shape[2], image_data.GetInformation())
 
     pd = image_data.GetPointData()
-    new_arr = np.transpose(arr[::-1], (2, 0, 1)).ravel()
+    new_arr = arr[::-1].reshape((-1, arr.shape[2]))
     pd.SetScalars(numpy_to_vtk(new_arr))
     pd._numpy_reference = new_arr.data
 
@@ -133,25 +202,6 @@ def trim_image(arr, background_color, crop_padding):
     return arr[slices]
 
 
-def test_trim_image():
-    import vtkplotlib as vpl
-    import matplotlib.pylab as plt
-
-
-    vpl.quick_test_plot()
-    fig = vpl.gcf()
-    arr = vpl.screenshot_fig()
-    vpl.close()
-
-    trimmed = trim_image(arr, fig.background_color, 10)
-    background_color = np.asarray(fig.background_color) * 255
-
-    assert (arr != background_color).any(-1).sum() == (trimmed != background_color).any(-1).sum()
-
-    plt.imshow(trimmed)
-    plt.show()
-
-
 def as_vtkimagedata(x, ndim=None):
     if isinstance(x, Path):
         x = str(x)
@@ -175,6 +225,39 @@ def as_vtkimagedata(x, ndim=None):
 
 
 
+def test_trim_image():
+    import vtkplotlib as vpl
+    import matplotlib.pylab as plt
+
+
+    vpl.quick_test_plot()
+    fig = vpl.gcf()
+    arr = vpl.screenshot_fig()
+    vpl.close()
+
+    trimmed = trim_image(arr, fig.background_color, 10)
+    background_color = np.asarray(fig.background_color) * 255
+
+    assert (arr != background_color).any(-1).sum() == (trimmed != background_color).any(-1).sum()
+
+    plt.imshow(trimmed)
+    plt.show()
+
+
+def test_conversions():
+    import vtkplotlib as vpl
+
+    vpl.quick_test_plot()
+    arr = vpl.screenshot_fig()
+    vpl.close()
+
+    image_data = vtkimagedata_from_array(arr)
+    arr2 = vtkimagedata_to_array(image_data)
+
+    assert np.array_equal(arr, arr2)
+
+
+
 if __name__ == "__main__":
 #    import vtkplotlib as vpl
 #    from vtkplotlib import image_io
@@ -186,6 +269,7 @@ if __name__ == "__main__":
 #    plt.show()
 
     test_trim_image()
+    test_conversions()
 
 
 

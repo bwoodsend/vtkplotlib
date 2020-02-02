@@ -79,6 +79,11 @@ try:
         from vtkmodules.vtkFiltersGeneralPython import vtkCursor3D
         from vtkmodules.vtkRenderingCorePython import vtkFollower
 
+        from vtkmodules.vtkIOImagePython import (vtkJPEGReader,
+                                                 vtkJPEGWriter,
+                                                 vtkPNGReader,
+                                                 vtkPNGWriter)
+
     from vtkmodules.vtkRenderingOpenGL2Python import vtkOpenGLRenderer
 
     from vtkmodules.util import numpy_support

@@ -142,7 +142,7 @@ def arrow(start, end, length=None, width_scale=1., color=None, opacity=None, fig
                                 _iter_colors(color, shape),
                                 _iter_scalar(label, shape)):
 
-        out_flat[i] = Arrow(s, e, l, width_scale, c, opacity, fig)
+        out_flat[i] = Arrow(s, e, l, width_scale, c, opacity, fig, lab)
 
     if out.ndim == 0:
         return out.item()
