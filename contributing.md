@@ -15,7 +15,7 @@ For either the API or the docs use the [github issues page](https://github.com/b
 To report an issue or to point out undesirable behavior, please use the [issues page](https://github.com/bwoodsend/vtkplotlib/issues/). Please include:
 
 *  vtkplotlib version.
-* Versions of all libraries listed under [*Requirements for installing*](https://vtkplotlib.readthedocs.io/en/latest/#requirements-for-installing) and [*Optional requirements*](https://vtkplotlib.readthedocs.io/en/latest/#optional-requirements) in our [quickstart](https://vtkplotlib.readthedocs.io/en/latest/) page.
+* Versions of all libraries listed under [*Requirements for installing*](https://vtkplotlib.readthedocs.io/en/latest/#requirements-for-installing) and [*Optional requirements*](https://vtkplotlib.readthedocs.io/en/latest/#optional-requirements) in our [quickstart](https://vtkplotlib.readthedocs.io/en/latest/) page. (Use `pip show numpy` or `pip freeze -> packages.txt` to find these versions.)
 * Python version.
 * Whether or not you use Anaconda.
 * OS.

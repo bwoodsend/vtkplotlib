@@ -217,11 +217,11 @@ class MeshPlot(ConstructedPlot):
 
         .. code-block:: python
 
-           np.array([[[x, y, z],  # corner 0  \
+           np.array([[[x, y, z],  # corner 0  \\
                       [x, y, z],  # corner 1  | triangle 0
                       [x, y, z]], # corner 2  /
                      ...
-                     [[x, y, z],  # corner 0  \
+                     [[x, y, z],  # corner 0  \\
                       [x, y, z],  # corner 1  | triangle n-1
                       [x, y, z]], # corner 2  /
                     ])
