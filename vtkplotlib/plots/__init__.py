@@ -22,7 +22,3 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-# VTK's numpy_to_vtk function has a very noisy warning - disable it here.
-from vtkplotlib._get_vtk import numpy_support
-import numpy as np
-np.warnings.filterwarnings("ignore", module=numpy_support.__name__)

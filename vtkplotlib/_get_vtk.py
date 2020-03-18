@@ -35,60 +35,77 @@ except ImportError:
 try:
 
     class vtk(object):
-        """This dummpy vtk class mimicks the default vtk module structure
+        """This dummy vtk class mimics the default vtk module structure
         whilst only loading the libraries and corresponding dlls that
         vtkplotlib uses. This makes import quicker and pyinstaller builds
         smaller.
         """
-        from vtkmodules.vtkRenderingCorePython import vtkActor
-        from vtkmodules.vtkRenderingCorePython import vtkRenderer
-        from vtkmodules.vtkRenderingCorePython import vtkWindowToImageFilter
-        from vtkmodules.vtkFiltersSourcesPython import vtkCubeSource
-        from vtkmodules.vtkCommonCorePython import VTK_ID_TYPE
-        from vtkmodules.vtkCommonCorePython import vtkCommand
-        from vtkmodules.vtkRenderingCorePython import vtkTextActor
-        from vtkmodules.vtkInteractionStylePython import vtkInteractorStyleTrackballCamera
-        from vtkmodules.vtkCommonCorePython import VTK_COLOR_MODE_DEFAULT
-        from vtkmodules.vtkCommonDataModelPython import vtkImageData
-        from vtkmodules.vtkInteractionStylePython import vtkInteractorStyleImage
-        from vtkmodules.vtkFiltersSourcesPython import vtkSphereSource
-        from vtkmodules.vtkCommonCorePython import vtkPoints
-        from vtkmodules.vtkRenderingCorePython import VTK_SCALAR_MODE_DEFAULT
-        from vtkmodules.vtkCommonMathPython import vtkMatrix4x4
-        from vtkmodules.vtkRenderingAnnotationPython import vtkScalarBarActor
-        from vtkmodules.vtkCommonCorePython import VTK_COLOR_MODE_MAP_SCALARS
-        from vtkmodules.vtkRenderingCorePython import VTK_SCALAR_MODE_USE_POINT_DATA
-        from vtkmodules.vtkIOLegacyPython import vtkPolyDataReader
-        from vtkmodules.vtkRenderingCorePython import vtkImageMapper
-        from vtkmodules.vtkRenderingAnnotationPython import vtkLegendBoxActor
-        from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
-        from vtkmodules.vtkCommonCorePython import VTK_MAJOR_VERSION
-        from vtkmodules.vtkIOLegacyPython import vtkPolyDataWriter
-        from vtkmodules.vtkCommonCorePython import VTK_COLOR_MODE_DIRECT_SCALARS
-        from vtkmodules.vtkCommonCorePython import vtkLookupTable
-        from vtkmodules.vtkCommonTransformsPython import vtkTransform
-        from vtkmodules.vtkRenderingCorePython import vtkActor2D
-        from vtkmodules.vtkRenderingCorePython import VTK_SCALAR_MODE_USE_CELL_DATA
-        from vtkmodules.vtkFiltersSourcesPython import vtkArrowSource
-        from vtkmodules.vtkRenderingCorePython import vtkRenderWindowInteractor
-        from vtkmodules.vtkCommonDataModelPython import vtkCellArray
-        from vtkmodules.vtkRenderingFreeTypePython import vtkVectorText
-        from vtkmodules.vtkRenderingCorePython import vtkRenderWindow
-        from vtkmodules.vtkIOGeometryPython import vtkSTLReader
-        from vtkmodules.vtkCommonDataModelPython import vtkPolyData
-        from vtkmodules.vtkFiltersGeneralPython import vtkCursor3D
-        from vtkmodules.vtkRenderingCorePython import vtkFollower
+        from vtkmodules.vtkCommonCorePython import (VTK_ID_TYPE,
+                                                    vtkCommand,
+                                                    VTK_COLOR_MODE_DEFAULT,
+                                                    vtkPoints,
+                                                    VTK_COLOR_MODE_MAP_SCALARS,
+                                                    VTK_MAJOR_VERSION,
+                                                    VTK_COLOR_MODE_DIRECT_SCALARS,
+                                                    vtkLookupTable)
+
+        from vtkmodules.vtkCommonDataModelPython import (vtkImageData,
+                                                         vtkCellArray,
+                                                         vtkPolyData)
+
+        from vtkmodules.vtkCommonMathPython import (vtkMatrix4x4)
+
+        from vtkmodules.vtkCommonTransformsPython import (vtkTransform)
+
+        from vtkmodules.vtkFiltersGeneralPython import (vtkCursor3D)
+
+        from vtkmodules.vtkFiltersSourcesPython import (vtkCubeSource,
+                                                        vtkSphereSource,
+                                                        vtkArrowSource)
+
+        from vtkmodules.vtkIOGeometryPython import (vtkSTLReader)
+
+        from vtkmodules.vtkIOLegacyPython import (vtkPolyDataReader,
+                                                  vtkPolyDataWriter)
+
+        from vtkmodules.vtkInteractionStylePython import (vtkInteractorStyleTrackballCamera,
+                                                          vtkInteractorStyleImage)
+
+        from vtkmodules.vtkRenderingAnnotationPython import (vtkScalarBarActor,
+                                                             vtkLegendBoxActor)
+
+        from vtkmodules.vtkRenderingCorePython import (vtkActor,
+                                                       vtkRenderer,
+                                                       vtkWindowToImageFilter,
+                                                       vtkTextActor,
+                                                       VTK_SCALAR_MODE_DEFAULT,
+                                                       VTK_SCALAR_MODE_USE_POINT_DATA,
+                                                       vtkImageMapper,
+                                                       vtkPolyDataMapper,
+                                                       vtkActor2D,
+                                                       VTK_SCALAR_MODE_USE_CELL_DATA,
+                                                       vtkRenderWindowInteractor,
+                                                       vtkRenderWindow,
+                                                       vtkFollower)
+
+        from vtkmodules.vtkRenderingFreeTypePython import (vtkVectorText)
 
         from vtkmodules.vtkIOImagePython import (vtkJPEGReader,
                                                  vtkJPEGWriter,
                                                  vtkPNGReader,
-                                                 vtkPNGWriter)
+                                                 vtkPNGWriter,
+                                                 vtkTIFFReader,
+                                                 vtkTIFFWriter,
+                                                 vtkBMPReader,
+                                                 vtkBMPWriter)
 
-    from vtkmodules.vtkRenderingOpenGL2Python import vtkOpenGLRenderer
 
     from vtkmodules.util import numpy_support
 
     if PyQt5_AVAILABLE:
+        # QVTKRenderWindowInteractor raises an error if this isn't loaded.
+        from vtkmodules.vtkRenderingOpenGL2Python import vtkOpenGLRenderer
+
         from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 
@@ -106,3 +123,10 @@ get_vtk_array_type = numpy_support.get_vtk_array_type
 vtk_to_numpy = numpy_support.vtk_to_numpy
 get_vtk_to_numpy_typemap = numpy_support.get_vtk_to_numpy_typemap
 numpy_to_vtkIdTypeArray = numpy_support.numpy_to_vtkIdTypeArray
+
+def _disable_numpy_complex_warning():
+    """VTK's numpy_to_vtk function has a very noisy warning - disable it here."""
+    import warnings
+    warnings.filterwarnings("ignore", module=numpy_support.__name__)
+
+_disable_numpy_complex_warning()
