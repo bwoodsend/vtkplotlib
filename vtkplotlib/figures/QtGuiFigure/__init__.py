@@ -141,7 +141,7 @@ class QtFigure2(QtFigure):
     def screenshot(self):
         path = QtWidgets.QFileDialog.getSaveFileName(self,
                                                      "Save screenshot",
-                                                     str(self.default_screenshot_path),
+                                               None, #      str(self.default_screenshot_path),
                                                      "(*.jpg);;(*.png)")[0]
 
         if path:
@@ -166,7 +166,6 @@ class QtFigure2(QtFigure):
 #        super().show(block)
 
     def update(self):
-        self.setWindowModified(True)
         super().update()
         if self.plot_table is not None:
             self.plot_table.update()
