@@ -22,19 +22,21 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-"""The image_io subpackage provides tools for working with VTK's revolting
-vtkImageData class which is used to represent 2D images. Unfortunately the
-vtkImageData is not primarly for 2D images - rather it is for volume plots
-(which are currently not implemented in vtkplotlib) which makes it a lot more
-awkward and counteruitive than you would expect it to be. Whenever vtkplotlib
+"""The image_io subpackage provides tools for working with VTK's vtkImageData
+class which is used to represent 2D images and easily wins the top prize for
+being the most frustration-inducing component of VTK. Unfortunately the
+vtkImageData is not primarily for 2D images - rather it is for volume plots
+(which are currently not implemented in vtkplotlib). Whenever vtkplotlib
 works with images it converts implicitly to/from numpy arrays using methods from
-here so you should only ever need these methods if you are exploring regions of
-VTK that are uncovered by vtkplotlib.
+here. Additionally this module provides methods for reading and writing images
+through VTK's image reader/writer classes.
 """
 
-import numpy as np
 import sys
 import os
+import io
+
+import numpy as np
 from pathlib2 import Path
 
 try:
@@ -43,7 +45,7 @@ except AttributeError:
     PathLike = Path
 
 try:
-    from PIL.Image import Image
+    from PIL.Image import Image, open as pillow_open
 except ImportError:
     Image = None
 
@@ -52,61 +54,121 @@ from vtkplotlib._get_vtk import vtk, vtk_to_numpy, numpy_to_vtk, numpy_support
 from vtkplotlib.unicode_paths import PathHandler
 
 
-def read(path, convert_to_array=True):
+def read(path, raw_bytes=None, format=None, convert_to_array=True):
     """Read an image from a file using one of VTK's ``vtkFormatReader`` classes
     where ``Format`` is replaced by JPEG or PNG.
 
     Unless specified not to using the `convert_to_array` argument, the output
     is converted to a 3D numpy array. Otherwise a vtkImageData is returned.
 
-    .. note: `path` must be a filename and not a BytesIO or similar psuedo file object.
+    .. note: `path` must be a filename and not a BytesIO or similar pseudo file object.
 
 
     """
-    ext = Path(path).suffix[1:].upper()
-    if ext == "JPG":
-        ext = "JPEG"
+    if isinstance(raw_bytes, bool):
+        raise TypeError("The arguments for this method have changed. If you meant to set the `convert_to_array` argument, please treat it as keyword only. i.e ``convert_to_array={}``".format(raw_bytes))
+
+    format = _normalise_format(path, format)
     try:
-        Reader = getattr(vtk, "vtk{}Reader".format(ext))
+        Reader = getattr(vtk, "vtk{}Reader".format(format))
     except AttributeError:
         return NotImplemented
 
     reader = Reader()
-    with PathHandler(path) as path_handler:
-        reader.SetFileName(path_handler.access_path)
-        reader.Update()
-        im_data = reader.GetOutput()
-        if convert_to_array:
-            return vtkimagedata_to_array(im_data)
-        return im_data
+
+    if isinstance(path, (str, PathLike)):
+        with PathHandler(path) as path_handler:
+            reader.SetFileName(path_handler.access_path)
+            reader.Update()
+    else:
+        if isinstance(path, io.IOBase):
+            raw_bytes = path.read()
+        if raw_bytes is not None:
+            bytes_arr = np.frombuffer(raw_bytes, dtype=np.uint8)
+            vtk_bytes = numpy_to_vtk(bytes_arr)
+            vtk_bytes._numpy_ref = bytes_arr
+            reader.SetMemoryBuffer(vtk_bytes)
+            reader.SetMemoryBufferLength(len(bytes_arr))
+            reader.Update()
+
+    im_data = reader.GetOutput()
+    if convert_to_array:
+        return vtkimagedata_to_array(im_data)
+    return im_data
 
 
-def write(arr, path):
+def _normalise_format(path, format):
+    """Extracts ``"JPEG"``, ``"PNG"`` etc from arguments provided to image
+    read write methods.
+    """
+    if format is None:
+        try:
+            format = Path(path).suffix
+        except TypeError:
+            raise ValueError("No ``format`` argument was given and couldn't guess the format from ``path``.")
+
+    format = format.upper()
+    if format[0] == ".":
+        format = format[1:]
+    if format == "JPG":
+        format = "JPEG"
+    if format == "TIF":
+        format = "TIFF"
+    return format
+
+
+def write(arr, path, format=None, quality=95):
     """Write an image from a file using one of VTK's ``vtkFormatWriter`` classes
     where ``Format`` is replaced by JPEG or PNG.
 
-    `arr` can be a ``vtkImageData`` or a numpy array.
+    :param arr: `arr` can be a ``vtkImageData`` or a numpy array..
+    :type arr:
 
-    .. note: `path` must be a filename and not a BytesIO or similar psuedo file object.
+    :param path: File path to write to.
+    :type path: str, os.Pathlike, io.BytesIO,
+
+    :param format: File format. Can be guessed based on the suffix of **path**.
+    :type format: str
+
+    :return: The raw image binary if ``path is None``, ``NotImplemented`` if the filetype is unknown Otherwise no return value.
+    :rtype: bytes
+
+
+    .. note::
+
+        BytesIO and raw bytes functionality is new in vtkplotlib >= 1.3.0.
+        Older versions are hardcoded to write to disk and therefore **path**
+        must be a filename and not a BytesIO or similar pseudo file object.
 
     """
-    ext = Path(path).suffix[1:].upper()
-    if ext == "JPG":
-        ext = "JPEG"
+    format = _normalise_format(path, format)
     try:
-        Writer = getattr(vtk, "vtk{}Writer".format(ext))
+        Writer = getattr(vtk, "vtk{}Writer".format(format))
     except AttributeError:
         return NotImplemented
     im_data = as_vtkimagedata(arr)
     im_data.Modified()
 
     writer = Writer()
-    with PathHandler(path, "w") as path_handler:
-        writer.SetFileName(path_handler.access_path)
-        writer.SetInputDataObject(im_data)
-        writer.Update()
-        writer.Write()
+    writer.SetInputDataObject(im_data)
 
+    if Writer is vtk.vtkJPEGWriter:
+        writer.SetQuality(quality)
+
+    if isinstance(path, (str, PathLike)):
+        with PathHandler(path, "w") as path_handler:
+            writer.SetFileName(path_handler.access_path)
+            writer.Update()
+            writer.Write()
+        return
+    writer.WriteToMemoryOn()
+    writer.Update()
+    writer.Write()
+    binary = vtk_to_numpy(writer.GetResult()).tobytes()
+
+    if path is None:
+        return binary
+    path.write(binary)
 
 
 def vtkimagedata_to_array(image_data):
@@ -157,7 +219,6 @@ def trim_image(arr, background_color, crop_padding):
     if (crop_padding is None) or crop_padding == 0:
         return arr
 
-
     background_color = np.asarray(background_color)
     if background_color.dtype.kind == "f" and arr.dtype.kind == "u":
         background_color = (background_color * 255).astype(arr.dtype)
@@ -176,7 +237,7 @@ def trim_image(arr, background_color, crop_padding):
         for (mask_1d_, bounds_) in zip((mask_1d, mask_1d[::-1]), bounds):
             arg = np.argmin(mask_1d_)
             if mask_1d_[arg]:
-                print("Figure is empty - not cropping")
+#                print("Figure is empty - not cropping")
                 return arr
             bounds_.append(arg)
 
@@ -203,7 +264,7 @@ def trim_image(arr, background_color, crop_padding):
 
 
 def as_vtkimagedata(x, ndim=None):
-    if isinstance(x, Path):
+    if isinstance(x, PathLike):
         x = str(x)
     if isinstance(x, str):
         try:
@@ -225,6 +286,8 @@ def as_vtkimagedata(x, ndim=None):
 
 
 
+from vtkplotlib.tests._figure_contents_check import checker, VTKPLOTLIB_WINDOWLESS_TEST
+@checker()
 def test_trim_image():
     import vtkplotlib as vpl
     import matplotlib.pylab as plt
@@ -238,14 +301,23 @@ def test_trim_image():
     trimmed = trim_image(arr, fig.background_color, 10)
     background_color = np.asarray(fig.background_color) * 255
 
+    # Check that no non-background coloured pixels have been lost.
     assert (arr != background_color).any(-1).sum() == (trimmed != background_color).any(-1).sum()
 
-    plt.imshow(trimmed)
-    plt.show()
+    if not VTKPLOTLIB_WINDOWLESS_TEST:
+        plt.imshow(trimmed)
+        plt.show()
+
+    return trimmed
+
+
 
 
 def test_conversions():
     import vtkplotlib as vpl
+
+    # Shouldn't do anything if the figure is empty.
+    assert vpl.screenshot_fig(trim_pad_width=.05).shape[:2] == vpl.gcf().render_size
 
     vpl.quick_test_plot()
     arr = vpl.screenshot_fig()
@@ -256,6 +328,46 @@ def test_conversions():
 
     assert np.array_equal(arr, arr2)
 
+def test_reads_writes(*fmts):
+    import vtkplotlib as vpl
+
+    path = vpl.data.ICONS["Right"]
+    arr = np.array(pillow_open(path))
+    with open(path, "rb") as f:
+        binary = f.read()
+
+    errors = []
+    for (fmt, modes) in fmts:
+        for mode in modes:
+            try:
+                if mode == "r":
+                    arr2 = read(None, binary, format=fmt)
+                else:
+                    arr2 = np.array(pillow_open(io.BytesIO(write(arr, None, fmt))))
+                error_msg = "with_fmt={}, mode={}".format(fmt, mode)
+                assert arr.shape == arr2.shape, error_msg
+                error = np.abs(arr - arr2.astype(np.float)).mean()
+        #            print(error, len(binary))
+                assert error < 1, error_msg
+            except BaseException as ex:
+                errors.append((ex, fmt, mode))
+                print(mode, fmt)
+                raise
+
+    return errors
+
+
+BUFFERABLE_FORMAT_MODES = [
+        ("jpg", "rw"),
+        ("png", "w"),
+        ("tif", ""),
+        ("bmp", "w"),
+        ]
+
+def test():
+    test_trim_image()
+    test_conversions()
+    test_reads_writes((".jpeg", "r"), *BUFFERABLE_FORMAT_MODES)
 
 
 if __name__ == "__main__":
@@ -267,9 +379,9 @@ if __name__ == "__main__":
 #
 #    plt.imshow(image_io.read(path))
 #    plt.show()
+    test()
 
-    test_trim_image()
-    test_conversions()
+
 
 
 

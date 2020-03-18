@@ -151,7 +151,7 @@ class TextureMap(object):
 
 
     The TextureMap object can be called to look up the color at a coordinate(s).
-    Like everything else in vktplotlib, texture coordinates should be zipped
+    Like everything else in vtkplotlib, texture coordinates should be zipped
     into a single array of the form:
 
     .. code-block:: python
@@ -213,19 +213,20 @@ class TextureMap(object):
 
 
     def __init__(self, array, interpolate=False):
-
         if isinstance(array, PathLike):
             array = str(array)
         if isinstance(array, string_types):
-            try:
-#                raise ValueError()
-                from matplotlib.pylab import imread
-                array = imread(array)
-            except (ValueError, ImportError) as ex:
-                from vtkplotlib.image_io import read
-                array = read(array)
-                if array is NotImplemented:
-                    raise NotImplementedError("Could not find a suitable VTKImageReader for \"{}\" and matplotlib's search failed with the following error - {}".format(array, ex))
+            path = array
+            from vtkplotlib.image_io import read
+            array = read(path)
+            if array is NotImplemented:
+                try:
+    #                raise ValueError()
+                    from matplotlib.pylab import imread
+                    array = imread(path)
+                except (ValueError, ImportError) as ex:
+                    raise NotImplementedError("Could not find a suitable VTKImageReader for \"{}\" and matplotlib's search failed with the following error - {}".format(path, ex))
+                    
             array = np.swapaxes(array, 0, 1)[:, ::-1]
         if Image and isinstance(array, Image.Image):
             array = np.array(array)
