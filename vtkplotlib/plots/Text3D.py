@@ -229,6 +229,8 @@ def annotate(points, text, direction, text_color="w", arrow_color="k", distance=
 
 
 
+from vtkplotlib.tests._figure_contents_check import checker
+@checker()
 def test():
     import vtkplotlib as vpl
 
@@ -240,9 +242,6 @@ def test():
     arrow, self = vpl.annotate(point, point, np.array([0, 0, 1]), text_color="green", arrow_color="purple")
 
     globals().update(locals())
-
-    vpl.show()
-
 
 
 

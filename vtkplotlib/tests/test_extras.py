@@ -28,6 +28,7 @@ from unittest import TestCase, main, skipUnless
 import numpy as np
 
 import vtkplotlib as vpl
+from vtkplotlib.tests.base import BaseTestCase
 
 try:
     from stl.mesh import Mesh
@@ -36,7 +37,7 @@ except ImportError:
 
 
 
-class TestExtras(TestCase):
+class TestExtras(BaseTestCase):
     def test_as_rgb_a(self):
         rgb, a = (np.array([0.00392157, 1.        , 0.02745098]), .5)
 
@@ -53,7 +54,7 @@ class TestExtras(TestCase):
             self.assertTrue(np.allclose(rgb, _rgb, atol=1/255), msg="{} != {}".format(rgb, _rgb))
             self.assertLess(abs(a - _a), 1 / 255)
 
-        self.assertEqual(vpl.colors.as_rgb_a("iqubxqiw7qwxb"), (None, None))
+        self.assertEqual(vpl.colors.as_rgb_a("not a color"), (None, None))
 
     def test_unicode_paths(self):
         from vtkplotlib.unicode_paths import test
@@ -64,8 +65,7 @@ class TestExtras(TestCase):
 
     def test_screenshot_trim(self):
         from vtkplotlib import image_io
-        image_io.test_trim_image()
-        image_io.test_conversions()
+        image_io.test()
 
 
 

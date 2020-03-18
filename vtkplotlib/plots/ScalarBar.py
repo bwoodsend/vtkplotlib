@@ -80,6 +80,8 @@ class ScalarBar(Actor2Base):
 
 
 
+from vtkplotlib.tests._figure_contents_check import checker
+@checker()
 def test():
     from stl.mesh import Mesh
     import vtkplotlib as vpl
@@ -89,8 +91,6 @@ def test():
 #    plot.scalar_range = -1, 2
 
     self = vpl.scalar_bar(plot, "X Values")
-
-    vpl.show()
 
     globals().update(locals())
 

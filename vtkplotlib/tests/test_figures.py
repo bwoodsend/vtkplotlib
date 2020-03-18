@@ -33,9 +33,11 @@ from pathlib2 import Path
 import vtkplotlib as vpl
 import time
 from unittest import TestCase, main, skipUnless
+from vtkplotlib.tests._figure_contents_check import checker, VTKPLOTLIB_WINDOWLESS_TEST
+from vtkplotlib.tests.base import BaseTestCase
 
 
-class TestFigures(TestCase):
+class TestFigures(BaseTestCase):
     def test_figure_io(self):
         vpl.close()
         self.assertIs(vpl.gcf(False), None)
@@ -68,35 +70,35 @@ class TestFigures(TestCase):
 
 
 
-
+    @checker()
     def test_save(self):
         plots = vpl.scatter(np.random.uniform(-10, 10, (30, 3)))
 
         # I can't get python2 to cooperate with unicode here.
         # The os functions just don't like them.
         if sys.version[0] == "3":
-
-            path = Path.cwd() / u"ҢघԝઌƔࢳܢˀા\\Հએࡓ\u061cཪЈतயଯ\u0886.png"
-            try:
-                os.mkdir(str(path.parent))
-                vpl.save_fig(path)
-                self.assertTrue(path.exists())
-            finally:
-                if path.exists():
-                    os.remove(str(path))
-                if path.parent.exists():
-                    os.rmdir(str(path.parent))
-
+             path = Path(u"ҢघԝઌƔࢳܢˀા", u"Հએࡓ\u061cཪЈतயଯ\u0886.png")
         else:
-            path = Path.cwd() / "image.png"
-            vpl.save_fig(path)
-            os.remove(str(path))
+            path = Path("boring", "name.png")
+        path = Path.cwd() / path
 
-        array = vpl.screenshot_fig(2)
+        try:
+            path.parent.mkdir(exist_ok=True)
+            vpl.save_fig(path)
+            self.assertTrue(path.exists())
+        finally:
+            if path.exists():
+                os.remove(str(path))
+            if path.parent.exists():
+                os.rmdir(str(path.parent))
+
+        array = vpl.screenshot_fig(magnification=2)
         self.assertEqual(array.shape,
                          tuple(i * 2 for i in vpl.gcf().render_size) + (3,))
-        plt.imshow(array)
-        plt.show()
+
+        if not VTKPLOTLIB_WINDOWLESS_TEST:
+            plt.imshow(array)
+            plt.show()
 
         shape = tuple(i * j for (i, j) in zip(vpl.gcf().render_size, (2, 3)))
         vpl.screenshot_fig(pixels=shape).shape
@@ -104,14 +106,11 @@ class TestFigures(TestCase):
 #        self.assertEqual(vpl.screenshot_fig(pixels=shape).shape,
 #                         shape[::-1] + (3,))
 
-
         vpl.close()
-        fig = vpl.figure()
-        for plot in plots:
-            fig += plot
-        vpl.show()
+        return array
 
 
+    @checker()
     def test_view(self):
         vpl.auto_figure(True)
         vpl.close()
@@ -133,9 +132,11 @@ class TestFigures(TestCase):
 
 
         vpl.text("Should be looking in the direction of the red arrow, with the green arrow pointing up")
-        vpl.show()
+        # Linux seems to need an extra prod to render this for some reason.
+        vpl.show(block=False)
+#        vpl.show()
 
-
+    @skipUnless(not VTKPLOTLIB_WINDOWLESS_TEST, "CBA")
     def test_multi_figures(self):
         vpl.close()
 
@@ -162,12 +163,14 @@ class TestFigures(TestCase):
         test()
 
 
+    @checker()
     @skipUnless(vpl.PyQt5_AVAILABLE, "PyQt5 not installed")
     def test_qfigure2(self):
-        fig = vpl.QtFigure2("a qt widget figure")
+        fig = vpl.QtFigure2("a QWidget figure")
+        fig.setWindowTitle(fig.window_name)
         self.assertIs(fig, vpl.gcf())
 
-        vpl.scatter(np.arange(9).reshape((3, 3)).T)
+        plot = vpl.scatter(np.arange(9).reshape((3, 3)).T)[0]
         vpl.quick_test_plot()
 
         fig.add_all()
@@ -181,13 +184,28 @@ class TestFigures(TestCase):
             fig.qapp.processEvents()
             time.sleep(.1)
 
-        fig.screenshot_button.released.emit()
+        if not VTKPLOTLIB_WINDOWLESS_TEST:
+            fig.screenshot_button.released.emit()
         fig.show_plot_table_button.released.emit()
 
+        fig.show(block=False)
 
-        fig.show()
 
+        for plot in fig.plot_table.rows:
+            fig.plot_table.rows[plot].text.released.emit()
+            fig.qapp.processEvents()
+            self.assertFalse(plot.visible)
 
+        self.assertTrue(np.allclose(vpl.screenshot_fig(fig=fig), np.array(255) * fig.background_color))
+
+        for plot in fig.plot_table.rows:
+            fig.plot_table.rows[plot].text.released.emit()
+            fig.qapp.processEvents()
+            self.assertTrue(plot.visible)
+
+        fig.plot_table.close()
+
+#        fig.show()
 
     def test_add_remove(self):
         fig = vpl.figure()
@@ -198,13 +216,13 @@ class TestFigures(TestCase):
         for i in plots:
             fig += i
             fig.update()
-            time.sleep(.05)
+            time.sleep(.02)
         for i in plots:
             fig -= i
             fig.update()
-            time.sleep(.05)
+            time.sleep(.02)
         vpl.close(fig)
 
 
-if __name__ == "__main__":
-    main(TestFigures())
+# if __name__ == "__main__":
+#     main(TestFigures())

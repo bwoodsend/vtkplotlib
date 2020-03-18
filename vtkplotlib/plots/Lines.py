@@ -181,7 +181,8 @@ class Lines(ConstructedPlot):
 
 
 
-
+from vtkplotlib.tests._figure_contents_check import checker
+@checker()
 def test():
     import vtkplotlib as vpl
 
@@ -206,12 +207,8 @@ def test():
     fig = vpl.gcf()
     fig.background_color = "grey"
 
-    vpl.show()
-
     globals().update(locals())
-
-    return self
 
 
 if __name__ == "__main__":
-    self = test()
+    test()

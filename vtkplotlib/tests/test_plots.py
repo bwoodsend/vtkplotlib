@@ -27,6 +27,7 @@ from unittest import TestCase, main, skipUnless
 import numpy as np
 
 import vtkplotlib as vpl
+from vtkplotlib.tests.base import BaseTestCase
 
 try:
     from stl.mesh import Mesh
@@ -35,14 +36,14 @@ except ImportError:
 
 
 
-class TestPlots(TestCase):
+class TestPlots(BaseTestCase):
+    @vpl.tests._figure_contents_check.checker()
     def test_arrow(self):
         points = np.random.uniform(-10, 10, (2, 3))
         vpl.scatter(points)
         vpl.arrow(*points, color="g")
-        vpl.show()
 
-
+    @vpl.tests._figure_contents_check.checker()
     def test_quiver(self):
         t = np.linspace(0, 2 * np.pi)
         points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
@@ -51,17 +52,14 @@ class TestPlots(TestCase):
         arrows = vpl.quiver(points, grads, color=grads)
         self.assertEqual(arrows.shape, t.shape)
 
-        vpl.show()
-
-
+    @vpl.tests._figure_contents_check.checker()
     def test_plot(self):
         t = np.arange(0, 1, .1) * 2 * np.pi
         points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
         vpl.plot(points, color="r", line_width=3, join_ends=True)
 
-        vpl.show()
 
-
+    @vpl.tests._figure_contents_check.checker()
     @skipUnless(Mesh, "numpy-stl is not installed")
     def test_mesh(self):
         import time
@@ -76,8 +74,7 @@ class TestPlots(TestCase):
 
         fig.show(False)
 
-        t0 = time.time()
-        for i in range(100):
+        for i in range(10):
     #        self.color = np.random.random(3)
     #        print(self.color)
             self.tri_scalars = (_mesh.x[:, 0] + 3 * i) % 20
@@ -85,12 +82,7 @@ class TestPlots(TestCase):
             self.vectors = _mesh.vectors
             fig.update()
 
-    #        time.sleep(.01)
-            if (time.time() - t0) > 1:
-                break
-
-
-        fig.show()
+            time.sleep(.01)
 
 
     def test_polygon(self):
@@ -105,16 +97,16 @@ class TestPlots(TestCase):
     def test_scatter(self):
         vpl.plots.Scatter.test()
 
+    @vpl.tests._figure_contents_check.checker()
     def test_text(self):
         vpl.text("text", (100, 100), color="g")
-        vpl.show()
 
 
     def test_annotate(self):
         vpl.text3d
         vpl.plots.Text3D.test()
 
-
+    @vpl.tests._figure_contents_check.checker()
     def test_surface(self):
         thi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 100),
                          np.linspace(0, np.pi, 50))
@@ -125,7 +117,6 @@ class TestPlots(TestCase):
         z = np.cos(theta)
 
         vpl.surface(x, y, z, scalars=x.ravel())
-        vpl.show()
 
 
     def test_surface_and_texturemap(self):

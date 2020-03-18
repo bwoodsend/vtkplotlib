@@ -521,7 +521,9 @@ class PolyData(object):
     _keys = [key for (key, val) in vars().items() if isinstance(val, property)]
     _keys.remove("cmap")
 
+from vtkplotlib.tests._figure_contents_check import checker, VTKPLOTLIB_WINDOWLESS_TEST
 
+@checker()
 def test(*spam):
     import vtkplotlib as vpl
     import numpy as np
@@ -543,10 +545,17 @@ def test(*spam):
 
     self.point_colors = point_colors
 
-    self.quick_show()
+    if not VTKPLOTLIB_WINDOWLESS_TEST:
+        self.quick_show()
+    else:
+        self.to_plot(fig=None)
+
 
     self.polygons, self.lines = self.lines, self.polygons
-    self.quick_show()
+    if not VTKPLOTLIB_WINDOWLESS_TEST:
+        self.quick_show()
+    else:
+        self.to_plot(fig=None)
 
     del self.lines
     del self.polygons
@@ -566,9 +575,8 @@ def test(*spam):
 #    print(copy.vtk_polydata.GetPoints)
 #    print(copy.points)
 
-    (self + copy).quick_show()
+    (self + copy).to_plot()
     repr(self)
-
 
     globals().update(locals())
 

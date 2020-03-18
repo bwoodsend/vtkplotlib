@@ -31,11 +31,12 @@ from pathlib2 import Path
 
 import vtkplotlib as vpl
 from unittest import TestCase, skipUnless, main
+from vtkplotlib.tests.base import BaseTestCase
 
 path = vpl.data.get_rabbit_stl()
 
 
-class TestMeshPlot(TestCase):
+class TestMeshPlot(BaseTestCase):
 
     @skipUnless(vpl.NUMPY_STL_AVAILABLE, "Requires numpy-stl")
     def test_type_normalise(self):

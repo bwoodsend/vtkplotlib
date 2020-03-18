@@ -31,7 +31,7 @@ from pathlib2 import Path
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot
 from vtkplotlib.plots.Lines import Lines
-
+from vtkplotlib.tests._figure_contents_check import checker
 
 try:
     from stl.mesh import Mesh as NumpyMesh
@@ -359,7 +359,7 @@ class MeshPlot(ConstructedPlot):
         self.polydata.points = vectors.reshape((-1, 3))
 
         # Ideally try to avoid rewriting the indices table.
-        # ``self.vectors += tranlation`` shouldn't require a rewrite.
+        # ``self.vectors += translation`` shouldn't require a rewrite.
         # This is only safe to do if the user isn't directly playing with
         # self.indices. self._last_used_default_indices tests that.
 
@@ -626,7 +626,7 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", o
 
     return self
 
-
+@checker()
 def test():
     import vtkplotlib as vpl
     from stl.mesh import Mesh
@@ -647,7 +647,6 @@ def test():
     self = vpl.mesh_plot_with_edge_scalars(_mesh, edge_scalars, centre_scalar=0)
     self.cmap = "Reds"
 #    mesh_data = _mesh
-    fig.show()
     globals().update(locals())
 
 

@@ -160,6 +160,9 @@ class Surface(ConstructedPlot):
         self.polydata.point_colors = s
 
 
+
+from vtkplotlib.tests._figure_contents_check import checker
+@checker()
 def test():
     import vtkplotlib as vpl
 
@@ -178,7 +181,6 @@ def test():
 
     self.connect()
     vpl.gcf().add_plot(self)
-    vpl.show()
 
 
 if __name__ == "__main__":

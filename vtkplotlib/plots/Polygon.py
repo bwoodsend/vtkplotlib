@@ -81,6 +81,8 @@ class Polygon(ConstructedPlot):
         self.color_opacity(color, opacity)
 
 
+from vtkplotlib.tests._figure_contents_check import checker
+@checker()
 def test():
 
     import vtkplotlib as vpl
@@ -89,8 +91,6 @@ def test():
     points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
 
     self = vpl.polygon(points, color="r")
-
-    vpl.show()
 
     globals().update(locals())
 

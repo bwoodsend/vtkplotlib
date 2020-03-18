@@ -172,7 +172,7 @@ class Legend(Actor2Base):
     To some extent, the text labels can be customised via
     ``legend.text_options`` which holds the vtkTextProperty (bucket class for
     settings like font). However, a lot of its methods do nothing. Most
-    notebely, ``legend.text_options.SetFontSize(size)`` has no effect.
+    notably, ``legend.text_options.SetFontSize(size)`` has no effect.
 
     """
     def __init__(self, plots_source="fig", fig="gcf", position=(.7, .7), size=(.3, .3),
@@ -349,6 +349,9 @@ class Legend(Actor2Base):
 
 
 
+
+from vtkplotlib.tests._figure_contents_check import checker
+@checker()
 def test():
     import vtkplotlib as vpl
 
@@ -367,9 +370,7 @@ def test():
     self.size = (.3, .3)
     self.position = np.array(1) - self.size
 
-    vpl.show()
     globals().update(locals())
-    return self
 
 
 

@@ -152,6 +152,8 @@ def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig=
 
 
 
+from vtkplotlib.tests._figure_contents_check import checker
+@checker()
 def test():
     import vtkplotlib as vpl
 
@@ -176,7 +178,6 @@ def test():
 
     globals().update(locals())
 
-    vpl.show()
 
 
 if __name__ == "__main__":

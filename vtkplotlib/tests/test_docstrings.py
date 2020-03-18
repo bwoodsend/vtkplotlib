@@ -29,13 +29,21 @@ from unittest import TestCase, skipUnless
 
 from vtkplotlib import PyQt5_AVAILABLE, NUMPY_STL_AVAILABLE
 
-class TestDocs(TestCase):
+from vtkplotlib.tests._figure_contents_check import checker, VTKPLOTLIB_WINDOWLESS_TEST
+from vtkplotlib.tests.base import BaseTestCase
+
+if PyQt5_AVAILABLE:
+    from PyQt5 import QtWidgets, QtCore, QtGui
+import vtkplotlib as vpl
+
+
+class TestDocs(BaseTestCase):
     """These are automatically extracted from the docstrings."""
 
-
+    @checker()
     @skipUnless(PyQt5_AVAILABLE, "PyQt5 not installed")
     def test_doc_00(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
 
         # Create the figure. This automatically sets itself as the current
         # working figure. The qapp is created automatically if one doesn't
@@ -48,13 +56,13 @@ class TestDocs(TestCase):
 
         # Automatically calls ``qapp.exec_()``. If you don't want it to then
         # use ``vpl.show(False)``.
-        vpl.show()
+#        vpl.show()
 
-
+    @checker()
     @skipUnless(PyQt5_AVAILABLE, "PyQt5 not installed")
     def test_doc_01(self):
-        import vtkplotlib as vpl
-        from PyQt5 import QtWidgets
+#        import vtkplotlib as vpl
+#        from PyQt5 import QtWidgets
         import numpy as np
         import sys
 
@@ -71,7 +79,7 @@ class TestDocs(TestCase):
                 self.setLayout(vbox)
 
                 # Create the figure
-                self.figure = vpl.QtFigure()
+                self.figure = vpl.QtFigure(parent=self)
 
                 # Create a button and attach a callback.
                 self.button = QtWidgets.QPushButton("Make a Ball")
@@ -107,59 +115,78 @@ class TestDocs(TestCase):
                 super().show()
                 self.figure.show()
 
-
+            def closeEvent(self, event):
+                """This isn't essential. VTK, OpenGL, Qt and Python's garbage
+                collect all get in the way of each other so that VTK can't
+                clean up properly which causes an annoying VTK error window to
+                pop up. Explicitly calling QtFigure's `closeEvent()` ensures
+                everything gets deleted in the right order.
+                """
+                self.figure.closeEvent(event)
 
 
         qapp = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
 
         window = FigureAndButton()
         window.show()
-        qapp.exec_()
 
-    @skipUnless(PyQt5_AVAILABLE, "PyQt5 not installed")
-    def test_doc_02(self):
-        import vtkplotlib as vpl
-        import numpy as np
-        from PyQt5.QtWidgets import QApplication
+        qapp.processEvents()
+        for i in range(5):
+            window.button.released.emit()
+            qapp.processEvents()
+        output_to_verify = checker().reduce_fig(window.figure)
 
-        print("create fig")
-        print(QApplication.instance())
-        # Create the figure. This as-is looks like just a QtFigure.
-        fig = vpl.QtFigure2()
-        print("add")
-        # Add each feature you want. Pass arguments to customise each one.
-        fig.add_screenshot_button(pixels=1080)
-        fig.add_preset_views()
-        fig.add_show_plot_table_button()
-        # Use ``fig.add_all()`` to add all them all.
+        if VTKPLOTLIB_WINDOWLESS_TEST:
+            window.close()
 
-        # You will likely want to dump the above into a function. Or a class
-        # inheriting from ``vpl.QtFigure2``.
-        print("plot")
-        # The usual, plot something super exciting.
-        vpl.polygon(np.array([[1, 0, 0],
-                              [1, 1, 0],
-                              [0, 1, 1],
-                              [0, 0, 1]]), color="grey")
-        print("show")
-        # Then either ``vpl.show()`` or
-        fig.show()
+        self._do_not_delete_yet = window
+
+        return output_to_verify
 
 
+#    @checker()
+#    @skipUnless(PyQt5_AVAILABLE, "PyQt5 not installed")
+#    def test_doc_02(self):
+#        import vtkplotlib as vpl
+#        import numpy as np
+#        from PyQt5.QtWidgets import QApplication
+#
+#        # Create the figure. This as-is looks like just a QtFigure.
+#        fig = vpl.QtFigure2()
+#
+#        # Add each feature you want. Pass arguments to customise each one.
+#        fig.add_screenshot_button(pixels=1080)
+#        fig.add_preset_views()
+#        fig.add_show_plot_table_button()
+#        # Use ``fig.add_all()`` to add all them all.
+#
+#        # You will likely want to dump the above into a function. Or a class
+#        # inheriting from ``vpl.QtFigure2``.
+#
+#        # The usual, plot something super exciting.
+#        vpl.polygon(np.array([[1, 0, 0],
+#                              [1, 1, 0],
+#                              [0, 1, 1],
+#                              [0, 0, 1]]), color="grey")
+#
+#        # Then either ``vpl.show()`` or
+##        fig.show()
+
+    @checker()
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_03(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
         from stl.mesh import Mesh
 
         mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
         vertices = mesh.vectors
 
         vpl.plot(vertices, join_ends=True, color="dark red")
-        vpl.show()
+#        vpl.show()
 
-
+    @checker()
     def test_doc_04(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
         import numpy as np
 
         # Create an octagon, using `t` as scalar values.
@@ -180,12 +207,13 @@ class TestDocs(TestCase):
         fig = vpl.gcf()
         fig.background_color = "grey"
 
-        vpl.show()
+#        vpl.show()
 
 
+    @checker()
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_05(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
         from stl.mesh import Mesh
 
         # path = "if you have an STL file then put it's path here."
@@ -199,12 +227,12 @@ class TestDocs(TestCase):
         vpl.mesh_plot(mesh)
 
         # Show the figure
-        vpl.show()
+#        vpl.show()
 
 
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_06(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
         from stl.mesh import Mesh
 
         # Open an STL as before
@@ -218,12 +246,12 @@ class TestDocs(TestCase):
         # Optionally the plot created by mesh_plot can be passed to color_bar
         vpl.color_bar(plot, "Heights")
 
-        vpl.show()
+#        vpl.show()
 
-
+    @checker()
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_07(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
         from stl.mesh import Mesh
         import numpy as np
 
@@ -237,12 +265,12 @@ class TestDocs(TestCase):
 
         vpl.mesh_plot(mesh, tri_scalars=tri_scalars)
 
-        vpl.show()
+#        vpl.show()
 
 
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_08(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
         from stl.mesh import Mesh
         import numpy as np
 
@@ -255,11 +283,11 @@ class TestDocs(TestCase):
 
         vpl.mesh_plot_with_edge_scalars(mesh, edge_scalars, centre_scalar=0, cmap="Greens")
 
-        vpl.show()
+#        vpl.show()
 
-
+    @checker()
     def test_doc_09(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
         import numpy as np
 
         phi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 1024),
@@ -272,11 +300,11 @@ class TestDocs(TestCase):
 
         vpl.surface(x, y, z)
 
-        vpl.show()
+#        vpl.show()
 
-
+    @checker()
     def test_doc_10(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
         import numpy as np
 
         # Create a ball at a point in space.
@@ -286,11 +314,11 @@ class TestDocs(TestCase):
         vpl.annotate(point,
                      "This ball is at {}".format(point),
                      np.array([0, 0, 1]))
-        vpl.show()
+#        vpl.show()
 
-
+    @checker()
     def test_doc_11(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
         import numpy as np
 
         # Create several balls.
@@ -311,11 +339,11 @@ class TestDocs(TestCase):
                      arrow_color="hunter green"
                      )
 
-        vpl.show()
+#        vpl.show()
 
-
+    @checker()
     def test_doc_12(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
         import numpy as np
 
 
@@ -332,24 +360,24 @@ class TestDocs(TestCase):
         polydata.polygons = np.array([[0, 1, 2]])
 
         # The polydata can be quickly inspected using
-        polydata.quick_show()
+        if not VTKPLOTLIB_WINDOWLESS_TEST:
+            polydata.quick_show()
 
         # When you are happy with it, it can be turned into a proper plot
         # object like those output from other ``vpl.***()`` commands. It will be
         # automatically added to ``vpl.gcf()`` unless told otherwise.
         plot = polydata.to_plot()
-        vpl.show()
+#        vpl.show()
 
-
+    @checker()
     def test_doc_13(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
 
         vpl.quick_test_plot()
-        vpl.show()
-
+#        vpl.show()
 
     def test_doc_14(self):
-        import vtkplotlib as vpl
+#        import vtkplotlib as vpl
         import numpy as np
 
         vpl.zip_axes(np.arange(10),
@@ -367,10 +395,13 @@ class TestDocs(TestCase):
         #             [ 8,  4,  3],
         #             [ 9,  4,  4]])
 
-
-    def test_doc_15(self):
-        import vtkplotlib as vpl
+    @checker()
+    def test_doc_035(self):
+#        import vtkplotlib as vpl
         import numpy as np
+#        import sys
+#        import crash_post_mortum
+#        sys.settrace(crash_post_mortum.Tracker().trace)
 
         # Define the 2 independent variables
         phi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 1024),
@@ -400,7 +431,16 @@ class TestDocs(TestCase):
                     scalars=texture_coords,
                     texture_map=texture_map)
 
-        vpl.show()
+#        vpl.show()
+
+    @classmethod
+    def tearDownClass(cls):
+        print("tear down")
+        if PyQt5_AVAILABLE:
+            qapp = QtWidgets.QApplication.instance()
+            if qapp:
+                qapp.exit()
+                qapp.quit()
 
 
 
