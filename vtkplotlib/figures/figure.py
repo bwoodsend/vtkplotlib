@@ -53,8 +53,6 @@ class Figure(BaseFigure):
 
 
 
-
-
 if __name__ == "__main__":
     import vtkplotlib as vpl
 

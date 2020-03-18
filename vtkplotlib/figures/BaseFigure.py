@@ -122,9 +122,12 @@ class BaseFigure(VTKRenderer):
     def render_size(self, size):
         self.renWin.SetSize(*size)
 
-
-
-
+    def close(self):
+        # This is important if the figure is ever reshown. Otherwise VTK will
+        # crash.
+        self.finalise()
+        if self is gcf(False):
+            scf(None)
 
 
 

@@ -34,7 +34,9 @@ from .figure_manager import (gcf,
                              screenshot_fig,
                              close,
                              reset_camera,
-                             view)
+                             view,
+                             zoom_to_contents,
+                             )
 
 try:
     from PyQt5 import QtWidgets, QtGui, QtCore

@@ -26,7 +26,7 @@
 from builtins import super
 
 import numpy as np
-import os
+import sys
 from pathlib2 import Path
 
 from vtkplotlib._get_vtk import vtk, vtk_to_numpy
@@ -264,7 +264,7 @@ def reset_camera(fig="gcf"):
     fig.renderer.ResetCamera()
 
 
-def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, fig="gcf"):
+def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, off_screen=False, fig="gcf"):
     """Take a screenshot of a figure. The image is returned as an array. To
     save a screenshot directly to a file, see vpl.save_fig.
 
@@ -279,6 +279,9 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, fig="gcf")
 
     :param trim_pad_width: Optionally auto crop to contents, this specifies how much space to give it, defaults to None for no cropping.
     :type trim_pad_width: positive int for padding in pixels, float from 0.0 - 1.0 for pad width relative to original size.
+
+    :param off_screen: If true, attempt to take the screenshot without opening the figure's window, defaults to False.
+    :type off_screen: bool, optional
 
     :param fig: The figure screenshot, defaults to vpl.gcf().
     :type fig: vpl.figure, vpl.QtFigure
@@ -297,12 +300,29 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, fig="gcf")
 
     .. note::
 
-        And no I have no idea why it spins. But vtk's example in the docs does
-        it as well so I think it's safe to say there's not much we can do about
-        it.
+        I have no idea why it spins. But vtk's example in the docs does it as
+        well so I think it's safe to say there's not much we can do about it.
+
+    .. note::
+
+        For QtFigures **off_screen** is ignored.
+
+    .. warning::
+
+        There has been a case where the contents of other windows (e.g Firefox)
+        have somehow ended up in the output
+        (see <https://github.com/bwoodsend/vtkplotlib/issues/1>). Which can be
+        resolved by setting ``off_screen=True``. But this option can lead to
+        a `bad X server connection` error on (I think) Linux machines without
+        built in graphics hardware. This is currently unresolved.
 
     """
     fig = gcf_check(fig, "screenshot_fig")
+
+    QtFigure = sys.modules.get("vtkplotlib.figures.QtFigure")
+    
+    off_screen = off_screen and not (QtFigure and isinstance(fig, QtFigure.QtFigure))
+    fig.renWin.SetOffScreenRendering(off_screen)
 
     # figure has to be drawn, including the window it goes in.
     fig.show(block=False)
@@ -330,17 +350,29 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, fig="gcf")
             magnification = (magnification[0], magnification[0])
         win_to_image_filter.SetMagnification(magnification[0])
 
+    win_to_image_filter.Modified()
     win_to_image_filter.Update()
 
     # Read the image as an array
     from vtkplotlib import image_io
     arr = image_io.vtkimagedata_to_array(win_to_image_filter.GetOutput())
     arr = image_io.trim_image(arr, fig.background_color, trim_pad_width)
+
+    # Rendering in Off screen mode seemingly makes it impossible to ever show
+    # that renWin again without either crashing or hanging indefinitely - even
+    # if you turn off screen rendering back off. `fig.finalise()` deletes the
+    # renWin and a new one will be created if it is needed.
+    if off_screen:
+        fig.close()
+#        fig.finalise()
+#        if hasattr(fig, "_clean_up"):
+#            fig._clean_up()
+
     return arr
 
 
 
-def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, fig="gcf", **imsave_plotargs):
+def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, off_screen=False, fig="gcf", **imsave_plotargs):
     """Take a screenshot and saves it to a file.
 
     :param path: The path, including extension, to save to.
@@ -351,6 +383,9 @@ def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, fig="gcf",
 
     :param pixels: Image dimensions in pixels, defaults to None.
     :type pixels: int or a (width, height) tuple of ints, optional
+
+    :param off_screen: If true, attempt to take the screenshot without opening the figure's window, defaults to False.
+    :type off_screen: bool, optional
 
     :param fig: The figure screenshot, defaults to vpl.gcf().
     :type fig: vpl.figure, vpl.QtFigure
@@ -397,12 +432,14 @@ def close(fig="gcf"):
     If the figure is the current figure then the current figure is reset.
     """
     if fig == "gcf":
-      fig = gcf()
+        # Don't use gcf_check() here so close() can be called redundantly without
+        # either creating a new figure just to close it again or raising a
+        # NoFigureError.
+        fig = gcf()
 
     if fig is not None:
-        # This is important if the figure is ever reshown. Otherwise VTK will
-        # crash.
-        fig.finalise()
+        # Closing is provided by the figure classes.
+        fig.close()
 
     if fig is gcf(False):
         scf(None)
@@ -413,6 +450,29 @@ def test_view():
     vpl.quiver(np.zeros((3, 3)), np.eye(3), color=np.eye(3))
     vpl.view()
     vpl.show()
+
+
+def zoom_to_contents(plots_to_exclude=(), padding=.05, fig="gcf"):
+    fig = gcf_check(fig, "zoom_to_contents")
+
+    # Temporarily hide any 2D plots such as legends or scalarbars.
+    from vtkplotlib.plots.BasePlot import Actor2Base
+    plots_2d_states = {plot: plot.visible for plot in fig.plots if isinstance(plot, Actor2Base)}
+    plots_2d_states.update((plot, plot.visible) for plot in plots_to_exclude)
+    for plot in plots_2d_states:
+        plot.visible = False
+
+    actual_shape = np.array(screenshot_fig(fig=fig, trim_pad_width=padding).shape[:2][::-1])
+    target_shape = np.array(fig.render_size)
+
+    zoom = (target_shape / actual_shape).min()
+    if zoom > 1:
+        fig.camera.Zoom(zoom)
+
+    for (plot, state) in plots_2d_states.items():
+        plot.visible = state
+
+    return zoom
 
 if __name__ == "__main__":
     pass
