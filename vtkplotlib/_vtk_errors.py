@@ -24,7 +24,7 @@
 
 
 
-class ErrorObserver:
+class ErrorObserver(object):
 
     def __init__(self):
         self.CallDataType = 'string0'
@@ -38,10 +38,13 @@ class ErrorObserver:
     def attach(self, vtk_obj):
         vtk_obj.AddObserver("ErrorEvent", self)
 
+class ErrorSilencer(ErrorObserver):
+    def __call__(self, obj, event, message):
+        pass
 
 
 handler = ErrorObserver()
-
+silencer = ErrorSilencer()
 
 if __name__ == "__main__":
     pass

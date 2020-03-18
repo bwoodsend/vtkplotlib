@@ -22,17 +22,21 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
+from __future__ import print_function
 
 import numpy as np
 import sys
-import os
-from pathlib2 import Path
 from vtkplotlib._get_vtk import vtk, QVTKRenderWindowInteractor
 
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
 from vtkplotlib.figures.BaseFigure import BaseFigure, VTKRenderer
 from vtkplotlib import nuts_and_bolts
-from vtkplotlib._vtk_errors import handler
+from vtkplotlib._vtk_errors import handler, silencer
+
+if __name__ == "__main__":
+    debug = print
+else:
+    debug = lambda *x: None
 
 
 class QtFigure(BaseFigure, QWidget):
@@ -164,6 +168,16 @@ class QtFigure(BaseFigure, QWidget):
                 self.figure.show()
 
 
+            def closeEvent(self, event):
+                \"""This isn't essential. VTK, OpenGL, Qt and Python's garbage
+                collect all get in the way of each other so that VTK can't
+                clean up properly which causes an annoying VTK error window to
+                pop up. Explicitly calling QtFigure's `closeEvent()` ensures
+                everything gets deleted in the right order.
+                \"""
+                self.figure.closeEvent(event)
+
+
 
 
         qapp = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
@@ -181,40 +195,64 @@ class QtFigure(BaseFigure, QWidget):
     def __init__(self, name="qt vtk figure", parent=None):
 
         self.qapp = QApplication.instance() or QApplication(sys.argv)
-#        print(self.qapp)
-#        print("qw init")
+#        debug(self.qapp)
+#        debug("qw init")
         QWidget.__init__(self, parent)
 
-#        print("name")
+#        debug("name")
         self.window_name = name
 
-#        print("layout")
+        self.setWindowModified(False)
+
+#        debug("layout")
         self.vl = QVBoxLayout()
-#        print("vtkwidget")
-        self.vtkWidget = QVTKRenderWindowInteractor(self)
-#        print("addWidget")
-        self.vl.addWidget(self.vtkWidget)
-#        print("renwon")
+#        debug("vtkwidget")
+        self.vtkWidget# = QVTKRenderWindowInteractor(self)
+#        debug("addWidget")
+#        self.vl.addWidget(self.vtkWidget)
+#        debug("renWin")
         self.renWin
         iren = self.iren
 
         # try to prevent error pop-up windows
-        handler.attach(self.vtkWidget)
-        handler.attach(self.iren)
-        handler.attach(self.renWin)
+        # They don't seem to achieve anything. Normally these spew errors on
+        # cleanup, by which time the silencer has already been garbage collected.
+        silencer.attach(self.vtkWidget)
+        silencer.attach(self.iren)
+        silencer.attach(self.renWin)
 
 
         self.data_holder = []
-#        print("basefig init")
-        BaseFigure.__init__(self)
-        iren.SetInteractorStyle(vtk.vtkInteractorStyleTrackballCamera())
+#        debug("basefig init")
+        BaseFigure.__init__(self, name)
+        self.iren_style = vtk.vtkInteractorStyleTrackballCamera()
+        iren.SetInteractorStyle(self.iren_style)
 
+        self.renWin.AddRenderer(self.renderer)
 
         self.setLayout(self.vl)
 
 
+    def _re_init(self):
+        debug("re init")
+        renderer = self.renderer
+        name = self.window_name
+        parent = self.parent()
+#        self.__init__(name, parent)
+        QWidget.__init__(self, parent)
+        self.window_name = name
+        self.vtkWidget, self.renWin, self.iren.SetInteractorStyle(self.iren_style)
+        self.renderer = renderer
+        self.renWin.AddRenderer(self.renderer)
+        self.renderer.SetActiveCamera(self.camera)
+        if self.vl.indexOf(self.vtkWidget) == -1:
+            self.vl.insertWidget(self._vtkwidget_replace_index, self.vtkWidget)
+        self.setLayout(self.vl)
+
 
     def show(self, block=None):
+        if self.renWin is not self.renderer.GetRenderWindow():
+            self._re_init()
         QWidget.show(self)
         if block is None:
             block = self.parent() is None
@@ -226,31 +264,81 @@ class QtFigure(BaseFigure, QWidget):
 
 
     @nuts_and_bolts.init_when_called
+    def vtkWidget(self):
+        vtkWidget = QVTKRenderWindowInteractor(self)
+        self.vl.addWidget(vtkWidget)
+        return vtkWidget
+
+    @nuts_and_bolts.init_when_called
     def renWin(self):
-        return self.vtkWidget.GetRenderWindow()
+        renWin = self.vtkWidget.GetRenderWindow()
+#        if not renWin.HasRenderer(self.renderer):
+#            renWin.AddRenderer(self.renderer)
+#            self.renderer.SetRenderWindow(renWin)
+        return renWin
 
     @nuts_and_bolts.init_when_called
     def iren(self):
+#        iren = vtk.vtkRenderWindowInteractor()
+#        self.renWin.SetInteractor(iren)
+#        assert iren is self.vtkWidget.GetRenderWindow().GetInteractor()
+#        BaseFigure.__init__(self)
         return self.vtkWidget.GetRenderWindow().GetInteractor()
 
     def update(self):
         BaseFigure.update(self)
         QWidget.update(self)
-        self.repaint()
+#        self.repaint()
         self.qapp.processEvents()
 
+    def close(self):
+        BaseFigure.close(self)
+        QWidget.close(self)
+        self._clean_up()
 
     def finalise(self):
 #        Very important that BaseFigure.finalise gets overwritten. This gets
 #        called immediately after self.iren.Start(). The original performs resets
-#        that stop the QtFigure from responding.
+#        that stop the QtFigure from responding. These resets must go in closeEvent().
         pass
 
+    def _clean_up(self):
+        debug("cleaning up")
+        self.renWin.MakeCurrent()
+        self._vtkwidget_replace_index = self.vl.indexOf(self.vtkWidget)
+        self.vl.removeWidget(self.vtkWidget)
+#        self.renderer.RemoveAllViewProps()
+        self.renWin.Finalize()
+        self.renWin.RemoveRenderer(self.renderer)
+        del self.vtkWidget, self.iren, self.renWin
 
+
+    window_name = property(QWidget.windowTitle, QWidget.setWindowTitle)
+
+    def closeEvent(self, event):
+        self._clean_up()
+#        debug("close")
+
+    def __del__(self):
+#        debug("delete")
+        try:
+            self.renderer.RemoveAllViewProps()
+        except (AttributeError, TypeError):
+            # In Python2, RemoveAllViewProps is already None 
+            pass
+#        BaseFigure.__del__(self)
+#        self.renderer.FastDelete()
+#        self.renWin.FastDelete()
+#        self.vtkWidget.FastDelete()
+
+
+
+from vtkplotlib.tests._figure_contents_check import checker
+@checker()
 def test():
     import vtkplotlib as vpl
 
-    self = QtFigure("a qt widget figure")
+    self = QtFigure("a Qt widget figure")
 
     assert self is vpl.gcf()
 
@@ -259,8 +347,11 @@ def test():
     vpl.view(camera_direction=direction)
     vpl.reset_camera()
 
+#    self.show()
+
+
 #    vpl.show()
-    self.show()
+    # self.show()
 #    self.__init__()
 #    self.show()
 #    self.vtkWidget.show()
