@@ -36,7 +36,8 @@ from .figures import (Figure as figure,
                       save_fig,
                       screenshot_fig,
                       close,
-                      PyQt5_AVAILABLE
+                      PyQt5_AVAILABLE,
+                      zoom_to_contents,
                       )
 
 
