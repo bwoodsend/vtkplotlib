@@ -24,6 +24,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
+from __future__ import print_function
 
 import numpy as np
 import sys
@@ -41,12 +42,22 @@ from pathlib2 import Path
 # https://stackoverflow.com/questions/9226516/python-windows-console-and-encodings-cp-850-vs-cp1252
 
 import locale
-ALLOWED_ENCODING = locale.getpreferredencoding(False)
+if os.name == "nt":
+    ALLOWED_ENCODING = locale.getlocale()[1] or "ascii"
+else:
+    ALLOWED_ENCODING = "utf-8"
+
+if __name__ == "__main__":
+    _print = print
+else:
+    _print = lambda *x: None
+
 
 class PathHandler(object):
     def __init__(self, path, mode="r", ALLOWED_ENCODING=ALLOWED_ENCODING):
-        self.str_path = str(path)
-        self.path = Path(path)
+        self.path = Path(path).absolute()
+        del path
+        self.str_path = str(self.path)
         self.ALLOWED_ENCODING = ALLOWED_ENCODING
 
 
@@ -94,15 +105,15 @@ class PathHandler(object):
     def __enter__(self):
 
         if not self.folder_ok:
-#            print("Warning - non-ascii folder", self.folder)
-            print("Setting the cwd to folder")
+#            _print("Warning - non-ascii folder", self.folder)
+            _print("Setting the cwd to folder")
             self.old_folder = Path.cwd()
             os.chdir(str(self.folder))
             self.access_folder = "".encode(self.ALLOWED_ENCODING)
 
 
         if not self.name_ok:
-#            print("Warning - non-ascii file name '{}'. Will give file a temporary name then change back afterwards."\
+#            _print("Warning - non-ascii file name '{}'. Will give file a temporary name then change back afterwards."\
 #                  .format(self.name))
 
             # Test the suffix encodes OK
@@ -125,7 +136,7 @@ class PathHandler(object):
 #        self.access_path = Path(self.access_path)
 
         if not self.name_ok and os.path.exists(self.access_path):
-            print("Reverting name changes")
+            _print("Reverting name changes")
             if self.path.exists():
                 # If the target path already exists then os.rename raises a
                 # FileExistsError. So if the user runs the same piece of code
@@ -135,7 +146,7 @@ class PathHandler(object):
             os.rename(self.access_path.decode(self.ALLOWED_ENCODING), self.path.name)
 
         if not self.folder_ok:
-            print("reverting to old working dir")
+            _print("reverting to old working dir")
             os.chdir(str(self.old_folder))
 
 
@@ -194,4 +205,5 @@ def test():
 
 
 if __name__ == "__main__":
+    print(ALLOWED_ENCODING)
     self = test()
