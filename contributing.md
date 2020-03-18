@@ -71,5 +71,5 @@ If you want to join the team then cool - you're hired! Again, email me. You will
 
 ## Donations 
 
-If this library has helped you and you want to throw some cash at someone then you can say thanks by giving to [these charities](https://uk.virginmoneygiving.com/Team/vtkplotlib).
+If this library has helped you and you want to throw some cash at someone then  [these](https://uk.virginmoneygiving.com/Team/vtkplotlib) are a couple of my favourite charities.
 

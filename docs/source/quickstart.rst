@@ -4,10 +4,15 @@ Introduction
 
 ..
     This site auto-generates the little python version badges from url.
-    The required  format is
-    https://img.shields.io/badge/[text_block_1]-[text_block_2]-[html_color].svg
-    Characters need to be url escaped. [space] is %20 and | is %7C
-    "https://img.shields.io/badge/python-%20{}-blue.svg".format("%20%7C%20".join(["2.7", "3.5", "3.6", "3.7", "3.8", "PyInstaller"]))
+    The required  format is:
+    https://img.shields.io/badge/[text_block_1]-[text_block_2]-[html_named_color].svg
+
+    It helps to pad with spaces. Characters need to be url escaped (can be done
+    using urllib).
+
+    from urlib.parse import quote
+    "https://img.shields.io/badge/" + quote("python- {}-blue.svg".format(\
+                " | ".join(["2.7", "3.5", "3.6", "3.7", "3.8", "PyInstaller"])))
 
 .. image:: https://img.shields.io/badge/python-%202.7%20%7C%203.5%20%7C%203.6%20%7C%203.7%20%7C%203.8%20%7C%20PyInstaller-blue.svg
 

@@ -114,7 +114,7 @@ class Text(BasePlot):
 
 
 def resize_event_cb(*args):
-    print(args)
+    # print(args)
     self.actor.SetPosition(*(i // 2 for i in fig.render_size))
 
 
