@@ -97,8 +97,12 @@ class TestFigures(BaseTestCase):
                          tuple(i * 2 for i in vpl.gcf().render_size) + (3,))
 
         if not VTKPLOTLIB_WINDOWLESS_TEST:
-            plt.imshow(array)
-            plt.show()
+            try:
+                plt.imshow(array)
+                plt.show()
+            except UnicodeDecodeError:
+                # There's an issue with the tk backend in python 2.
+                pass
 
         shape = tuple(i * j for (i, j) in zip(vpl.gcf().render_size, (2, 3)))
         vpl.screenshot_fig(pixels=shape).shape
@@ -222,6 +226,14 @@ class TestFigures(BaseTestCase):
             fig.update()
             time.sleep(.02)
         vpl.close(fig)
+
+    @checker()
+    def test_zoom(self):
+        vpl.scatter(np.random.uniform(-20, 20, (30, 3)), color="r")
+        vpl.show(block=False)
+        balls_to_ignore = vpl.scatter(np.random.uniform(-50, 50, (30, 3)))
+        vpl.text("This should be ignored by zoom.")
+        vpl.zoom_to_contents(plots_to_exclude=balls_to_ignore)
 
 
 # if __name__ == "__main__":

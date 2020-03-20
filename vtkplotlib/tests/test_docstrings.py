@@ -61,8 +61,8 @@ class TestDocs(BaseTestCase):
     @checker()
     @skipUnless(PyQt5_AVAILABLE, "PyQt5 not installed")
     def test_doc_01(self):
-#        import vtkplotlib as vpl
-#        from PyQt5 import QtWidgets
+        import vtkplotlib as vpl
+        from PyQt5 import QtWidgets
         import numpy as np
         import sys
 

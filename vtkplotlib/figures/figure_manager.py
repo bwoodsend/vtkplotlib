@@ -22,7 +22,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-
+from __future__ import division
 from builtins import super
 
 import numpy as np
@@ -256,11 +256,7 @@ def reset_camera(fig="gcf"):
     pointing into the middle of where all the plots are. Then it adjusts the
     zoom so that everything fits on the screen.
     """
-    if fig == "gcf":
-      fig = gcf()
-    if fig is None:
-        raise NoFigureError("reset_camera")
-
+    fig = gcf_check(fig, "reset_camera")
     fig.renderer.ResetCamera()
 
 
@@ -319,18 +315,15 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, off_screen
     """
     fig = gcf_check(fig, "screenshot_fig")
 
-    QtFigure = sys.modules.get("vtkplotlib.figures.QtFigure")
-    
-    off_screen = off_screen and not (QtFigure and isinstance(fig, QtFigure.QtFigure))
-    fig.renWin.SetOffScreenRendering(off_screen)
-
-    # figure has to be drawn, including the window it goes in.
-    fig.show(block=False)
+    # figure has to be drawn, including the window it goes in unless using off_screen.
+    fig._prep_for_screenshot(off_screen)
 
     # screenshot code:
     win_to_image_filter = vtk.vtkWindowToImageFilter()
     win_to_image_filter.SetInput(fig.renWin)
 
+
+    # Normalise and set user inputs for magnification.
 
     if isinstance(pixels, int):
         pixels = (pixels * 16) // 9, pixels
@@ -341,7 +334,7 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, off_screen
     if pixels is not None:
         magnification = tuple(pixels[i] // fig.render_size[i] for i in range(2))
 
-    # Depends on VTK version.
+    # Dependent on VTK version.
     if hasattr(win_to_image_filter, "SetScale"):
         win_to_image_filter.SetScale(*magnification)
     else:
@@ -350,10 +343,11 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, off_screen
             magnification = (magnification[0], magnification[0])
         win_to_image_filter.SetMagnification(magnification[0])
 
+    # Finally take the screenshot.
     win_to_image_filter.Modified()
     win_to_image_filter.Update()
 
-    # Read the image as an array
+    # And convert it to something a bit less awkward.
     from vtkplotlib import image_io
     arr = image_io.vtkimagedata_to_array(win_to_image_filter.GetOutput())
     arr = image_io.trim_image(arr, fig.background_color, trim_pad_width)
@@ -362,8 +356,8 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, off_screen
     # that renWin again without either crashing or hanging indefinitely - even
     # if you turn off screen rendering back off. `fig.finalise()` deletes the
     # renWin and a new one will be created if it is needed.
-    if off_screen:
-        fig.close()
+#    if off_screen:
+#        fig.close()
 #        fig.finalise()
 #        if hasattr(fig, "_clean_up"):
 #            fig._clean_up()
@@ -435,21 +429,12 @@ def close(fig="gcf"):
         # Don't use gcf_check() here so close() can be called redundantly without
         # either creating a new figure just to close it again or raising a
         # NoFigureError.
-        fig = gcf()
+        fig = gcf(create_new=False)
 
     if fig is not None:
         # Closing is provided by the figure classes.
         fig.close()
 
-    if fig is gcf(False):
-        scf(None)
-
-
-def test_view():
-    import vtkplotlib as vpl
-    vpl.quiver(np.zeros((3, 3)), np.eye(3), color=np.eye(3))
-    vpl.view()
-    vpl.show()
 
 
 def zoom_to_contents(plots_to_exclude=(), padding=.05, fig="gcf"):
@@ -462,15 +447,19 @@ def zoom_to_contents(plots_to_exclude=(), padding=.05, fig="gcf"):
     for plot in plots_2d_states:
         plot.visible = False
 
-    actual_shape = np.array(screenshot_fig(fig=fig, trim_pad_width=padding).shape[:2][::-1])
-    target_shape = np.array(fig.render_size)
+    for i in range(10):
+        actual_shape = np.array(screenshot_fig(fig=fig, trim_pad_width=padding).shape[:2][::-1])
+        target_shape = np.array(fig.render_size)
 
-    zoom = (target_shape / actual_shape).min()
-    if zoom > 1:
-        fig.camera.Zoom(zoom)
+        zoom = (target_shape / actual_shape).min()
+        if zoom > 1:
+            fig.camera.Zoom(zoom)
 
-    for (plot, state) in plots_2d_states.items():
-        plot.visible = state
+        for (plot, state) in plots_2d_states.items():
+            plot.visible = state
+
+        if zoom < 1 + padding / 5:
+            break
 
     return zoom
 

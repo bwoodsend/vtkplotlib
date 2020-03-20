@@ -25,6 +25,7 @@
 """
 
 from builtins import super
+import future.utils
 
 from vtkplotlib.data import DATA_FOLDER
 import os
@@ -107,7 +108,7 @@ class AutoChecker(TestCase):
     @classmethod
     def reduce_fig(cls, fig):
         from vtkplotlib.figures.figure_manager import screenshot_fig
-        return cls.reduce_image_array(screenshot_fig(fig=fig, off_screen=True))
+        return cls.reduce_image_array(screenshot_fig(fig=fig))
 
     @classmethod
     def reduce(cls, obj):
@@ -118,11 +119,19 @@ class AutoChecker(TestCase):
         return cls.reduce_fig(obj)
 
     def save(self):
-        self.path.write_text(json.dumps(self.data, indent="  "))
+        text = json.dumps(self.data, indent=2)
+        if future.utils.PY2:
+            self.path.write_bytes(text)
+        else:
+            self.path.write_text(text)
 
     def load(self):
         if self.path.exists():
-            self.data = json.loads(self.path.read_text())
+            if future.utils.PY2:
+                text = self.path.read_bytes()
+            else:
+                text = self.path.read_text()
+            self.data = json.loads(text)
         else:
             self.data = {}
 

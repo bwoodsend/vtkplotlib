@@ -29,9 +29,9 @@ import numpy as np
 
 
 
-from vtkplotlib.plots.BasePlot import BasePlot
+from vtkplotlib.plots.BasePlot import Actor2Base
 
-class Text(BasePlot):
+class Text(Actor2Base):
     """2D text at a fixed point on the window (independent of camera
     position / orientation).
 

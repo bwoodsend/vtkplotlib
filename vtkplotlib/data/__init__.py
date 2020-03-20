@@ -47,7 +47,7 @@ def get_rabbit_stl():
 
 ICONS_FOLDER = DATA_FOLDER / "icons"
 
-ICONS = {i.stem: str(i) for i in ICONS_FOLDER.glob("*")}
+ICONS = {i.stem: str(i) for i in ICONS_FOLDER.glob("*.jpg")}
 
 
 

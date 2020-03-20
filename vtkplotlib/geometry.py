@@ -25,7 +25,7 @@
 Anything geometry related goes in here. I use this file for multiple projects
 so there will be unused functions in here.
 """
-
+from __future__ import division
 
 import numpy as np
 
@@ -172,7 +172,7 @@ def orthogonal_bases(vector0):
     vector0 = np.asarray(vector0)
 
     old_shape = vector0.shape
-    vector0 = nuts_and_bolts.flatten_all_but_last(vector0)
+    vector0 = vector0.reshape((-1, vector0.shape[-1]))
     vector0 = normalised(vector0)
     if not np.isfinite(vector0).all():
         raise ValueError("vector0 must have non zero magnitude")

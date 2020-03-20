@@ -24,23 +24,12 @@
 # =============================================================================
 
 from __future__ import division
-from future.utils import string_types, as_native_str
+from future import utils as _future
 
 import numpy as np
 from matplotlib import colors, cm
-from pathlib2 import Path
 from vtkplotlib._get_vtk import vtk, numpy_to_vtk, vtk_to_numpy
 
-
-try:
-    from PIL import Image
-except ImportError:
-    Image = None
-
-try:
-    from os import PathLike
-except ImportError:
-    PathLike = Path
 
 
 mpl_colors = {}
@@ -79,7 +68,10 @@ def as_rgb_a(color=None, opacity=None):
     opacity_out = None
 
     if color is not None:
-        if isinstance(color, str):
+        if isinstance(color, _future.string_types):
+            if _future.PY2 and isinstance(color, unicode):
+                color = color.encode()
+
             if color[0] == "#":
                 # allow #RRGGBB hex colors
                 # mpl's hex2rgb doesn't allow opacity. Otherwise I'd just use that
@@ -124,7 +116,7 @@ def as_rgb_a(color=None, opacity=None):
 
 def normalise(colors, axis=None):
     colors = colors - np.nanmin(colors, axis=axis, keepdims=True)
-    colors /= np.max(colors, axis=axis, keepdims=True)
+    colors /= np.nanmax(colors, axis=axis, keepdims=True)
     return colors
 
 
@@ -140,9 +132,9 @@ class TextureMap(object):
 
 
     :param array: The image data. It is converted to an array if it isn't one already.
-    :type array: str path, os.PathLike, np.ndarray with shape (m, n, 3 or 4), PIL Image
+    :type array: filename, np.ndarray with shape (m, n, 3 or 4), PIL Image
 
-    :param interpolate: , defaults to False.
+    :param interpolate: Allow intersection between pixels, defaults to False.
     :type interpolate: bool, optional
 
 
@@ -213,9 +205,10 @@ class TextureMap(object):
 
 
     def __init__(self, array, interpolate=False):
-        if isinstance(array, PathLike):
+        from vtkplotlib.nuts_and_bolts import isinstance_PathLike
+        if isinstance_PathLike(array):
             array = str(array)
-        if isinstance(array, string_types):
+        if isinstance(array, str):
             path = array
             from vtkplotlib.image_io import read
             array = read(path)
@@ -226,13 +219,14 @@ class TextureMap(object):
                     array = imread(path)
                 except (ValueError, ImportError) as ex:
                     raise NotImplementedError("Could not find a suitable VTKImageReader for \"{}\" and matplotlib's search failed with the following error - {}".format(path, ex))
-                    
+
             array = np.swapaxes(array, 0, 1)[:, ::-1]
-        if Image and isinstance(array, Image.Image):
+        from vtkplotlib.nuts_and_bolts import isinstance_no_import
+        if isinstance_no_import(array, "PIL.Image", "Image"):
             array = np.array(array)
             array = np.swapaxes(array, 0, 1)[:, ::-1]
 
-        ex = lambda x: TypeError("`array` must be an np.ndarray with shape (m, n, 3) or (m, n, 4). Got {} {}".format(x, as_native_str(array)))
+        ex = lambda x: TypeError("`array` must be an np.ndarray with shape (m, n, 3) or (m, n, 4). Got {} {}".format(x, repr(array)))
         if (not isinstance(array, np.ndarray)):
             raise ex(type(array))
         if (len(array.shape) != 3):
@@ -283,7 +277,7 @@ class TextureMap(object):
             return self.array[uv[..., 0], uv[..., 1]]
 
 converted_cmaps = {}
-temp = []
+_temp = []
 
 def as_vtk_cmap(cmap, cache=True):
     if cache and isinstance(cmap, str):
@@ -307,6 +301,9 @@ def as_vtk_cmap(cmap, cache=True):
     if callable(cmap):
         cmap = cmap(np.arange(256, dtype=np.uint8))
 
+    if isinstance(cmap, list):
+        cmap = cmap_from_list(cmap)
+
     if not isinstance(cmap, np.ndarray):
         raise TypeError()
 
@@ -316,7 +313,7 @@ def as_vtk_cmap(cmap, cache=True):
         table.SetTable(numpy_to_vtk(cmap))
         table._numpy_ref = cmap
 
-        temp.append(cmap)
+        _temp.append(cmap)
         if name is not None:
             converted_cmaps[name] = table
         return table

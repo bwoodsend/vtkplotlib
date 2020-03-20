@@ -29,7 +29,7 @@ import sys
 from vtkplotlib._get_vtk import vtk, QVTKRenderWindowInteractor
 
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
-from vtkplotlib.figures.BaseFigure import BaseFigure, VTKRenderer
+from vtkplotlib.figures.BaseFigure import BaseFigure
 from vtkplotlib import nuts_and_bolts
 from vtkplotlib._vtk_errors import handler, silencer
 
@@ -198,145 +198,164 @@ class QtFigure(BaseFigure, QWidget):
 #        debug(self.qapp)
 #        debug("qw init")
         QWidget.__init__(self, parent)
-
-#        debug("name")
-        self.window_name = name
-
-        self.setWindowModified(False)
-
-#        debug("layout")
-        self.vl = QVBoxLayout()
-#        debug("vtkwidget")
-        self.vtkWidget# = QVTKRenderWindowInteractor(self)
-#        debug("addWidget")
-#        self.vl.addWidget(self.vtkWidget)
-#        debug("renWin")
-        self.renWin
-        iren = self.iren
-
-        # try to prevent error pop-up windows
-        # They don't seem to achieve anything. Normally these spew errors on
-        # cleanup, by which time the silencer has already been garbage collected.
-        silencer.attach(self.vtkWidget)
-        silencer.attach(self.iren)
-        silencer.attach(self.renWin)
-
-
-        self.data_holder = []
-#        debug("basefig init")
         BaseFigure.__init__(self, name)
-        self.iren_style = vtk.vtkInteractorStyleTrackballCamera()
-        iren.SetInteractorStyle(self.iren_style)
 
-        self.renWin.AddRenderer(self.renderer)
-
+        self.vl = QVBoxLayout()
         self.setLayout(self.vl)
+
+        self._vtkWidget = QVTKRenderWindowInteractor(self)
+        self.vl.addWidget(self.vtkWidget)
+
+        self.renWin
+        self.iren
 
 
     def _re_init(self):
         debug("re init")
-        renderer = self.renderer
         name = self.window_name
-        parent = self.parent()
-#        self.__init__(name, parent)
-        QWidget.__init__(self, parent)
+        QWidget.__init__(self, self.parent())
         self.window_name = name
-        self.vtkWidget, self.renWin, self.iren.SetInteractorStyle(self.iren_style)
-        self.renderer = renderer
-        self.renWin.AddRenderer(self.renderer)
-        self.renderer.SetActiveCamera(self.camera)
-        if self.vl.indexOf(self.vtkWidget) == -1:
-            self.vl.insertWidget(self._vtkwidget_replace_index, self.vtkWidget)
         self.setLayout(self.vl)
-
-
-    def show(self, block=None):
-        if self.renWin is not self.renderer.GetRenderWindow():
-            self._re_init()
-        QWidget.show(self)
-        if block is None:
-            block = self.parent() is None
-        BaseFigure.show(self, block)
         self.setWindowTitle(self.window_name)
 
-        if block:
-            self.qapp.exec_()
+        self.vtkWidget = QVTKRenderWindowInteractor(self)
+        self.vl.insertWidget(self._vtkWidget_replace_index, self.vtkWidget)
+
+        self.renWin, self.iren
 
 
-    @nuts_and_bolts.init_when_called
+    @property
     def vtkWidget(self):
-        vtkWidget = QVTKRenderWindowInteractor(self)
-        self.vl.addWidget(vtkWidget)
-        return vtkWidget
+        if not hasattr(self, "_vtkWidget"):
+            self._re_init()
+        return self._vtkWidget
+    @vtkWidget.setter
+
+    def vtkWidget(self, widget):
+        self._vtkWidget = widget
+
+    @vtkWidget.deleter
+    def vtkWidget(self):
+        if hasattr(self, "_vtkWidget"):
+            del self._vtkWidget
+
+    def _base_show_wrap(QWidget_show_name):
+        """Wrap all the ``QWidget.show()``, ``QWidget.showMaximized()`` etc
+        methods so they can all be used as expected. Just incase Qt has changed
+        and some ``show...()`` methods aren't present, this defaults to just
+        ``show()``.
+        """
+
+        QWidget_show = getattr(QWidget, QWidget_show_name, QWidget.show)
+        def show(self, block=None):
+            if not hasattr(self, "vtkWidget"):
+                self._re_init()
+            self._connect_renderer()
+
+            QWidget_show(self)
+
+            self.iren.Initialize()
+            self.renWin.Render()
+            self.iren.Start()
+
+    #        self.setWindowTitle(self.window_name)
+            if block is None:
+                block = self.parent() is None
+            if block:
+                self._flush_stdout()
+                self.qapp.exec_()
+            BaseFigure.show(self, block)
+
+        show.__name__ = QWidget_show.__name__
+        try: show.__qualname__ = QWidget_show.__qualname__
+        except (AttributeError, TypeError): pass
+
+        return show
+
+    show = _base_show_wrap("show")
+    showMaximized = _base_show_wrap("showMaximized")
+    showMinimized = _base_show_wrap("showMinimized")
+    showFullScreen = _base_show_wrap("showFullScreen")
+    showNormal = _base_show_wrap("showNormal")
+#    showBanana = _base_show_wrap("showBanana")
+
 
     @nuts_and_bolts.init_when_called
     def renWin(self):
+        if not hasattr(self, "vtkWidget"):
+            self._re_init()
         renWin = self.vtkWidget.GetRenderWindow()
-#        if not renWin.HasRenderer(self.renderer):
-#            renWin.AddRenderer(self.renderer)
-#            self.renderer.SetRenderWindow(renWin)
         return renWin
 
     @nuts_and_bolts.init_when_called
     def iren(self):
-#        iren = vtk.vtkRenderWindowInteractor()
-#        self.renWin.SetInteractor(iren)
-#        assert iren is self.vtkWidget.GetRenderWindow().GetInteractor()
-#        BaseFigure.__init__(self)
-        return self.vtkWidget.GetRenderWindow().GetInteractor()
+        iren = self.renWin.GetInteractor()
+        iren.SetInteractorStyle(self.style)
+        return iren
 
     def update(self):
         BaseFigure.update(self)
         QWidget.update(self)
-#        self.repaint()
         self.qapp.processEvents()
 
-    def close(self):
-        BaseFigure.close(self)
-        QWidget.close(self)
-        self._clean_up()
+#    def close(self):
+#        BaseFigure.close(self)
+#        QWidget.close(self)
+#        self._clean_up()
 
-    def finalise(self):
-#        Very important that BaseFigure.finalise gets overwritten. This gets
-#        called immediately after self.iren.Start(). The original performs resets
-#        that stop the QtFigure from responding. These resets must go in closeEvent().
-        pass
-
-    def _clean_up(self):
+    def on_close(self):
         debug("cleaning up")
-        self.renWin.MakeCurrent()
-        self._vtkwidget_replace_index = self.vl.indexOf(self.vtkWidget)
-        self.vl.removeWidget(self.vtkWidget)
+        if hasattr(self, "_renWin"):
+            # These prevent error dialogs popping up.
+            self._disconnect_renderer()
+            self.renWin.MakeCurrent()
+            self.renWin.Finalize()
+
+        if hasattr(self, "_vtkWidget"):
+            self._vtkWidget_replace_index = self.vl.indexOf(self.vtkWidget)
+            self.vl.removeWidget(self.vtkWidget)
 #        self.renderer.RemoveAllViewProps()
-        self.renWin.Finalize()
-        self.renWin.RemoveRenderer(self.renderer)
+
         del self.vtkWidget, self.iren, self.renWin
+
+    def closeEvent(self, event):
+        self.on_close()
 
 
     window_name = property(QWidget.windowTitle, QWidget.setWindowTitle)
 
-    def closeEvent(self, event):
-        self._clean_up()
-#        debug("close")
 
     def __del__(self):
 #        debug("delete")
         try:
             self.renderer.RemoveAllViewProps()
         except (AttributeError, TypeError):
-            # In Python2, RemoveAllViewProps is already None 
+            # In Python2, RemoveAllViewProps is already None
             pass
 #        BaseFigure.__del__(self)
 #        self.renderer.FastDelete()
 #        self.renWin.FastDelete()
 #        self.vtkWidget.FastDelete()
 
+    def _prep_for_screenshot(self, off_screen=False):
+        BaseFigure._prep_for_screenshot(self, off_screen)
+        if off_screen:
+            print("Off screen rendering can't be done using QtFigures.")
+        self.show(block=False)
+
+    def close(self):
+        QWidget.close(self)
+        # closeEvent seems to be called anyway but call this just to be sure.
+        self.on_close()
+        BaseFigure.close(self)
 
 
-from vtkplotlib.tests._figure_contents_check import checker
+from vtkplotlib.tests._figure_contents_check import checker, VTKPLOTLIB_WINDOWLESS_TEST
 @checker()
 def test():
     import vtkplotlib as vpl
+
+    QtFigure._abc_assert_no_abstract_methods()
 
     self = QtFigure("a Qt widget figure")
 
@@ -349,20 +368,15 @@ def test():
 
 #    self.show()
 
+    self.show(block=False)
+    self.close()
 
-#    vpl.show()
-    # self.show()
-#    self.__init__()
-#    self.show()
-#    self.vtkWidget.show()
-#    self.update()
-#    self.show(False)
-#    self.update()
-#    self.vtkWidget.show()
-#    self.qapp.exec_()
-
+    self.showMaximized(block=not VTKPLOTLIB_WINDOWLESS_TEST)
+    out = vpl.screenshot_fig(fig=self)
+    vpl.close(fig=self)
 
     globals().update(locals())
+    return out
 
 
 

@@ -27,21 +27,14 @@ from builtins import super
 
 import numpy as np
 import sys
-import os
 from pathlib2 import Path
 
 from itertools import zip_longest
 from PyQt5 import QtWidgets, QtGui, QtCore
 
-try:
-    from PIL import Image
-except ImportError:
-    Image = None
-
 
 from vtkplotlib.figures import QtFigure, save_fig, view
 from vtkplotlib.data import ICONS_FOLDER
-from vtkplotlib import geometry
 
 SCREENSHOT_ICON_PATH = ICONS_FOLDER / "screenshot.png"
 
@@ -216,19 +209,12 @@ def as_qicon(obj):
     if isinstance(obj, QtGui.QIcon):
         return obj
 
-    if isinstance(obj, str):
-        obj = Path(obj)
-
-    try:
-        PathLike = os.PathLike
-    except AttributeError:
-        PathLike = Path
-
-    if isinstance(obj, PathLike):
+    from vtkplotlib.nuts_and_bolts import isinstance_PathLike, isinstance_no_import
+    if isinstance_PathLike(obj):
 #                if obj.is_file():
             pixmap = QtGui.QPixmap(str(obj))
 
-    if (Image is not None) and isinstance(obj, Image.Image):
+    if isinstance_no_import(obj, "PIL.Image", "Image"):
         pixmap = obj.toqpixmap()
 
 

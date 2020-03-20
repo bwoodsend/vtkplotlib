@@ -59,7 +59,7 @@ from .plots.Legend import Legend as legend
 from .plots import BasePlot
 from .plots.polydata import PolyData
 
-from . import data
+from . import data, image_io
 
 color_bar = scalar_bar
 
@@ -82,3 +82,4 @@ def quick_test_plot(fig="gcf"):
 
 from .nuts_and_bolts import zip_axes, unzip_axes
 from .colors import TextureMap
+from ._get_vtk import vtk

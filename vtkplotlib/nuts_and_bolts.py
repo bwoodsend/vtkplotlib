@@ -26,16 +26,11 @@
 there will be a lot of irrelevant functions."""
 
 import numpy as np
-
-
+import os, sys, io
+from future.utils import native_str
 
 def set_to_array(s, dtype=float):
     return np.fromiter(iter(s), count=len(s), dtype=dtype)
-
-def sep_args(args):
-    print("use sep_last_ax")
-    assert 0
-    return sep_last_ax(args)
 
 def sep_last_ax(points):
     points = np.asarray(points)
@@ -94,57 +89,6 @@ def unzip_axes(points):
 
     return sep_last_ax(points)
 
-def flatten_all_but_last(arr):
-    arr = np.asarray(arr)
-    return arr.reshape(int(np.prod(arr.shape[:-1])), arr.shape[-1])
-
-#def mask_union(mask, *masks):
-#    out = mask.copy()
-#    for m in masks:
-#        np.logical_or(out, m, out=out)
-#    return out
-#
-#def mask_and(mask, *masks):
-#    out = mask.copy()
-#    for m in masks:
-#        np.logical_and(out, m, out=out)
-#    return out
-#
-#
-#def set_element_0(s):
-#    for i in s:
-#        return i
-#
-#def arg_array_inv(args, out_len=None, default=None):
-#    out_len = out_len or len(args)
-#    out = np.empty(out_len, args.dtype)
-#    if default is not None:
-#        out.fill(default)
-#
-#    out[args] = np.arange(len(args))
-#    return out
-#
-#
-#def random_selection(lst, size=None):
-#    indices = np.random.randint(0, len(lst), size)
-#
-#    return np.asarray(lst)[indices]
-#
-#def as_str(x):
-#    if isinstance(x, str):
-#        return x
-#    elif isinstance(x, bytes):
-#        return x.decode(errors="replace")
-#    else:
-#        return str(x)
-#
-#def numpy_broadcastable(*arrs):
-#    arrs = (np.asarray(i) for i in arrs)
-#    for lens in zip(*(i.shape[::-1] for i in arrs)):
-#        lens = set(lens)
-#        if len(lens - {1}) > 1:
-#            return False
-#    return True
 
 
 def init_when_called(func):
@@ -162,18 +106,21 @@ def init_when_called(func):
 
     return property(getter, None, deleter, func.__doc__)
 
+def isinstance_no_import(x, module_name, type_name):
+    """Test if ``isinstance(x, a_type)`` without importing **a_type** from
+    wherever it came from - which would be wasteful and confuses dependency
+    scanners (like PyInstaller's).
+    """
+    module = sys.modules.get(module_name)
+    return module and isinstance(x, getattr(module, type_name))
 
 
-#def repeat(x=None, n):
-#    return (x, ) * n
-#
-#def difference_map(x, y):
-#    x = np.asarray(x)
-#    y = np.asarray(y)
-#    dif = x[repeat(None, len(x.shape)), (np.newaxis, ) * len(y.shape)] - y[(np.newaxis, ) * x.shape]
-#    assert dif.shape == x.shape + y.shape
-#    return dif
+def isinstance_PathLike(x, allow_buffers=False):
+    """Test if **x** is any of the types that could contain a filename or, if
+    **allow_buffers**, a pseudo file."""
+    return isinstance(x, native_str) \
+        or (hasattr(os, "PathLike") and isinstance(x, os.PathLike)) \
+        or isinstance_no_import(x, "pathlib", "Path") \
+        or isinstance_no_import(x, "pathlib2", "Path") \
+        or (allow_buffers and isinstance(x, io.IOBase))
 
-
-if __name__ == "__main__":
-    pass

@@ -24,11 +24,12 @@
 
 from __future__ import division
 
-from unittest import TestCase, main, skipUnless
+from unittest import TestCase, main, skipUnless, skipIf
 import numpy as np
 
 import vtkplotlib as vpl
 from vtkplotlib.tests.base import BaseTestCase
+from vtkplotlib.tests._figure_contents_check import VTKPLOTLIB_WINDOWLESS_TEST
 
 try:
     from stl.mesh import Mesh
@@ -63,9 +64,14 @@ class TestExtras(BaseTestCase):
     def test_data(self):
         vpl.data.assert_ok()
 
-    def test_screenshot_trim(self):
-        from vtkplotlib import image_io
-        image_io.test()
+    def test_image_io(self):
+        from vtkplotlib import _image_io
+        _image_io.test()
+
+    @skipIf(VTKPLOTLIB_WINDOWLESS_TEST, "Requires manual interaction.")
+    def test_figure_contents_check(self):
+        from vtkplotlib.tests._figure_contents_check import test
+        test()
 
 
 

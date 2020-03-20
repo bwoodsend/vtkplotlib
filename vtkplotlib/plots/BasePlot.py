@@ -23,13 +23,10 @@
 # =============================================================================
 
 from builtins import super
+from future import utils
 
 from vtkplotlib._get_vtk import vtk
-import operator
 import numpy as np
-import os
-import sys
-from pathlib2 import Path
 
 from vtkplotlib.figures import gcf
 from vtkplotlib.colors import as_rgb_a
@@ -221,7 +218,7 @@ class Actor2Base(BasePlot):
 def _iter_points(points):
     """Fixes the array shape to (n, 3)."""
     points = np.asarray(points)
-    return nuts_and_bolts.flatten_all_but_last(points)
+    return points.reshape((-1, 3))
 
 
 def _iter_colors(colors, shape):
@@ -232,7 +229,7 @@ def _iter_colors(colors, shape):
     if colors is None:
         return (None for i in range(size))
 
-    if isinstance(colors, (tuple, list, str)):
+    if isinstance(colors, (tuple, list,) + utils.string_types):
         return (colors for i in range(size))
 
     colors = np.asarray(colors)
@@ -241,9 +238,9 @@ def _iter_colors(colors, shape):
         raise ValueError("colors type not understood")
 
     if colors.shape[:-1] == shape:
-        return nuts_and_bolts.flatten_all_but_last(colors)
-
+        return colors.reshape((-1, colors.shape[-1]))
     else:
+        print(colors, shape)
         raise ValueError("colors type not understood")
 
 

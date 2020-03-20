@@ -24,19 +24,23 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
+"""
+VTK uses whatever encoding your machine's "current codepage". But you have
+to explicitly string.encode(codepage) strings to bytes then hand those to VTK.
+See this answer:
+https://discourse.vtk.org/t/what-is-state-of-the-art-unicode-file-names-on-windows/1821/42
+
+This module provides PathHandler - a context manager which handles this when
+using VTK's file reader/writer classes.
+"""
+
 from __future__ import print_function
 
 import numpy as np
 import sys
 import os
 from pathlib2 import Path
-
-# VTK uses whatever encoding your machine's "current codepage". But you have
-# to explicitly string.encode(codepage) strings to bytes then hand those to VTK.
-# See this answer:
-# https://discourse.vtk.org/t/what-is-state-of-the-art-unicode-file-names-on-windows/1821/42
-
-# I believe it's just a Windows issue. Other OSs are sensible and use UTF-8.
+# I believe it's just a Windows issue. Other OSs are more practical and use UTF-8.
 # The codepage is different for different regions. This snippet should say
 # what encoding to use.
 # https://stackoverflow.com/questions/9226516/python-windows-console-and-encodings-cp-850-vs-cp1252
@@ -121,11 +125,11 @@ class PathHandler(object):
 
             while True:
                 self.access_name = str(np.random.randint(1 << 31,)).encode(self.ALLOWED_ENCODING) + suffix
-                if not os.path.exists(self.access_path):
+                if not os.path.exists(self.py_access_path):
                     break
 
             if self.mode == "r":
-                os.rename(str(self.path), self.access_path.decode(self.ALLOWED_ENCODING))
+                os.rename(str(self.path), self.py_access_path)
 
 
         return self
@@ -135,7 +139,7 @@ class PathHandler(object):
     def __exit__(self, *spam):
 #        self.access_path = Path(self.access_path)
 
-        if not self.name_ok and os.path.exists(self.access_path):
+        if not self.name_ok and os.path.exists(self.py_access_path):
             _print("Reverting name changes")
             if self.path.exists():
                 # If the target path already exists then os.rename raises a
@@ -143,7 +147,7 @@ class PathHandler(object):
                 # twice without deleting the output it'll fail.
                 assert self.mode == "w"
                 os.remove(str(self.path))
-            os.rename(self.access_path.decode(self.ALLOWED_ENCODING), self.path.name)
+            os.rename(self.py_access_path, str(self.path))
 
         if not self.folder_ok:
             _print("reverting to old working dir")
@@ -162,6 +166,8 @@ def test_path(path):
 
     self = PathHandler(path, "w")
     with self:
+        _print(path, "->", self.py_access_path)
+
         writer = vtk.vtkPolyDataWriter()
         writer.SetFileName(self.access_path)
         writer.SetInputData(polydata)
@@ -190,16 +196,23 @@ def test_path(path):
 
 
 
-#    path = "C:\\" + "\\".join(np.random.randint(128, 0x1000, 10, np.int32).tobytes().decode("utf-32") for i in range(5)) + ".jpg"
-test_paths = [Path(__file__).parent / "fóldér" / "TéXTFílé.txt",
-              Path(__file__).parent / 'ԗݨྪࢩѸ\u0590ഃׅƂ' / 'ಫܴ\u0a92ȕՆؐཛྷറƃತ' / 'ෂҢघԝઌƔࢳܢˀાՀએࡓ\u061cཪЈतயଯ\u0886.txt']
 
 def test():
-    path = test_paths[0]
-    self = test_path(path)
+    from vtkplotlib.data import DATA_FOLDER
 
-    path = test_paths[1]
-    self = test_path(path)
+    NAMES = [u"name"]
+
+    # Proper Python unicode support came in version 3.6 I think (determined
+    # empirically).
+    version = (sys.version_info.major, sys.version_info.minor)
+    if version >= (3, 6):
+        NAMES.append(u"ÑÂmé")
+    if version >= (3, 6):
+        NAMES.append(np.arange(0x100, 0xd800, 0x500, np.int32).tobytes().decode("utf-32"))
+
+    import itertools
+    for path in itertools.combinations_with_replacement(NAMES, 2):
+        self = test_path(DATA_FOLDER / Path(*path))
 
     return self
 

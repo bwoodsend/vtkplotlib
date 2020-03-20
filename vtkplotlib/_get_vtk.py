@@ -69,7 +69,7 @@ try:
                                                   vtkPolyDataWriter)
 
         from vtkmodules.vtkInteractionStylePython import (vtkInteractorStyleTrackballCamera,
-                                                          vtkInteractorStyleImage)
+                                                          vtkInteractorStyleImage,)
 
         from vtkmodules.vtkRenderingAnnotationPython import (vtkScalarBarActor,
                                                              vtkLegendBoxActor)
@@ -107,6 +107,8 @@ try:
         from vtkmodules.vtkRenderingOpenGL2Python import vtkOpenGLRenderer
 
         from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+
+    from vtkmodules import vtkRenderingGL2PSOpenGL2Python
 
 
 except ImportError:

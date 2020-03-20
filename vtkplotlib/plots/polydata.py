@@ -23,7 +23,7 @@
 # =============================================================================
 
 # I would avoid looking in here - it's chaos.
-from __future__ import nested_scopes
+from __future__ import nested_scopes, division
 
 import numpy as np
 import os

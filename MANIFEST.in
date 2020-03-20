@@ -1,3 +1,6 @@
 include README.md
 include LICENSE.txt
-recursive-include vtkplotlib/data *
+include vtkplotlib/data/icons/*.jpg
+include vtkplotlib/data/icons/*.png
+recursive-include vtkplotlib/data/models *
+

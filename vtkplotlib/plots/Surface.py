@@ -123,7 +123,7 @@ class Surface(ConstructedPlot):
         super().__init__(fig)
 
         points = nuts_and_bolts.zip_axes(x, y, z)
-        flat_points = nuts_and_bolts.flatten_all_but_last(points)
+        flat_points = points.reshape((-1, 3))
 
         shape = points.shape[:-1]
         unflatten_map = np.arange(np.prod(shape), dtype=self.polydata.ID_ARRAY_DTYPE).reshape(shape)
@@ -156,7 +156,8 @@ class Surface(ConstructedPlot):
     @colors.setter
     def colors(self, s):
         if s is not None and s.ndim > 2:
-            s = nuts_and_bolts.flatten_all_but_last(s)
+            s = np.asarray(s)
+            s = s.reshape((-1, s.shape[-1]))
         self.polydata.point_colors = s
 
 
