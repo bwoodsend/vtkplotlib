@@ -106,9 +106,9 @@ def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig=
     :type points: np.array with ``points.shape[-1] == 3``
 
     :param color: The color of the markers, can be singular or per marker, defaults to white.
-    :type color: str, 3-tuple, 4-tuple, np.array with same shape as `points`, optional
+    :type color: str, 3-tuple, 4-tuple, np.array with same shape as **points**, optional
 
-    :param opacity: The translucencies of the plots, 0 is invisible, 1 is solid, defaults to solid.
+    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
     :type opacity: float, np.array, optional
 
     :param radius: The radius of each marker, defaults to 1.0.
@@ -117,16 +117,23 @@ def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig=
     :param use_cursors: If false use spheres, if true use cursors, defaults to False.
     :type use_cursors: bool, optional
 
-    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure, optional
+    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
     :param label: Give the plot a label to use in legends, defaults to None.
     :type label: str, optional
 
-
     :return: The marker or an array of markers.
-    :rtype: vtkplotlib.plots.Scatter.Sphere or vtkplotlib.plots.Scatter.Cursor or np.array
+    :rtype: :class:`vtkplotlib.plots.Scatter.Sphere` or :class:`vtkplotlib.plots.Scatter.Cursor` or ``np.ndarray`` or spheres or cursors.
 
+
+    Coloring by directly with scalars is not supported for scatter but you can
+    do it using:
+
+    .. code-block:: python
+
+        from matplotlib.cm import get_cmap
+        vpl.scatter(points, color=get_cmap("rainbow")(scalars))
 
     """
 

@@ -120,9 +120,9 @@ def main(colorImage):
 
 
 from vtkplotlib import image_io
-from vtkplotlib.plots.BasePlot import Actor2Base
+from vtkplotlib.plots.BasePlot import Base2DPlot
 
-class Imshow(Actor2Base):
+class Imshow(Base2DPlot):
     def __init__(self, arr, fig="gcf"):
         super().__init__(fig)
 

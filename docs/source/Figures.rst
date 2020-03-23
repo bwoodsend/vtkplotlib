@@ -1,7 +1,8 @@
-vtkplotlib Figures
+Figures
 ==================
 
-Figures are the window that you plot into. This section outlines:
+Figures, typically abbreviated to `figs`, are the window that you plot into. This
+section outlines:
 
 * Their creation.
 * General figure management.
@@ -12,107 +13,124 @@ Figures are the window that you plot into. This section outlines:
 Overview
 --------
 
-Some of this is handled automatically. There is a global "current working
-figure". This can be accessed using ``vpl.gcf()``. If it doesn't exist then it
-is automatically created. Each plot command will add itself to the current working
-figure unless explicitly told not to using the `fig` option. Either use
-``fig=alternative_figure`` to plot into a different one or ``fig=None`` to not
-use any. The figure is shown using ``vpl.show()`` or ``fig.show()``. After the
-shown figure is closed the current working figure is deleted.
+Some of this is handled automatically. There is a global "current working figure".
+This can be get and set using ``vpl.gcf()`` and ``vpl.scf(fig)``. If it doesn't
+exist then it is automatically created. Each plot command will add itself to the
+current working figure unless explicitly told not by setting ``fig=None`` or
+``fig=alternative_fig`` in the plot command. The figure is shown using
+``vpl.show()`` or ``fig.show()``. After the shown figure is closed it ceases to
+be the current working figure but you can use it by referencing it explicitly.
+Figures can be reshown indefinitely and should be exactly as you left them on
+close.
+
+---------------
+
+show
+---------------
+
+.. autofunction:: vtkplotlib.show
+
+-----------------
+
+figure
+-----------------
+
+.. autoclass:: vtkplotlib.figure
+
+
+--------------
+
+gcf
+--------------
+
+.. autofunction:: vtkplotlib.gcf
+
+
+--------------
+
+scf
+--------------
+
+.. autofunction:: vtkplotlib.scf
+
+
+-------------------
+
+screenshot_fig
+-------------------
+
+.. autofunction:: vtkplotlib.screenshot_fig
+
+
+-------------------
+
+save_fig
+-------------------
+
+.. autofunction:: vtkplotlib.save_fig
 
 
 ---------------
 
-vtkplotlib.show
+view
 ---------------
 
-.. autofunction:: vtkplotlib.figures.figure_manager.show
-
------------------
-
-vtkplotlib.figure
------------------
-
-.. autoclass:: vtkplotlib.figures.figure.Figure
-
-
---------------
-
-vtkplotlib.gcf
---------------
-
-.. autofunction:: vtkplotlib.figures.figure_manager.gcf
-
-
---------------
-
-vtkplotlib.scf
---------------
-
-.. autofunction:: vtkplotlib.figures.figure_manager.scf
+.. autofunction:: vtkplotlib.view
 
 
 -----------------------
 
-vtkplotlib.reset_camera
+reset_camera
 -----------------------
 
-.. autofunction:: vtkplotlib.figures.figure_manager.reset_camera
-
-
--------------------
-
-vtkplotlib.save_fig
--------------------
-
-.. autofunction:: vtkplotlib.figures.figure_manager.save_fig
-
-
----------------
-
-vtkplotlib.view
----------------
-
-.. autofunction:: vtkplotlib.figures.figure_manager.view
-
-
-----------------
-
-vtkplotlib.close
-----------------
-
-.. autofunction:: vtkplotlib.figures.figure_manager.close
-
-
--------------------------
-
-vtkplotlib.figure_history
--------------------------
-
-.. autodata:: vtkplotlib._history.figure_history
+.. autofunction:: vtkplotlib.reset_camera
 
 
 ----------------------
 
-vtkplotlib.auto_figure
+zoom_to_contents
 ----------------------
 
-.. autofunction:: vtkplotlib.figures.figure_manager.auto_figure
+.. autofunction:: vtkplotlib.zoom_to_contents
+
+
+----------------
+
+close
+----------------
+
+.. autofunction:: vtkplotlib.close
+
+
+-------------------------
+
+figure_history
+-------------------------
+
+.. autodata:: vtkplotlib.figure_history
+
+
+----------------------
+
+auto_figure
+----------------------
+
+.. autofunction:: vtkplotlib.auto_figure
 
 
 -------------------
 
-vtkplotlib.QtFigure
+QtFigure
 -------------------
 
-.. autoclass:: vtkplotlib.figures.QtFigure.QtFigure
+.. autoclass:: vtkplotlib.QtFigure
 
 
 --------------------
 
-vtkplotlib.QtFigure2
+QtFigure2
 --------------------
 
-.. autoclass:: vtkplotlib.figures.QtGuiFigure.QtFigure2
+.. autoclass:: vtkplotlib.QtFigure2
 
 

@@ -20,13 +20,13 @@
 # -- Project information -----------------------------------------------------
 
 project = 'vtkplotlib'
-copyright = '2019, bwoodsend'
+copyright = '2019-2020, bwoodsend'
 author = 'bwoodsend'
 
 # The short X.Y version
-version = ''
+version = '1.3'
 # The full version, including alpha/beta/rc tags
-release = '0.1'
+release = '1.3.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -186,3 +186,13 @@ epub_exclude_files = ['search.html']
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+
+# -- Globally defined substitutions to be used in rst files -----------------
+
+rst_epilog = "\n"
+
+for vtk_name in ['vtkActor', 'vtkActor2D', 'vtkArrowSource', 'vtkBMPReader', 'vtkBMPWriter', 'vtkCellArray', 'vtkCommand', 'vtkCubeSource', 'vtkCursor3D', 'vtkFollower', 'vtkImageData', 'vtkImageMapper', 'vtkInteractorStyleImage', 'vtkInteractorStyleTrackballCamera', 'vtkJPEGReader', 'vtkJPEGWriter', 'vtkLegendBoxActor', 'vtkLookupTable', 'vtkMatrix4x4', 'vtkPNGReader', 'vtkPNGWriter', 'vtkPoints', 'vtkPolyData', 'vtkPolyDataMapper', 'vtkPolyDataReader', 'vtkPolyDataWriter', 'vtkRenderWindow', 'vtkRenderWindowInteractor', 'vtkRenderer', 'vtkSTLReader', 'vtkScalarBarActor', 'vtkSphereSource', 'vtkTIFFReader', 'vtkTIFFWriter', 'vtkTextActor', 'vtkTransform', 'vtkVectorText', 'vtkWindowToImageFilter']:
+    rst_epilog += ".. _{0}: https://vtk.org/doc/nightly/html/class{0}.html#details\n".format(vtk_name)
+
+

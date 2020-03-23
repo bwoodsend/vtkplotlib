@@ -27,11 +27,11 @@ from builtins import super
 from vtkplotlib._get_vtk import vtk
 import numpy as np
 
-from vtkplotlib.plots.BasePlot import Actor2Base
+from vtkplotlib.plots.BasePlot import Base2DPlot
 
 
 
-class ScalarBar(Actor2Base):
+class ScalarBar(Base2DPlot):
     """Create a scalar bar. Also goes by the alias `colorbar`.
 
     :param plot: The plot with scalars to draw a scalarbar for.
@@ -39,15 +39,14 @@ class ScalarBar(Actor2Base):
     :param title: , defaults to ''.
     :type title: str, optional
 
-    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure, optional
-
+    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
     :return: The scalarbar object.
     :rtype: vtkplotlib.plots.ScalarBar.ScalarBar
 
 
-    The `plot` argument can be the output of any ``vpl.***`` command that takes
+    The **plot** argument can be the output of any ``vtkplotlib.***`` command that takes
     `scalars` as an argument.
 
     """

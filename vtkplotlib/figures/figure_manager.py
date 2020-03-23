@@ -26,10 +26,9 @@ from __future__ import division
 from builtins import super
 
 import numpy as np
-import sys
 from pathlib2 import Path
 
-from vtkplotlib._get_vtk import vtk, vtk_to_numpy
+from vtkplotlib._get_vtk import vtk
 
 try:
     # Doing this allows the current figure to be remembered if vtkplotlib get's
@@ -64,8 +63,8 @@ def auto_figure(auto=None):
 def scf(figure):
     """Sets the current working figure.
 
-    :param figure: The figure or None.
-    :type figure: vpl.figure, vpl.QtFigure
+    :param figure: A figure or None.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`
 
     """
     global _figure
@@ -81,9 +80,8 @@ def gcf(create_new=True):
     :param create_new: Allow a new one to be created if none exist, defaults to True.
     :type create_new: bool, optional
 
-
     :return: The current figure or None.
-    :rtype: vpl.figure, vpl.QtFigure
+    :rtype: :class:`vtkplotlib.figure` or :class:`vtkplotlib.QtFigure`
 
     If none exists then a new one gets created by ``vpl.figure()`` unless
     ``create_new=False`` in which case None is returned. Will always return None
@@ -102,10 +100,9 @@ def gcf(create_new=True):
 
 
 class NoFigureError(Exception):
-    """"""
 
     fmt = """{} requires a figure and auto_fig is disabled. Create one using
-    vpl.figure() and pass it as `fig` argument. Or call vpl.auto_figure(True)
+    `vpl.figure()` and pass it as `fig` argument. Or call `vpl.auto_figure(True)`
     and leave the `fig` argument as the default.""".format
     def __init__(self, name):
         super().__init__(self.fmt(name))
@@ -121,23 +118,21 @@ def gcf_check(fig, function_name):
 
 def show(block=True, fig="gcf"):
     """Shows a figure. This is analogous to matplotlib's show function. After
-    your plot commands call this to open the interactive 3D image viewer.
+    your plot commands call this to open the interactive 3D viewer.
 
-    :param block: , defaults to True.
+    :param block: Enter interactive mode, otherwise just open the window, defaults to True.
     :type block: bool, optional
 
-    :param fig: The figure to show, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure
+    :param fig: The figure to show, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
 
-    If 'block' is True then it enters interactive mode and the program
-    is held until window exit.
-    Otherwise the window is opened but not monitored. i.e an image
-    will appear on the screen but it wont respond to being clicked on.
-    By editing the plot and calling fig.update() you can create an
-    animation but it will be non-interactive. True interactive animation hasn't
-    been implemented yet - it's on the TODO list.
-
+    If **block** is True then it enters interactive mode and the program is held
+    until window exit. Otherwise the window is opened but not monitored. i.e an
+    image will appear on the screen but it wont respond to being clicked on. By
+    editing the plot and calling ``fig.update()`` you can create an animation but
+    it will be non-interactive. True interactive animation hasn't been implemented
+    yet - it's on the TODO list.
 
     .. note::
 
@@ -148,8 +143,8 @@ def show(block=True, fig="gcf"):
     .. warning::
 
         A window can not be closed by the close button until it is in
-        interactive mode. Otherwise it'll just crash python. Use
-        vtkplotlib.close() to kill a non interactive window.
+        interactive mode. Otherwise it'll just crash Python. Use
+        :meth:`vtkplotlib.close` to close a non interactive window.
 
 
     The current figure is reset on **exit** from interactive mode.
@@ -171,22 +166,21 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
     :param camera_direction: The direction the camera is pointing, defaults to None.
     :type camera_direction: np.array([eX, eY, eZ]), optional
 
-    :param up_view: Roll the camera so that the `up_view` vector is pointing towards the
+    :param up_view: Roll the camera so that the **up_view** vector is pointing towards the
             top of the screen, defaults to None.
     :type up_view: np.array([eX, eY, eZ]), optional
 
-    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure
+    :param fig: The figure to modify, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
-
-    :return: A dictionary containing the current configuration.
+    :return: A dictionary containing the new configuration.
     :rtype: dict
 
 
     .. note::
 
-        This function sucks. You may be better off manipulating the
-        vtk camera directly (stored in fig.camera). If you do choose this
+        This function's not brilliant. You may be better off manipulating the
+        vtk camera directly (stored in ``fig.camera``). If you do choose this
         route, start experimenting by calling ``print(fig.camera)``. If
         anyone makes a better version of this function then please share.
 
@@ -194,9 +188,9 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
     There is an unfortunate amount of implicit chaos going on here. Here are
     some hidden implications. I'm not even sure these are all true.
 
-    1. If `forwards` is used then `focal_point` and `camera_position` are ignored.
+    1. If **forwards** is used then **focal_point** and **camera_position** are ignored.
 
-    2. If `camera_position` is given but `focal_point` is not also given then `camera_position` is relative to where VTK determines is the middle of your plots. This is equivalent to setting `camera_direction` as ``-camera_position``.
+    2. If **camera_position** is given but **focal_point** is not also given then **camera_position** is relative to where VTK determines is the middle of your plots. This is equivalent to setting ``camera_direction=-camera_position``.
 
     The following is well behaved:
     ::
@@ -247,8 +241,8 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
 def reset_camera(fig="gcf"):
     """Reset the position and zoom of the camera so that all plots are visible.
 
-    :param fig: The figure, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure
+    :param fig: The figure to modify, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
 
     This does not touch the orientation. It pushes the camera without
@@ -279,19 +273,19 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, off_screen
     :param off_screen: If true, attempt to take the screenshot without opening the figure's window, defaults to False.
     :type off_screen: bool, optional
 
-    :param fig: The figure screenshot, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure
+    :param fig: The figure to screenshot, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
 
-    Setting `pixels` overrides `magnification`. If only one dimension is given
-    to `pixels` then it is the height and an aspect ration of 16:9 is used.
+    Setting **pixels** overrides **magnification**. If only one dimension is given
+    to **pixels** then it is the height and an aspect ration of 16:9 is used.
     This is to match with the 1080p/720p/480p/... naming convention.
 
 
     .. note::
 
         VTK can only work with integer multiples of the render size (given by
-        `figure.render_size`). `pixels` will be therefore be rounded to
+        ``figure.render_size``). **pixels** will be therefore be rounded to
         conform to this.
 
     .. note::
@@ -381,8 +375,8 @@ def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, off_screen
     :param off_screen: If true, attempt to take the screenshot without opening the figure's window, defaults to False.
     :type off_screen: bool, optional
 
-    :param fig: The figure screenshot, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure
+    :param fig: The figure to save, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
 
     This just calls ``vpl.screenshot_fig`` then passes it to matplotlib's
@@ -420,8 +414,8 @@ def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, off_screen
 def close(fig="gcf"):
     """Close a figure.
 
-    :param fig: The figure to close, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure
+    :param fig: The figure to close, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
     If the figure is the current figure then the current figure is reset.
     """
@@ -438,11 +432,33 @@ def close(fig="gcf"):
 
 
 def zoom_to_contents(plots_to_exclude=(), padding=.05, fig="gcf"):
+    """VTK, by default, leaves the camera zoomed out so that the renders contain
+    a large amount of empty background. :meth:`zoom_to_contents` zooms in so
+    that the contents fill the render.
+
+    :param plots_to_exclude: Plots that are unimportant and can be cropped out, defaults to ``()``.
+    :type plots_to_exclude: iterable of plots, optional
+
+    :param padding: Amount of space to leave around the contents, in pixels if integer or relative to ``min(fig.render_size)`` if float defaults to ``0.05``.
+    :type padding: int, float, optional
+
+    :param fig: The figure zoom, defaults to ``:meth:`vtkplotlib.gcf```.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+
+    This method only zooms in. If you need to zoom out to fit all your plots in
+    call :meth:`vtkplotlib.reset_camera` first then this method. Plots in
+    **plots_to_exclude** are temporarily hidden (using ``plot.visible = False``)
+    then restored. 2D plots such as a :meth:`legend` or :meth:`scalar_bar` which
+    have a fixed position on the render are always excluded.
+
+    .. note:: New in v1.3.0.
+
+    """
     fig = gcf_check(fig, "zoom_to_contents")
 
     # Temporarily hide any 2D plots such as legends or scalarbars.
-    from vtkplotlib.plots.BasePlot import Actor2Base
-    plots_2d_states = {plot: plot.visible for plot in fig.plots if isinstance(plot, Actor2Base)}
+    from vtkplotlib.plots.BasePlot import Base2DPlot
+    plots_2d_states = {plot: plot.visible for plot in fig.plots if isinstance(plot, Base2DPlot)}
     plots_2d_states.update((plot, plot.visible) for plot in plots_to_exclude)
     for plot in plots_2d_states:
         plot.visible = False
@@ -461,7 +477,6 @@ def zoom_to_contents(plots_to_exclude=(), padding=.05, fig="gcf"):
         if zoom < 1 + padding / 5:
             break
 
-    return zoom
 
 if __name__ == "__main__":
     pass

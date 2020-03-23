@@ -187,7 +187,7 @@ class ConstructedPlot(BasePlot):
     cmap = PolyData.cmap
 
 
-class Actor2Base(BasePlot):
+class Base2DPlot(BasePlot):
     def __actor2d_init__(self):
 
         self.actor.GetPositionCoordinate().SetCoordinateSystemToNormalizedDisplay()

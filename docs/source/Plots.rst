@@ -1,113 +1,115 @@
-vtkplotlib Plots
+Plots
 ================
 
 
 
-vtkplotlib.scatter
+scatter
 ------------------
 
-.. autofunction:: vtkplotlib.plots.Scatter.scatter
+.. autofunction:: vtkplotlib.scatter
 
 
 ---------------
 
-vtkplotlib.plot
+plot
 ---------------
 
-.. autoclass:: vtkplotlib.plots.Lines.Lines
+.. autofunction:: vtkplotlib.plot
 
 
 --------------------
 
-vtkplotlib.mesh_plot
+mesh_plot
 --------------------
 
-.. autoclass:: vtkplotlib.plots.MeshPlot.MeshPlot
+.. autofunction:: vtkplotlib.mesh_plot
 
 
 --------------------------------------
 
-vtkplotlib.mesh_plot_with_edge_scalars
+mesh_plot_with_edge_scalars
 --------------------------------------
 
-.. autofunction:: vtkplotlib.plots.MeshPlot.mesh_plot_with_edge_scalars
+.. autofunction:: vtkplotlib.mesh_plot_with_edge_scalars
 
 
 ------------------
 
-vtkplotlib.polygon
+polygon
 ------------------
 
-.. autoclass:: vtkplotlib.plots.Polygon.Polygon
+.. autofunction:: vtkplotlib.polygon
 
 
 ---------------------
 
-vtkplotlib.scalar_bar
+scalar_bar
 ---------------------
 
-.. autoclass:: vtkplotlib.plots.ScalarBar.ScalarBar
+.. autofunction:: vtkplotlib.scalar_bar
 
 
 ----------------
 
-vtkplotlib.arrow
+arrow
 ----------------
 
-.. autofunction:: vtkplotlib.plots.Arrow.arrow
+.. autofunction:: vtkplotlib.arrow
 
 
 -----------------
 
-vtkplotlib.quiver
+quiver
 -----------------
 
-.. autofunction:: vtkplotlib.plots.Arrow.quiver
+.. autofunction:: vtkplotlib.quiver
 
 
 ---------------
 
-vtkplotlib.text
+text
 ---------------
 
-.. autoclass:: vtkplotlib.plots.Text.Text
+.. autofunction:: vtkplotlib.text
 
 
 -----------------
 
-vtkplotlib.text3d
+text3d
 -----------------
 
-.. autoclass:: vtkplotlib.plots.Text3D.Text3D
+.. autofunction:: vtkplotlib.text3d
 
 
 -------------------
 
-vtkplotlib.annotate
+annotate
 -------------------
 
-.. autofunction:: vtkplotlib.plots.Text3D.annotate
+.. autofunction:: vtkplotlib.annotate
 
 
 ------------------
 
-vtkplotlib.surface
+surface
 ------------------
 
-.. autoclass:: vtkplotlib.plots.Surface.Surface
-
-
--------------------
-
-vtkplotlib.PolyData
--------------------
-
-.. autoclass:: vtkplotlib.plots.polydata.PolyData
+.. autofunction:: vtkplotlib.surface
 
 
 -----------------
 
-vtkplotlib.legend
+legend
 -----------------
 
-.. autoclass:: vtkplotlib.plots.Legend.Legend
+.. autofunction:: vtkplotlib.legend
+
+
+---------------------------
+
+custom plots using PolyData
+---------------------------
+
+.. autofunction:: vtkplotlib.PolyData
+
+

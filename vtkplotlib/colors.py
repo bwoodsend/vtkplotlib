@@ -23,6 +23,158 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
+"""
+Colors
+======
+
+The :mod:`vtkplotlib.colors` module provides methods for:
+
+- Converting the various color types and matplotlib's named colors to RGB(A)
+  using :meth:`as_rgb_a`.
+- Creating and converting colormaps (usually abbreviated to cmap) to VTK's
+  equivalent ``vtkLookupTable`` class.
+- Texture mapping.
+
+For the most part, these methods are used implicitly whenever you set the
+**color** or **cmap** arguments of any of vtkplotlib's classes/methods/attributes.
+But if you're doing something unusual then these may help.
+
+.. note:: This submodule was introduced in `v1.3.0`.
+
+------------------------------------------------
+
+Individual Colors
+-----------------
+
+as_rgb_a
+^^^^^^^^
+
+.. autofunction:: vtkplotlib.colors.as_rgb_a
+
+---------------------------------------------
+
+Colormaps
+---------
+
+Colormaps are used to visualize scalar data as heatmaps. The color map
+determines which color represents each scalar value. In VTK, colormaps are
+called lookup tables and are of type ``vtk.vtkLookupTable``.
+
+Any vtkplotlib method that takes  **cmap** argument can utilise a colormap.
+
+
+
+.. code-block:: python
+
+    import vtkplotlib as vpl
+    from stl.mesh import Mesh
+
+    # Load the usual rabbit.
+    mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
+
+    fig = vpl.figure()
+
+    # Use the x values as scalars. Use matplotlib's "rainbow" colormap.
+    plot = vpl.mesh_plot(mesh, scalars=mesh.x, cmap="rainbow")
+    fig.show()
+
+    # The cmap is accessed as a vtkLookupTable via the cmap attribute.
+    plot.cmap
+    # (vtkCommonCorePython.vtkLookupTable)0000003C06D06F40
+
+    # Create and set a new cmap from a list of colors.
+    plot.cmap = ["red", "white", "green"]
+    fig.show()
+
+    # Explicitly set the scalar range
+    plot.scalar_range = -20, 20
+    fig.show()
+
+    # Set the scalar range back to automatic
+    plot.scalar_range = ...
+
+Note that in Python 2.7 you can't use ``...`` except when indexing. Use
+``Ellipsis`` instead.
+
+
+---------------------------------------------
+
+
+as_vtk_cmap
+^^^^^^^^^^^
+
+.. autofunction:: vtkplotlib.colors.as_vtk_cmap
+
+---------------------------------------------
+
+cmap_from_list
+^^^^^^^^^^^^^^
+
+.. autofunction:: vtkplotlib.colors.cmap_from_list
+
+
+---------------------------------------------
+
+vtkLookupTable
+^^^^^^^^^^^^^^
+
+VTK's ``vtkLookupTable`` provides some useful functionality that you can't access
+any other way. Assuming you have a lookup table called ``table`` you can use the
+following:
+
++-----------------------------------+------------------------------------------+
+| Methods                           | Meaning                                  |
++===================================+==========================================+
+| | table.GetBelowRangeColor()      | | Choose a color to use when given       |
+| | table.SetBelowRangeColor()      | | a scalar below the scalar range.       |
+| | table.GetUseBelowRangeColor()   | | This must be enabled explicitly to     |
+| | table.SetUseBelowRangeColor()   | | use.                                   |
++-----------------------------------+------------------------------------------+
+| | table.GetAboveRangeColor()      | | Choose a color to use when given       |
+| | table.SetAboveRangeColor()      | | a scalar above the scalar range.       |
+| | table.GetUseAboveRangeColor()   | | This must be enabled explicitly to     |
+| | table.SetUseAboveRangeColor()   | | use.                                   |
++-----------------------------------+------------------------------------------+
+| | table.GetNanColor()             | | Choose a color to use when given       |
+| | table.SetNanColor()             | | a NaN scalar.                          |
+| | table.GetUseNanColor()          | | This must be enabled explicitly to     |
+| | table.SetUseNanColor()          | | use.                                   |
++-----------------------------------+------------------------------------------+
+
+
+.. note::
+
+    The scalar range is not controlled by the lookup table.
+
+
+---------------------------------------------------------
+
+Texture Maps
+------------
+
+Texture maps are like colormaps but two dimensional. i.e Rather than feeding it
+a scalar and getting a color, you give it an `x` and `y` coordinate and get a
+color. Texture maps allow you to color surfaces realistically to look like fur or
+grass or brickwork by using a texture map containing a 2D image of that texture.
+
+TextureMap
+^^^^^^^^^^
+
+.. autoclass:: vtkplotlib.colors.TextureMap
+
+---------------------------------------------------------
+
+Misc
+------
+
+normalise
+^^^^^^^^^
+
+.. autofunction:: vtkplotlib.colors.normalise
+
+"""
+
+
 from __future__ import division
 from future import utils as _future
 
@@ -34,34 +186,43 @@ from vtkplotlib._get_vtk import vtk, numpy_to_vtk, vtk_to_numpy
 
 mpl_colors = {}
 mpl_colors.update(colors.BASE_COLORS)
-for dic in (colors.CSS4_COLORS, colors.TABLEAU_COLORS, colors.XKCD_COLORS):
-    for (key, val) in dic.items():
-        mpl_colors[key.split(":")[-1]] = colors.hex2color(val)
+for _dic in (colors.CSS4_COLORS, colors.TABLEAU_COLORS, colors.XKCD_COLORS):
+    for (_key, _val) in _dic.items():
+        mpl_colors[_key.split(":")[-1]] = colors.hex2color(_val)
 
 
 def as_rgb_a(color=None, opacity=None):
-    """This is designed to handle all the different ways a color and/or
-    opacity can be given.
+    """This method converts all the different ways a single color and opacity
+    can be specified into the form ``(np.array([red, green, blue]), opacity)``.
 
-    'color' accepts either:
-        A string color name. e.g "r" or "red". This uses matplotlib's
-        named color libraries. See there or vtkplotlib.colors.mpl_colors for
-        a full list of names.
+    The **color** argument can be:
 
-        Or an html hex string in the form "#RRGGBB". (An alpha here is silently ignored.)
+    #. A string named color such as "r" or "red". This uses matplotlib's
+       named color libraries. For a full list of available colors see the dicts
+       `BASE_COLORS`, `CSS4_COLORS` and `XKCD_COLORS` from `matplotlib.colors` or
+       `vtkplotlib.colors.mpl_colors.keys()`.
 
-        Or any iterable of length 3 or 4 representing
-            (r, g, b) or (r, g, b, alpha)
-        r, g, b, alpha can be from 0 to 1 or from 0 to 255 (inclusive).
-        Conventionally if they are from 0 to 1 they should be floats and if they
-        are from 0 to 255 they should be ints. But this is so often not the
-        case that this rule is useless. This function divides by 255 if it sees
-        anything greater than 1. Hence from 0 to 1 is the preferred format.
+    #. A tuple or list of `3` or `4` scalars representing (r, g, b) or
+       (r, g, b, alpha). r, g, b, alpha can be from `0` to `1` or from `0` to
+       `255` (inclusive).
 
-    'opacity':
-        An scalar like the numbers for 'color'.'opacity' overrides alpha
-        if alpha is provided in 'color'.
+    #. An html hex string in the form "#RRGGBB" or "#RRGGBBAA" where ``"RR"``,
+       ``"GG"``, ``"BB"`` and ``"AA"`` are hexadecimal numbers from `00` to `FF`.
 
+    #. A ``PyQt5.QtGui.QColor()``.
+
+    The **opacity** argument should be a scalar like those for the (r, g, b)
+    from form 2 above values.
+
+    If an opacity if specified in both arguments then **opacity** argument
+    overrides alpha values in **color**.
+
+    .. note::
+
+        Conventionally the values if they are from 0.0 to 1.0 they should be
+        floats and if they are from 0 to 255 they should be ints. But this is so
+        often not the case that this rule is unusable. This function divides by
+        255 if the scalars are integers and it sees anything greater than 1.
 """
 
     color_out = None
@@ -73,6 +234,8 @@ def as_rgb_a(color=None, opacity=None):
                 color = color.encode()
 
             if color[0] == "#":
+                if len(color) not in (7, 9):
+                    raise ValueError("HTML Hex string color \"{}\" is not a valid length.".format(color))
                 # allow #RRGGBB hex colors
                 # mpl's hex2rgb doesn't allow opacity. Otherwise I'd just use that
                 return as_rgb_a(tuple(int(color[i: 2 + i], 16) for i in range(1, len(color), 2)),
@@ -93,9 +256,13 @@ def as_rgb_a(color=None, opacity=None):
                         print("Color {!r} not found. Skipping color assignment. See vtkplotlib.colors.mpl_colors.keys() for a list of available colors.".format(color))
                         return None, None
 
+        # QColors
+        from vtkplotlib.nuts_and_bolts import isinstance_no_import
+        if isinstance_no_import(color, "PyQt5.QtGui", "QColor"):
+            return as_rgb_a(color.getRgbF(), opacity)
 
         color = np.asarray(color)
-        if color.dtype == int and color.max() > 1:
+        if color.dtype.kind in "ui" and color.max() > 1:
             # convert 0 <= x < 256 colors to 0 <= x <= 1
             color = color / 255.
             if opacity is not None:
@@ -115,6 +282,35 @@ def as_rgb_a(color=None, opacity=None):
 
 
 def normalise(colors, axis=None):
+    """Scale and translate RBG(A) values so that they are all between 0 and 1.
+
+    :param colors: Array of colors.
+    :type colors: np.ndarray
+
+    :param axis: Axis to reduce over, normally either ``-1`` or ``None`` are sensible, defaults to ``None``.
+    :type axis: int, optional
+
+    :return: Normalised colors.
+    :rtype: np.ndarray
+
+    The output should have the properties ``np.min(out, axis) == 0`` and
+    ``np.max(out, axis) == 1``.
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        import numpy as np
+
+        points = np.random.uniform(-30, 30, (300, 3))
+
+        # This would be an invalid way to color by position.
+        # vpl.scatter(points, color=points)
+
+        # A better way to color by position.
+        vpl.scatter(points, color=vpl.colors.normalise(points))
+        vpl.show()
+
+    """
     colors = colors - np.nanmin(colors, axis=axis, keepdims=True)
     colors /= np.nanmax(colors, axis=axis, keepdims=True)
     return colors
@@ -134,12 +330,11 @@ class TextureMap(object):
     :param array: The image data. It is converted to an array if it isn't one already.
     :type array: filename, np.ndarray with shape (m, n, 3 or 4), PIL Image
 
-    :param interpolate: Allow intersection between pixels, defaults to False.
+    :param interpolate: Allow interpolation between pixels, defaults to False.
     :type interpolate: bool, optional
 
-
     :return: A callable texturemap object.
-    :rtype: ``vtkplotlib.colors.TextureMap``
+    :rtype: :class:`vtkplotlib.TextureMap`
 
 
     The TextureMap object can be called to look up the color at a coordinate(s).
@@ -190,7 +385,7 @@ class TextureMap(object):
         texture_map = vpl.TextureMap(path, interpolate=True)
 
 
-        # You could convert ``texture_coords`` to ``colors`` now using.
+        # You could convert `texture_coords` to `colors` now using.
         # colors = texture_map(texture_coords)
         # then pass ``colors`` as the `scalars` argument instead.
 
@@ -280,6 +475,36 @@ converted_cmaps = {}
 _temp = []
 
 def as_vtk_cmap(cmap, cache=True):
+    """Colormaps are generally converted implicitly from any valid format to a
+    ``vtk.vtkLookupTable`` using this method. `Any valid format` is defined as
+    the following:
+
+    #. A string matplotlib colormap name such as ``'RdYlGn'``.
+    #. Anything out of the ``matplotlib.cm`` package.
+    #. A list of named colors such as ``["red", "white", "blue"]``. See
+       :meth:`cmap_from_list` for more details and flexibility.
+    #. An ``(n, 3)`` or ``(n, 4)`` numpy array of RGB(A) int or float values.
+    #. A callable that takes an array of scalars and returns an array of form **4**.
+
+    Unless specified otherwise using ``cache=False``, named colormaps of form
+    **1** are cached in ``vtkplotlib.colors.converted_cmaps``. If you intend to
+    modify the vtkLookupTable then it's best not to allow caching.
+
+    .. note::
+
+        VTK doesn't interpolate between colors. i.e if you use form **4** and
+        only provide a short list of colors then the resulting heatmap will be
+        block colors rather than a smooth gradient.
+
+    .. note::
+
+        Whilst VTK appears to support opacity gradients in the colormaps, it
+        doesn't actually use them. If your colormap says opacity should vary
+        with scalars then the opacity is averaged for the plot.
+
+
+    """
+
     if cache and isinstance(cmap, str):
         if cmap in converted_cmaps:
             return converted_cmaps[cmap]
@@ -323,6 +548,29 @@ def as_vtk_cmap(cmap, cache=True):
 
 
 def cmap_from_list(colors, opacities=None, scalars=None, resolution=None):
+    """Create a colormap from a list of colors. Unlike matplotlib's
+    ``ListedColormap``, this method will interpolate between the input
+    **colors** to give a smooth map.
+
+    :param colors: A list colors.
+    :type colors: list of valid colors as defined by :meth:`as_rgb_a`
+
+    :param opacities: Translucency or translucencies, defaults to ``None``.
+    :type opacities: Scalar from 0 to 1 or array-like of scalars, optional
+
+    :param scalars: Control scalars to correspond exact colors from **color**, defaults to ``None``.
+    :type scalars: array-like with same length as **colors**, optional
+
+    :param resolution: Number of colors in output, defaults to ``(len(points) - 1) * 255 + 1``.
+    :type resolution: int, optional
+
+    :return: An array of RGBA values.
+    :rtype: ``np.ndarray`` with shape ``(n, 4)`` and dtype ``np.uint8``
+
+    The output can be fed either to :meth:`as_vtk_cmap` or passed directly as a
+    **cmap** argument to any vtkplotlib method that takes one.
+
+    """
     from vtkplotlib.plots.BasePlot import _iter_scalar
     from vtkplotlib.nuts_and_bolts import zip_axes, unzip_axes
     n = len(colors)
@@ -331,13 +579,13 @@ def cmap_from_list(colors, opacities=None, scalars=None, resolution=None):
 
     for (i, color, opacity) in zip(range(n), colors, _iter_scalar(opacities, n)):
         color, opacity = as_rgb_a(color, opacity)
-        rgbas[i, :3], rgbas[i:, 3] = color, 1. if opacity is None else opacity
+        rgbas[i, :3], rgbas[i:, 3] = color, (1. if opacity is None else opacity)
 
     if scalars is None:
         scalars = np.arange(n)
 
     if resolution is None:
-        resolution = (n - 1) * 256
+        resolution = (n - 1) * 255 + 1
 
     ts = np.linspace(scalars[0], scalars[-1], resolution)
 

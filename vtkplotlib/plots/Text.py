@@ -29,9 +29,9 @@ import numpy as np
 
 
 
-from vtkplotlib.plots.BasePlot import Actor2Base
+from vtkplotlib.plots.BasePlot import Base2DPlot
 
-class Text(Actor2Base):
+class Text(Base2DPlot):
     """2D text at a fixed point on the window (independent of camera
     position / orientation).
 
@@ -47,12 +47,11 @@ class Text(Actor2Base):
     :param color: The color of the text, defaults to white.
     :type color: str, 3-tuple, 4-tuple, optional
 
-    :param opacity: The translucency of the text, 0 is invisible, 1 is solid, defaults to solid.
+    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
     :type opacity: float, optional
 
-    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure, optional
-
+    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
     :return: The text plot object.
     :rtype: vtkplotlib.plots.Text.Text

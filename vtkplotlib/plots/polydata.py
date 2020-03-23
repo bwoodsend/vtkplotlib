@@ -251,33 +251,46 @@ SCALAR_MODES_FROM_STRINGS = {val:key for (key, val) in SCALAR_MODES_TO_STRINGS.i
 
 
 class PolyData(object):
-    """The polydata is a key building block to making customised plot objects. A
-    lot of vtkplotlib plot commands use one of these under the hood.
+    """The polydata is a key building block to making customised plot objects.
+    The :class:`mesh_plot`, :class:`plot` and :class:`surface` methods are in
+    fact just a thin wrapping layer around a :class:`PolyData`. This is a wrapper
+    around VTK's `vtkPolyData`_ object, which is functionally equivalent, but
+    difficult and crash-prone to work with directly.
 
-    :param vtk_polydata: An original vtkPolyData to build on top of, defaults to None.
+    :param vtk_polydata: An original `vtkPolyData`_ to build on top of, defaults to None.
     :type vtk_polydata: vtk.vtkPolyData, optional
 
-    This is a wrapper around VTK's vtkPolyData object. This class is
-    incomplete. I still need to sort colors/scalars properly. And I want to add
-    functions to build from vtkSource objects.
 
-    A polydata consists of:
+    A polydata consists of the following 2D numpy arrays:
 
-    1. points
-    2. lines
-    3. polygons
-    4. scalar, texturemap coordinates or direct color information
+    +----------------+-------+--------+--------------------------------------------+
+    | Attribute name | dtype | shape  | Meaning                                    |
+    +----------------+-------+--------+--------------------------------------------+
+    | points         | float | (a, 3) | | All line start and end points            |
+    |                |       |        | | and all polygon corners.                 |
+    +----------------+-------+--------+--------------------------------------------+
+    | lines          | int   | (b, 3) | | Each row of **lines** corresponds        |
+    |                |       |        | | the point indices a line passes          |
+    |                |       |        | | through.                                 |
+    +----------------+-------+--------+--------------------------------------------+
+    | polygons       | int   | (c, 3) | | Each row of **polygons** corresponds     |
+    |                |       |        | | the point indices a the corners of       |
+    |                |       |        | | a polygon.                               |
+    +----------------+-------+--------+--------------------------------------------+
+    | point_colors   | float | (a,)   |                                            |
+    |                |       | (a, 1) | | Per-point scalars, texture coordinates   |
+    |                |       | (a, 2) | | or RGB values, depending on the shape.   |
+    |                |       | (a, 3) |                                            |
+    +----------------+-------+--------+--------------------------------------------+
+    | polygon_colors | float | (c,)   |                                            |
+    |                |       | (c, 1) | | Per-polygon scalars, texture coordinates |
+    |                |       | (c, 2) | | or RGB values, depending on the shape.   |
+    |                |       | (c, 3) |                                            |
+    +----------------+-------+--------+--------------------------------------------+
 
-    or combinations of the four.
 
-    :param self.points: All the vertices used for all points, lines and polygons. These points aren't visible. To create some kind of points plot use vpl.scatter.
-    :type self.points: np.ndarray of floats with shape (`number_of_vertices`, `3`)
-
-    :param self.lines: The arg of each vertex from `self.points` the line should pass through. Each row represents a seperate line.
-    :type self.lines: np.ndarray of ints with shape (`number_of_lines`, `points_per_line`)
-
-    :param self.polygons: Each row represents a polygon. Each cell contains the arg of a vertex from `self.points` that is to be a corner of that polygon.
-    :type self.polygons: np.ndarray of ints with shape (`number_of_polygons`, `corners_per_polygon`)
+    The points aren't visible themselves - to create some kind of points plot
+    use :meth`scatter`.
 
     Lines and polyons can be interchanged to switch from solid surface to
     wire-frame.
@@ -293,14 +306,14 @@ class PolyData(object):
 
         polydata = vpl.PolyData()
 
-        polydata.points = np.array([[1, 0, 0],
-                                    [0, 1, 0],
-                                    [0, 0, 1]], float)
+        polydata.points = np.array([[1, 0, 0],          # vertex 0
+                                    [0, 1, 0],          # vertex 1
+                                    [0, 0, 1]], float)  # vertex 2
 
-        # Create a wire-frame triangle passing points [0, 1, 2, 0].
+        # Create a wire-frame triangle passing through vertices [0, 1, 2, 0].
         polydata.lines = np.array([[0, 1, 2, 0]])
 
-        # Create a solid triangle with points [0, 1, 2] as it's corners.
+        # Create a solid triangle with vertices [0, 1, 2] as it's corners.
         polydata.polygons = np.array([[0, 1, 2]])
 
         # The polydata can be quickly inspected using
@@ -311,24 +324,6 @@ class PolyData(object):
         # automatically added to ``vpl.gcf()`` unless told otherwise.
         plot = polydata.to_plot()
         vpl.show()
-
-
-    The original vtkPolyData object is difficult to use, can't directly work
-    with numpy and is full of pot-holes that can cause unexplained crashes if
-    not carefully avoided. This wrapper class seeks to solve those issues by
-    acting as an intermediate layer between you and VTK. This class consists
-    mainly of properties that
-
-    - handle the numpy-vtk conversions
-    - ensure proper shape checking
-    - hides VTK's rather awkward compound array structures
-    - automatically sets scalar mode/range parameters in the mapper
-
-    A `vpl.PolyData` can be constructed from scratch or from an existing
-    `vtkPolyData` object.
-
-    It also provides convenience methods ``self.to_plot()`` and
-    ``self.quick_show()`` for quick one-line visualising the current state.
 
 
     """
@@ -365,7 +360,6 @@ class PolyData(object):
             points.SetData(numpy_to_vtk(vertices))
             points._numpy_reference = vertices
             self.vtk_polydata.SetPoints(points)
-
 
 
     lines = cell_array_handler_property("Lines")
