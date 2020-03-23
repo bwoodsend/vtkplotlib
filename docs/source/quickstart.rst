@@ -10,7 +10,7 @@ Introduction
     It helps to pad with spaces. Characters need to be url escaped (can be done
     using urllib).
 
-    from urlib.parse import quote
+    from urllib.parse import quote
     "https://img.shields.io/badge/" + quote("python- {}-blue.svg".format(\
                 " | ".join(["2.7", "3.5", "3.6", "3.7", "3.8", "PyInstaller"])))
 
@@ -44,7 +44,7 @@ Requirements for installing:
  - `future`_
 
 It can take VTK a few weeks to release to PyPi for a new Python version so
-using the absolute latest Python is not recomended. There is no VTK version for
+using the absolute latest Python is not recommended. There is no VTK version for
 Windows users with python 2.7 on PyPi. But you can get a .whl from
 `here <https://www.lfd.uci.edu/~gohlke/pythonlibs/#vtk>`_.
 

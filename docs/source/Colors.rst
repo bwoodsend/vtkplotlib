@@ -1,0 +1,1 @@
+.. automodule:: vtkplotlib.colors

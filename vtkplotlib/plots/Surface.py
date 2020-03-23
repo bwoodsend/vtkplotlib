@@ -54,11 +54,6 @@ class Surface(ConstructedPlot):
         z = h(\\phi, \\theta) \\quad
 
 
-    .. seealso:: ``vtkplotlib.mesh_plot`` for a surface made out of triangles
-
-    .. seealso:: ``vtkplotlib.polygon`` for a surface made out of polygons.
-
-
     :param x: x components.
     :type x: 2D np.ndarray with shape (m, n)
 
@@ -69,31 +64,34 @@ class Surface(ConstructedPlot):
     :type z: 2D np.ndarray with shape (m, n)
 
     :param scalars: per-point scalars / texturemap coordinates / RGB colors, defaults to None.
-    :type scalars: np.ndarray with shape (m, n [, 1 or 2 or 3]) NoneType, optional
+    :type scalars: np.ndarray with shape (m, n [, 1 or 2 or 3]), optional
 
     :param color: The color of the plot, defaults to white.
     :type color: str, 3-tuple, 4-tuple, optional
 
-    :param opacity: The translucency of the plot, 0 is invisible, 1 is solid, defaults to solid.
+    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
     :type opacity: float, optional
 
     :param cmap: Colormap to use for scalars, defaults to `rainbow`.
-    :type cmap: str, 2D np.ndarray, matplotlib colormap, vtkLookupTable, optional
+    :type cmap: matplotlib cmap, `vtkLookupTable`_, or similar see :meth:`vtkplotlib.colors.as_vtk_cmap`, optional
 
-    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure, optional
+    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
     :param label: Give the plot a label to use in legends, defaults to None.
     :type label: str, optional
 
-
-
     :return: The surface object.
-    :rtype: vtkplotlib.plots.Surface.Surface
+    :rtype: :class:`vtkplotlib.surface`
 
+
+    .. seealso:: 
+    
+        :meth:`vtkplotlib.mesh_plot` for a surface made out of triangles or 
+        :meth:`vtkplotlib.polygon` for a surface made out of polygons.
 
     This is the only function in `vtkplotlib` that takes it's (x, y, z)
-    components as seperate arguments. ``x``, ``y`` and ``z`` should be 2D
+    components as seperate arguments. **x**, **y** and **z** should be 2D
     arrays with matching shapes. This is typically achieved by using
     ``phi, theta = np.meshgrid(phis, thetas)`` then calculating x, y and z
     from ``phi`` and ``theta``. Here is a rather unexciting example.
@@ -116,7 +114,7 @@ class Surface(ConstructedPlot):
         vpl.show()
 
 
-    .. seealso:: A parametrically constructed object plays well with a TextureMap.
+    .. seealso:: A parametrically constructed object plays well with a :class:`vtkplotlib.colors.TextureMap`.
 
     """
     def __init__(self, x, y, z, scalars=None, color=None, opacity=None, texture_map=None, cmap=None, fig="gcf", label=None):

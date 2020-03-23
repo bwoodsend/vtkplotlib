@@ -41,7 +41,7 @@ class Lines(ConstructedPlot):
     :param color: The color(s) of the lines, defaults to white.
     :type color: str, 3-tuple, 4-tuple, np.ndarray optional
 
-    :param opacity: The translucency of the plot, 0 is invisible, 1 is solid, defaults to solid.
+    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
     :type opacity: float, optional
 
     :param line_width: The thickness of the lines, defaults to 1.0.
@@ -51,19 +51,18 @@ class Lines(ConstructedPlot):
     :type join_ends: bool, optional
 
     :param cmap: Colormap to use for scalars, defaults to `rainbow`.
-    :type cmap: str, 2D np.ndarray, matplotlib colormap, vtkLookupTable, optional
+    :type cmap: matplotlib cmap, `vtkLookupTable`_, or similar see :meth:`vtkplotlib.colors.as_vtk_cmap`, optional
 
-    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure, optional
+    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
     :param label: Give the plot a label to use in legends, defaults to None.
     :type label: str, optional
 
+    :return: A lines object. Always a single object - even when plotting multiple lines.
+    :rtype: :class:`vtkplotlib.plots.Lines.Lines`
 
-    :return: A lines object.
-    :rtype: vtkplotlib.plots.Lines.Lines
-
-    If `vertices` is 3D then multiple seperate lines are plotted. This can be
+    If **vertices** is 3D then multiple seperate lines are plotted. This can be
     used to plot meshes as wireframes.
 
     .. code-block:: python
@@ -77,10 +76,10 @@ class Lines(ConstructedPlot):
         vpl.plot(vertices, join_ends=True, color="dark red")
         vpl.show()
 
-    If `color` is an `np.ndarray` then a color per vertex is implied. The shape
-    of `color` relative to the shape of `vertices` determines whether the
+    If **color** is an `np.ndarray` then a color per vertex is implied. The shape
+    of **color** relative to the shape of **vertices** determines whether the
     colors should be interpreted as scalars, texture coordinates or RGB values.
-    If `color` is either a list, tuple, or str then it is one color for the
+    If **color** is either a list, tuple, or str then it is one color for the
     whole plot.
 
 

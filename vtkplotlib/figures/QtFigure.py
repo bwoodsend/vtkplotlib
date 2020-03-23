@@ -43,11 +43,11 @@ class QtFigure(BaseFigure, QWidget):
     """The VTK render window embedded into a PyQt5 QWidget. This can be
     embedded into a GUI the same way all other QWidgets are used.
 
-    :param name: The window title of the figure, only applicable is parent is None, defaults to 'qt vtk figure'.
+    :param name: The window title of the figure, only applicable is **parent** is None, defaults to 'qt vtk figure'.
     :type name: str, optional
 
     :param parent: Parent window, defaults to None.
-    :type parent: NoneType, optional
+    :type parent: PyQt5.QtWidgets.QWidget, optional
 
 
     .. note::
@@ -58,9 +58,9 @@ class QtFigure(BaseFigure, QWidget):
         with some basic Qt before coming here.
 
 
-    This class inherits both from QWidget and a vtkplotlib BaseFigure class.
-    Therefore it can be used exactly the same as you would normally use either
-    a `QWidget` or a `vpl.figure`.
+    This class inherits both from :class:`PyQt5.QtWidgets.QWidget` and a
+    vtkplotlib BaseFigure class. Therefore it can be used exactly the same as you
+    would normally use either a `QWidget` or a :class:`vtkplotlib.figure`.
 
     Care must be taken when using Qt to ensure you have **exactly one**
     QApplication. To make this class quicker to use the qapp is created
@@ -80,7 +80,7 @@ class QtFigure(BaseFigure, QWidget):
 
     On ``self.show()``, ``self.qapp.exec_()`` is called automatically if
     ``self.parent() is None`` (unless specified otherwise). If the QFigure is part
-    of a larger window then ``larger_window.show()`` must also show
+    of a larger window then ``larger_window.show()`` must also explicitly show
     the figure. It won't begin interactive mode until ``qapp.exec_()`` is
     called.
 
@@ -187,7 +187,9 @@ class QtFigure(BaseFigure, QWidget):
         qapp.exec_()
 
 
-    .. seealso:: QtFigure2 is an extension of this to provide some standard GUI elements, ready-made.
+    .. note::  QtFigures are not reshowable if the figure has a parent.
+
+    .. seealso:: :class:`vtkplotlib.QtFigure2` is an extension of this to provide some standard GUI elements, ready-made.
 
 
     """

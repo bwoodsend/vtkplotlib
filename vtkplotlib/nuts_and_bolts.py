@@ -66,7 +66,7 @@ def zip_axes(*axes):
         #             [ 8,  4,  3],
         #             [ 9,  4,  4]])
 
-    .. seealso:: ``vpl.unzip_axes`` for the reverse.
+    .. seealso:: :meth:`unzip_axes` for the reverse.
 
     """
 
@@ -78,11 +78,10 @@ def unzip_axes(points):
     :param points: Some points.
     :type points: np.ndarray
 
-
     :return: Each axis separately as a tuple.
     :rtype: tuple of arrays
 
-    .. seealso ``vpl.zip_axes`` for the reverse.
+    See :meth:`vpl.zip_axes` more information and the reverse.
 
     """
 

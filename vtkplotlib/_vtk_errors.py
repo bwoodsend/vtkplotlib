@@ -23,6 +23,7 @@
 # =============================================================================
 
 
+import traceback
 
 class ErrorObserver(object):
 
@@ -41,6 +42,26 @@ class ErrorObserver(object):
 class ErrorSilencer(ErrorObserver):
     def __call__(self, obj, event, message):
         pass
+
+class VTKException(Exception):
+    pass
+
+class VTKErrorRaiser(ErrorObserver):
+    error_message = None
+    def __init__(self, vtk_obj):
+        super().__init__()
+        self.attach(vtk_obj)
+
+    def __call__(self, obj, event, message):
+        self.error_message = message
+        self.stack = traceback.extract_stack()
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, type, value, tb):
+        if self.error_message is not None:
+            raise VTKException(self.error_message)
 
 
 handler = ErrorObserver()

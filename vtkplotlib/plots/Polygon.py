@@ -33,8 +33,8 @@ from vtkplotlib.plots.BasePlot import ConstructedPlot
 
 
 class Polygon(ConstructedPlot):
-    """Creates a filled polygon(s) with `vertices` as it's corners. For a 3
-    dimensional `vertices` array, each 2d array within `vertices` is a seperate
+    """Creates a filled polygon(s) with **vertices** as it's corners. For a 3
+    dimensional **vertices** array, each 2d array within **vertices** is a seperate
     polygon.
 
     :param vertices: Each corner of each polygon.
@@ -43,18 +43,17 @@ class Polygon(ConstructedPlot):
     :param color: The color of whole the plot, defaults to white.
     :type color: str, 3-tuple, 4-tuple, optional
 
-    :param opacity: The translucency of the plot, 0 is invisible, 1 is solid, defaults to solid.
+    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
     :type opacity: float, optional
 
-    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure, optional
+    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
     :param label: Give the plot a label to use in legends, defaults to None.
     :type label: str, optional
 
-
-    :return: A polygon object
-    :rtype: vtkplotlib.plots.Polygon.Polygon
+    :return: A polygon object.
+    :rtype: :class:`vtkplotlib.plots.Polygon.Polygon`
 
 
     VTK renders everything as only triangles. Polygons with more than 3 sides

@@ -1,32 +1,28 @@
-vtkplotlib Extras
+Utilities
 =================
 
+A few miff-muffet-moof functions.
 
-vtkplotlib.zip_axes
+--------------------
+
+zip_axes
 -------------------
 
-.. autofunction:: vtkplotlib.nuts_and_bolts.zip_axes
+.. autofunction:: vtkplotlib.zip_axes
 
 
 ---------------------
 
-vtkplotlib.unzip_axes
+unzip_axes
 ---------------------
 
-.. autofunction:: vtkplotlib.nuts_and_bolts.unzip_axes
+.. autofunction:: vtkplotlib.unzip_axes
 
-
----------------------
-
-vtkplotlib.TextureMap
----------------------
-
-.. autoclass:: vtkplotlib.colors.TextureMap
 
 
 --------------------------
 
-vtkplotlib.quick_test_plot
+quick_test_plot
 --------------------------
 
 .. autofunction:: vtkplotlib.quick_test_plot

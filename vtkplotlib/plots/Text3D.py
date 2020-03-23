@@ -35,7 +35,7 @@ from vtkplotlib.plots.Arrow import Arrow
 
 class Text3D(SourcedPlot):
     """Create floating text in 3D space. Optionally can be set to orientate
-    itself to follow the camera (defaults to on) with the `follow_cam`
+    itself to follow the camera (defaults to on) with the **follow_cam**
     argument.
 
     :param string: The text to be shown.
@@ -53,15 +53,14 @@ class Text3D(SourcedPlot):
     :param color: The color of the text, defaults to white.
     :type color: str, 3-tuple, 4-tuple, optional
 
-    :param opacity: The translucency of the text, 0 is invisible, 1 is solid, defaults to solid.
+    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
     :type opacity: float, optional
 
-    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure, optional
+    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
     :param label: Give the plot a label to use in legends, defaults to None.
     :type label: str, optional
-
 
     :return: text3D plot object
     :rtype: vtkplotlib.plots.Text3D.Text3D
@@ -129,7 +128,7 @@ class Text3D(SourcedPlot):
 def annotate(points, text, direction, text_color="w", arrow_color="k", distance=3., text_size=1., fig="gcf"):
     """Annotate a feature with an arrow pointing at a point and a text label
     on the reverse end of the arrow. This is just a convenience call to
-    ``vpl.arrow`` and ``vpl.text3d``. See there for just one or the other.
+    :meth:`arrow` and :meth:`text3d`. See there for just one or the other.
 
     :param points: The position of the feature where the arrow's tip should be.
     :type points: np.ndarray
@@ -151,18 +150,17 @@ def annotate(points, text, direction, text_color="w", arrow_color="k", distance=
     :param text_size: The height of one line of text, can have 3 values, defaults to 1.0.
     :type text_size: number or 3-tuple of numbers, optional
 
-    :param fig: The figure to plot into, can be None, defaults to vpl.gcf().
-    :type fig: vpl.figure, vpl.QtFigure
-
+    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
+    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
     :return: (arrow, text) 2-tuple
-    :rtype: (Arrow, Text3D)
+    :rtype: (:class:`vtkplotlib.plots.Arrow.Arrow`, :class:`vtkplotlib.plots.Text3D.Text3D`)
 
 
     The arrow points to the highest point and the text is placed at a point
-    `distance` above (where above also is determined by direction).
+    **distance** above (where above also is determined by direction).
 
-    If `text` is not a str then it is automatically converted to one.
+    If **text** is not a str then it is automatically converted to one.
 
 
     .. code-block:: python
@@ -180,7 +178,7 @@ def annotate(points, text, direction, text_color="w", arrow_color="k", distance=
         vpl.show()
 
 
-    If multiple points are given the farthest in the direction `direction` is
+    If multiple points are given the farthest in the direction **direction** is
     selected. The idea is to try to prevent the annotations ending up in
     amongst the plots or, when plotting meshes, inside the mesh.
 

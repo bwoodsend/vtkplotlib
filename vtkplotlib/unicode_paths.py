@@ -206,7 +206,7 @@ def test():
     # empirically).
     version = (sys.version_info.major, sys.version_info.minor)
     if version >= (3, 6):
-        NAMES.append(u"ÑÂmé")
+        NAMES.append(u"Ñ mé")
     if version >= (3, 6):
         NAMES.append(np.arange(0x100, 0xd800, 0x500, np.int32).tobytes().decode("utf-32"))
 
