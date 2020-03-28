@@ -379,7 +379,7 @@ def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, off_screen
     :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
 
 
-    This just calls ``vpl.screenshot_fig`` then passes it to matplotlib's
+    This just calls :meth:`screenshot_fig` then passes it to matplotlib's
     ``pylab.imsave`` function. See those for more information.
 
     The available file formats are determined by matplotlib's choice of
@@ -390,7 +390,8 @@ def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, off_screen
     array = screenshot_fig(magnification=magnification,
                            pixels=pixels,
                            fig=fig,
-                           trim_pad_width=trim_pad_width)
+                           trim_pad_width=trim_pad_width,
+                           off_screen=off_screen)
 
     try:
         from matplotlib.pylab import imsave
