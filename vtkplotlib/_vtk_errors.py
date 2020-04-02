@@ -24,6 +24,7 @@
 
 
 import traceback
+from builtins import super
 
 class ErrorObserver(object):
 

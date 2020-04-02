@@ -22,21 +22,21 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-
 import sys
 from pathlib2 import Path
 
-import pkg_resources
 
+# vtkplotlib isn't zip safe and I have no intention of trying to make it so.
+# Hence, using __file__ instead of (super slow) pkg_resources is fine.
+
+from vtkplotlib import __file__ as _init_path
 
 if getattr( sys, 'frozen', False ) :
     # running in a pyinstaller bundle
-    DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")).parent / "vpl-data"
+    DATA_FOLDER = Path(_init_path).parent.with_name("vpl-data")
 else :
     # running normally
-    DATA_FOLDER = Path(pkg_resources.resource_filename("vtkplotlib", "")) / "data"
-
-ROOT = DATA_FOLDER.parent
+    DATA_FOLDER = Path(_init_path).with_name("data")
 
 
 MODELS_FOLDER = DATA_FOLDER / "models"
@@ -48,8 +48,6 @@ def get_rabbit_stl():
 ICONS_FOLDER = DATA_FOLDER / "icons"
 
 ICONS = {i.stem: str(i) for i in ICONS_FOLDER.glob("*.jpg")}
-
-
 
 
 def assert_ok():
