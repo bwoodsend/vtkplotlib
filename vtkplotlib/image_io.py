@@ -57,7 +57,7 @@ is using matplotlib's `imshow`_ method.
 Conversions
 -----------
 
-Coonverting numpy to `vtkImageData`_ and back is ugly. These methods do this for
+Converting numpy to `vtkImageData`_ and back is ugly. These methods do this for
 you.
 
 -------------------------
@@ -110,7 +110,7 @@ Formats allowing pseudo files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Some formats allow reading and writing from RAM whereas others must use the disk.
-The following table summerises which are allowed. This table is accessable via
+The following table summarises which are allowed. This table is accessable via
 ``vtkplotlib.image_io.BUFFERABLE_FORMAT_MODES``.
 
 ====  ==============

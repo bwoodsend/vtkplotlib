@@ -184,7 +184,7 @@ def pack_lengths(itr_of_arrays):
                           [25, 26, 27, 28]])
         np.array([3, 20, 21, 22, 2, 23, 24, 4, 25, 26, 27, 28])
 
-    .. sealso:
+    .. seealso:
 
         unpack_lengths for the reverse.
     """
@@ -292,7 +292,7 @@ class PolyData(object):
     The points aren't visible themselves - to create some kind of points plot
     use :meth`scatter`.
 
-    Lines and polyons can be interchanged to switch from solid surface to
+    Lines and polygons can be interchanged to switch from solid surface to
     wire-frame.
 
 

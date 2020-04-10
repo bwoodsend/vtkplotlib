@@ -5,7 +5,7 @@
 # @author: Brénainn Woodsend
 #
 #
-# _numy_vtk.py currently does nothing.
+# _numpy_vtk.py currently does nothing.
 # Copyright (C) 2019  Brénainn Woodsend
 #
 # This program is free software: you can redistribute it and/or modify
