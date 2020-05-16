@@ -196,3 +196,5 @@ for vtk_name in ['vtkActor', 'vtkActor2D', 'vtkArrowSource', 'vtkBMPReader', 'vt
     rst_epilog += ".. _{0}: https://vtk.org/doc/nightly/html/class{0}.html#details\n".format(vtk_name)
 
 
+# -- Add this file for Google search console ----------
+html_extra_path = ["google77eb9775385691af.html"]
