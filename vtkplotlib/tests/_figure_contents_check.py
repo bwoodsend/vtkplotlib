@@ -33,12 +33,7 @@ import numpy as np
 
 try:
     import inspect
-    import json
-    import zlib
-    from unittest import TestCase
-    import base64
 
-    import bz2
 except ImportError:
     VTKPLOTLIB_WINDOWLESS_TEST = False
     DEFAULT_MODE = ""
@@ -51,7 +46,7 @@ else:
         DEFAULT_MODE = "w"
 
 
-class AutoChecker(TestCase):
+class AutoChecker(object):
     def __init__(self):
         self.path = DATA_FOLDER / "test-data.json"
         self.load()
@@ -101,6 +96,7 @@ class AutoChecker(TestCase):
 
     @staticmethod
     def reduce_image_array(arr):
+        import zlib, bz2, base64
         return {"shape": list(arr.shape),
                 "crc32_checksum": zlib.crc32(arr.tobytes("C")),
                 "image": base64.b64encode(bz2.compress(arr.tobytes("C"))).decode()}
@@ -119,6 +115,7 @@ class AutoChecker(TestCase):
         return cls.reduce_fig(obj)
 
     def save(self):
+        import json
         text = json.dumps(self.data, indent=2)
         if future.utils.PY2:
             self.path.write_bytes(text)
@@ -126,6 +123,7 @@ class AutoChecker(TestCase):
             self.path.write_text(text)
 
     def load(self):
+        import json
         if self.path.exists():
             if future.utils.PY2:
                 text = self.path.read_bytes()
@@ -152,6 +150,7 @@ class AutoChecker(TestCase):
 
     @staticmethod
     def extract_dic_image(dic):
+        import bz2, base64
         shape = dic["shape"]
 #        checksum = dic["crc32_checksum"]
         bin = bz2.decompress(base64.b64decode(dic["image"].encode()))
