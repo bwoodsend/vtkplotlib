@@ -6,7 +6,7 @@ Contribution and communication guide.
 
 ## General feedback or suggestions
 
-For either the API or the docs use the [github issues page](https://github.com/bwoodsend/vtkplotlib/issues/) and mark it with an appropriate label. 
+For either the API or the docs use the [github issues page](https://github.com/bwoodsend/vtkplotlib/issues/) and mark it with an appropriate label.
 
 
 
@@ -31,16 +31,16 @@ To request a feature, either create an issue or just ping me at <bwoodsend@gmail
 def exciting_new_feature(some, key, parameters, or, options, you, think, youll, need):
     # Some vague info about the types, desired effect, defaults of each parameter from
     # above. Doesn't have to be complete.
-    
+
     # Any handy little (type) abstractions you can would like. Such as:
     if not isinstance(text_parameter, str):
         text_parameter = str(text_parameter)
 	# It doesn't have to be proper code.
-    
+
     # leave the implementation to me...
     # unless you have any suggestions
-    
-    return # What, if anything, should come out? 
+
+    return # What, if anything, should come out?
 ```
 
 Or whatever you feel makes the point...
@@ -55,7 +55,7 @@ To suggest a documentation improvement, or to point out a function or component 
 
 ## Write your own feature
 
-You are welcome to this, but if it's a one off and you're not already familiar with VTK, then you're probably better off just to request it. The learning curve for VTK is steep, and the internals of vtkplotlib are pretty unorganized. But if you're determined then don't let me stop you. One day I'll get round to documenting all the core base classes used to add new features, but until then, feel free to ping me <bwoodsend@gmail.com> first for guidance. I have a few features half-prepped hidden away and unexposed so you may not need to start from scratch. 
+You are welcome to this, but if it's a one off and you're not already familiar with VTK, then you're probably better off just to request it. The learning curve for VTK is steep, and the internals of vtkplotlib are pretty unorganized. But if you're determined then don't let me stop you. One day I'll get round to documenting all the core base classes used to add new features, but until then, feel free to ping me <bwoodsend@gmail.com> first for guidance. I have a few features half-prepped hidden away and unexposed so you may not need to start from scratch.
 
 If you do know VTK, then you may find it easier to write a pure VTK proof of concept script and I'll handle the rest. Please don't waste time trying to re-implement a particular piece of API such as ``color="string"`` arguments - there are base classes and internal methods for doing these which I can link up in seconds.
 
@@ -65,11 +65,6 @@ You can either create a fork, and then a pull request, or you can just write a s
 
 ## Become a collaborator
 
-If you want to join the team then cool - you're hired! Again, email me. You will need a fairly good understanding of VTK or be willing to learn it. I'll eventually write a proper description of the library's internals to guide you. 
+If you want to join the team then cool - you're hired! Again, email me. You will need a fairly good understanding of VTK or be willing to learn it. I'll eventually write a proper description of the library's internals to guide you.
 
-
-
-## Donations 
-
-If this library has helped you and you want to throw some cash at someone then  [these](https://uk.virginmoneygiving.com/Team/vtkplotlib) are a couple of my favourite charities.
 
