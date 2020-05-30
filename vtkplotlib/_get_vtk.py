@@ -40,7 +40,7 @@ try:
         vtkplotlib uses. This makes import quicker and pyinstaller builds
         smaller.
         """
-        from vtkmodules.vtkCommonCorePython import (VTK_ID_TYPE,
+        from vtkmodules.vtkCommonCore import (VTK_ID_TYPE,
                                                     vtkCommand,
                                                     VTK_COLOR_MODE_DEFAULT,
                                                     vtkPoints,
@@ -49,32 +49,32 @@ try:
                                                     VTK_COLOR_MODE_DIRECT_SCALARS,
                                                     vtkLookupTable)
 
-        from vtkmodules.vtkCommonDataModelPython import (vtkImageData,
+        from vtkmodules.vtkCommonDataModel import (vtkImageData,
                                                          vtkCellArray,
                                                          vtkPolyData)
 
-        from vtkmodules.vtkCommonMathPython import (vtkMatrix4x4)
+        from vtkmodules.vtkCommonMath import (vtkMatrix4x4)
 
-        from vtkmodules.vtkCommonTransformsPython import (vtkTransform)
+        from vtkmodules.vtkCommonTransforms import (vtkTransform)
 
-        from vtkmodules.vtkFiltersGeneralPython import (vtkCursor3D)
+        from vtkmodules.vtkFiltersGeneral import (vtkCursor3D)
 
-        from vtkmodules.vtkFiltersSourcesPython import (vtkCubeSource,
+        from vtkmodules.vtkFiltersSources import (vtkCubeSource,
                                                         vtkSphereSource,
                                                         vtkArrowSource)
 
-        from vtkmodules.vtkIOGeometryPython import (vtkSTLReader)
+        from vtkmodules.vtkIOGeometry import (vtkSTLReader)
 
-        from vtkmodules.vtkIOLegacyPython import (vtkPolyDataReader,
+        from vtkmodules.vtkIOLegacy import (vtkPolyDataReader,
                                                   vtkPolyDataWriter)
 
-        from vtkmodules.vtkInteractionStylePython import (vtkInteractorStyleTrackballCamera,
+        from vtkmodules.vtkInteractionStyle import (vtkInteractorStyleTrackballCamera,
                                                           vtkInteractorStyleImage,)
 
-        from vtkmodules.vtkRenderingAnnotationPython import (vtkScalarBarActor,
+        from vtkmodules.vtkRenderingAnnotation import (vtkScalarBarActor,
                                                              vtkLegendBoxActor)
 
-        from vtkmodules.vtkRenderingCorePython import (vtkActor,
+        from vtkmodules.vtkRenderingCore import (vtkActor,
                                                        vtkRenderer,
                                                        vtkWindowToImageFilter,
                                                        vtkTextActor,
@@ -88,9 +88,9 @@ try:
                                                        vtkRenderWindow,
                                                        vtkFollower)
 
-        from vtkmodules.vtkRenderingFreeTypePython import (vtkVectorText)
+        from vtkmodules.vtkRenderingFreeType import (vtkVectorText)
 
-        from vtkmodules.vtkIOImagePython import (vtkJPEGReader,
+        from vtkmodules.vtkIOImage import (vtkJPEGReader,
                                                  vtkJPEGWriter,
                                                  vtkPNGReader,
                                                  vtkPNGWriter,
@@ -104,11 +104,11 @@ try:
 
     if PyQt5_AVAILABLE:
         # QVTKRenderWindowInteractor raises an error if this isn't loaded.
-        from vtkmodules.vtkRenderingOpenGL2Python import vtkOpenGLRenderer
+        from vtkmodules.vtkRenderingOpenGL2 import vtkOpenGLRenderer
 
         from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
-    from vtkmodules import vtkRenderingGL2PSOpenGL2Python
+    from vtkmodules import vtkRenderingGL2PSOpenGL2
 
 
 except ImportError:
