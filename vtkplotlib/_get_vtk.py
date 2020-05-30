@@ -99,6 +99,16 @@ try:
                                                  vtkBMPReader,
                                                  vtkBMPWriter)
 
+    # These aren't used directly by vtkplotlib but are by other vtk modules.
+    # Explicitly importing them here is the easiest way to tell PyInstaller
+    # to include them.
+    if vtk.VTK_MAJOR_VERSION >= 9:
+        from vtkmodules import (vtkCommonExecutionModel,
+                                vtkCommonMisc,
+                                vtkCommonTransforms,
+                                vtkFiltersCore,
+                                vtkIOCore,
+                                vtkImagingCore,)
 
     from vtkmodules.util import numpy_support
 
