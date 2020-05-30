@@ -524,9 +524,7 @@ def test(*spam):
 
     self = PolyData()
 
-
-    from stl.mesh import Mesh
-    vectors = Mesh.from_file(vpl.data.get_rabbit_stl()).vectors
+    vectors = vpl.mesh_plot(vpl.data.get_rabbit_stl(), fig=None).vectors
 
 
     points = vectors.reshape((-1, 3))
