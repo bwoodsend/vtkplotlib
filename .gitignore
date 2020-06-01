@@ -105,3 +105,6 @@ venv.bak/
 
 # spellchecker whitelist
 spellcheck.txt
+
+# Test data
+vtkplotlib/data/test-data.json

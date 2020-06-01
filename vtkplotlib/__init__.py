@@ -59,7 +59,7 @@ from .plots.Legend import Legend as legend
 from .plots import BasePlot
 from .plots.polydata import PolyData
 
-from . import data, image_io
+from . import data, image_io, interactive
 
 color_bar = scalar_bar
 

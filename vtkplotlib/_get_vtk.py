@@ -47,7 +47,8 @@ try:
                                                     VTK_COLOR_MODE_MAP_SCALARS,
                                                     VTK_MAJOR_VERSION,
                                                     VTK_COLOR_MODE_DIRECT_SCALARS,
-                                                    vtkLookupTable)
+                                                    vtkLookupTable,
+                                                    vtkObject)
 
         from vtkmodules.vtkCommonDataModel import (vtkImageData,
                                                          vtkCellArray,
@@ -69,7 +70,8 @@ try:
                                                   vtkPolyDataWriter)
 
         from vtkmodules.vtkInteractionStyle import (vtkInteractorStyleTrackballCamera,
-                                                          vtkInteractorStyleImage,)
+                                                          vtkInteractorStyleImage,
+                                                          )
 
         from vtkmodules.vtkRenderingAnnotation import (vtkScalarBarActor,
                                                              vtkLegendBoxActor)
@@ -86,7 +88,10 @@ try:
                                                        VTK_SCALAR_MODE_USE_CELL_DATA,
                                                        vtkRenderWindowInteractor,
                                                        vtkRenderWindow,
-                                                       vtkFollower)
+                                                       vtkFollower,
+                                                       vtkPropPicker,
+                                                       vtkActorCollection,
+                                                       vtkInteractorStyle,)
 
         from vtkmodules.vtkRenderingFreeType import (vtkVectorText)
 
@@ -121,7 +126,7 @@ try:
     from vtkmodules import vtkRenderingGL2PSOpenGL2
 
 
-except ImportError:
+except ():
 #    pass
     import vtk
     from vtk.util import numpy_support
