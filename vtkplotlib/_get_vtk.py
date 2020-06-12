@@ -126,7 +126,7 @@ try:
     from vtkmodules import vtkRenderingGL2PSOpenGL2
 
 
-except ():
+except ImportError:
 #    pass
     import vtk
     from vtk.util import numpy_support
