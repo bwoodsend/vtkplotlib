@@ -6,14 +6,25 @@ Created on Wed Jun 19 19:00:26 2019
 """
 
 from setuptools import setup, find_packages
+from distutils.command.build import build
 from os import path
 
+HERE = path.split(__file__)[0]
 
-with open(path.join(path.split(__file__)[0], "README.md"), "r") as fh:
+with open(path.join(HERE, "README.md"), "r") as fh:
     long_description = fh.read()
 
+with open(path.join(HERE, "version"), "r") as fh:
+    version = fh.read().strip().lstrip("v")
+
+class Build(build):
+    def run(self):
+        with open(path.join(HERE, "vtkplotlib", "__version__.py"), "w") as fh:
+            fh.write("# -*- coding: utf-8 -*-\n__version__ = \"{}\"\n".format(version))
+        build.run(self)
+
 setup(name='vtkplotlib',
-      version='1.3.5',
+      version=version,
       description='High level 3D graphics and plotting powered by VTK',
       long_description=long_description,
       long_description_content_type="text/markdown",
@@ -33,4 +44,5 @@ setup(name='vtkplotlib',
       zip_safe=False,
       test_suite='nose.collector',
       tests_require=['nose'],
+      cmdclass={"build": Build}
       )

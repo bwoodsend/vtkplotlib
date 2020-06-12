@@ -23,10 +23,10 @@ project = 'vtkplotlib'
 copyright = '2019-2020, bwoodsend'
 author = 'bwoodsend'
 
-# The short X.Y version
-version = '1.3'
 # The full version, including alpha/beta/rc tags
-release = '1.3.5'
+from vtkplotlib import __version__ as release
+# The short X.Y version
+version = ".".join(release.split(".")[:2])
 
 
 # -- General configuration ---------------------------------------------------

@@ -83,3 +83,5 @@ def quick_test_plot(fig="gcf"):
 from .nuts_and_bolts import zip_axes, unzip_axes
 from .colors import TextureMap
 from ._get_vtk import vtk
+
+from .__version__ import __version__
