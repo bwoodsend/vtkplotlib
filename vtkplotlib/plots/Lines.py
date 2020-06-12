@@ -166,7 +166,8 @@ class Lines(ConstructedPlot):
         if isinstance(c, np.ndarray):
             if c.shape == self.shape[:-1]:
                 c = c[..., np.newaxis]
-            assert self.shape[:-1] == c.shape[:-1]
+            # TODO: put a proper failsafe in here
+#            assert self.shape[:-1] == c.shape[:-1]
             self.polydata.point_colors = c.reshape((-1, c.shape[-1]))
 
             if not self._freeze_scalar_range:
