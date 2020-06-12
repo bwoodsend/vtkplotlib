@@ -38,6 +38,7 @@ def null_callback():
 
 def get_super_callback(invoker=None, event_name=None):
     if invoker is None or event_name is None:
+        # Try to guess the arguments that would have been provided.
         # This uses the same frame hack that future uses to mimick super() in
         # Python 2.
 
