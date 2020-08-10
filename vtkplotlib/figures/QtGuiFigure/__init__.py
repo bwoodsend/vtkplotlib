@@ -51,6 +51,7 @@ class QtFigure2(QtFigure):
     1. A screenshot button.
     2. A panel for preset camera views.
     3. An actor table to show / hide / color plots interactively (although it needs some way to group them).
+    4. A cursor tracker displaying 3D coordinates of the mouse.
 
     I hope/intend to add:
 
@@ -129,6 +130,9 @@ class QtFigure2(QtFigure):
         self.save_fig_kargs = save_fig_kargs
         return self
 
+    def add_cursor_tracker(self):
+        from vtkplotlib.interactive import CursorTrackor
+        self.cursor_tracker = CursorTrackor(self)
 
 
     def screenshot(self):
@@ -172,6 +176,7 @@ class QtFigure2(QtFigure):
         self.add_preset_views()
         self.add_screenshot_button()
         self.add_show_plot_table_button()
+        self.add_cursor_tracker()
         return self
 
 
