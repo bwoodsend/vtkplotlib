@@ -320,14 +320,19 @@ class Legend(Base2DPlot):
 
         # Find the centre of the polydata
         bounds = np.reshape(polydata.GetBounds(), (3, 2))
-        centre = bounds.mean(1)
+        centre = polydata.GetCenter()
+
+        # Needed in case of nan points which result in 1e299s in `bounds`.
+        old = np.seterr(over="ignore")
 
         # If not already near enough to the origin
         if np.abs(centre).max() > bounds.std(1).max() * .1:
 
             polydata = PolyData(polydata).copy()
-            polydata.points -= centre[np.newaxis]
+            polydata.points -= np.array(centre)[np.newaxis]
             polydata = polydata.vtk_polydata
+
+        np.seterr(**old)
 
         self.legend.SetEntrySymbol(index, polydata)
 
