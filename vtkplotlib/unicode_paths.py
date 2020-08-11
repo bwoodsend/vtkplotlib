@@ -43,9 +43,13 @@ from pathlib2 import Path
 # The codepage is different for different regions. This snippet should say
 # what encoding to use.
 # https://stackoverflow.com/questions/9226516/python-windows-console-and-encodings-cp-850-vs-cp1252
+# Since VTK==9.0.0, VTK have switched to utf-8 so we can skip all this for VTK
+# versions >= 9.
+
+from vtkplotlib._get_vtk import vtk
 
 import locale
-if os.name == "nt":
+if os.name == "nt" and vtk.VTK_MAJOR_VERSION <= 8:
     ALLOWED_ENCODING = locale.getlocale()[1] or "ascii"
 else:
     ALLOWED_ENCODING = "utf-8"
@@ -55,9 +59,16 @@ if __name__ == "__main__":
 else:
     _print = lambda *x: None
 
-
 class PathHandler(object):
+    """Context manager to handle unicode filenames (which VTK does poorly).
+    This class will choose any combination of:
 
+    * Temporarily changing the cwd and using relative paths for non-ascii
+      folders.
+    * Temporarily rename files to be read to an ascii name.
+    * Direct VTK to write to an ascii name then rename it afterwards.
+
+    """
     def __init__(self, path, mode="r", ALLOWED_ENCODING=ALLOWED_ENCODING):
         self.path = Path(path).absolute()
         del path
