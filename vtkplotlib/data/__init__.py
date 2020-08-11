@@ -25,25 +25,24 @@
 import sys
 from pathlib2 import Path
 
-
 # vtkplotlib isn't zip safe and I have no intention of trying to make it so.
 # Hence, using __file__ instead of (super slow) pkg_resources is fine.
 
 from vtkplotlib import __file__ as _init_path
 
-if getattr( sys, 'frozen', False ) :
-    # running in a pyinstaller bundle
+if getattr(sys, 'frozen', False):
+    # running in a PyInstaller bundle
     DATA_FOLDER = Path(_init_path).parent.with_name("vpl-data")
-else :
+else:
     # running normally
     DATA_FOLDER = Path(_init_path).with_name("data")
 
-
 MODELS_FOLDER = DATA_FOLDER / "models"
 
+
 def get_rabbit_stl():
-#    print("This is not my rabbit file. See README.txt and LICENSE.txt in\n{}\nfor details.".format(folder))
     return str(MODELS_FOLDER / "rabbit" / "rabbit.stl")
+
 
 ICONS_FOLDER = DATA_FOLDER / "icons"
 
@@ -54,6 +53,7 @@ def assert_ok():
     assert ICONS_FOLDER.is_dir()
     assert MODELS_FOLDER.is_dir()
     assert Path(get_rabbit_stl()).exists()
+
 
 if __name__ == "__main__":
     assert_ok()

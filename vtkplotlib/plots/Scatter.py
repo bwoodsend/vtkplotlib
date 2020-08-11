@@ -26,14 +26,15 @@ from builtins import super
 
 import numpy as np
 
-
 from vtkplotlib._get_vtk import vtk
 from vtkplotlib.plots.BasePlot import SourcedPlot, _iter_colors, _iter_points, _iter_scalar
 
 
 class Sphere(SourcedPlot):
     """Plot an individual sphere."""
-    def __init__(self, point, color=None, opacity=None, radius=1., fig="gcf", label=None):
+
+    def __init__(self, point, color=None, opacity=None, radius=1., fig="gcf",
+                 label=None):
         super().__init__(fig)
 
         self.source = vtk.vtkSphereSource()
@@ -59,7 +60,9 @@ class Sphere(SourcedPlot):
 
 
 class Cursor(SourcedPlot):
-    def __init__(self, point, color=None, opacity=None, radius=1, fig="gcf", label=None):
+
+    def __init__(self, point, color=None, opacity=None, radius=1, fig="gcf",
+                 label=None):
         super().__init__(fig)
 
         self.source = vtk.vtkCursor3D()
@@ -68,7 +71,6 @@ class Cursor(SourcedPlot):
 
         self.connect()
         self.__setstate__(locals())
-
 
     @property
     def point(self):
@@ -80,7 +82,8 @@ class Cursor(SourcedPlot):
 
     @property
     def radius(self):
-        return np.array([self.source.GetModelBounds()]).reshape((3, 2)).T - self.point
+        return np.array([self.source.GetModelBounds()]).reshape(
+            (3, 2)).T - self.point
 
     @radius.setter
     def radius(self, r):
@@ -95,11 +98,8 @@ class Cursor(SourcedPlot):
         self.source.SetModelBounds(*(r + self.point).T.flat)
 
 
-
-
-
-
-def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig="gcf", label=None):
+def scatter(points, color=None, opacity=None, radius=1., use_cursors=False,
+            fig="gcf", label=None):
     """Scatter plot using little spheres or cursor objects.
 
     :param points: The point(s) to place the marker(s) at.
@@ -140,10 +140,10 @@ def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig=
     points = np.asarray(points)
     out = np.empty(points.shape[:-1], object)
     out_flat = out.ravel()
-    for (i, (xyz, c, r, l)) in enumerate(zip(_iter_points(points),
-                                             _iter_colors(color, points.shape[:-1]),
-                                             _iter_scalar(radius, points.shape[:-1]),
-                                             _iter_scalar(label, points.shape[:-1]))):
+    for (i, (xyz, c, r, l)) in enumerate(
+            zip(_iter_points(points), _iter_colors(color, points.shape[:-1]),
+                _iter_scalar(radius, points.shape[:-1]),
+                _iter_scalar(label, points.shape[:-1]))):
 
         if use_cursors:
             cls = Cursor
@@ -158,36 +158,24 @@ def scatter(points, color=None, opacity=None, radius=1., use_cursors=False, fig=
         return out_flat[0]
 
 
-
 from vtkplotlib.tests._figure_contents_check import checker
+
+
 @checker()
 def test():
     import vtkplotlib as vpl
 
     points = np.random.uniform(-10, 10, (30, 3))
 
-#    for i in range(3):
-#        self = vpl.cursor(np.array([5, 0, 0]) * i, radius=4)
-
     colors = vpl.colors.normalise(points)
-    radii = np.abs(points[:, 0]) ** .5
+    radii = np.abs(points[:, 0])**.5
 
-    vpl.scatter(points,
-                color=colors,
-                radius=radii,
-                use_cursors=False,
-                )[0]
-    self = vpl.scatter(points,
-                       color=colors,
-                       radius=radii,
-                       use_cursors=True)[0]
-#    self.point += np.array([10, 0, 0])
+    vpl.scatter(points, color=colors, radius=radii, use_cursors=False)[0]
+    self = vpl.scatter(points, color=colors, radius=radii, use_cursors=True)[0]
+    self.point += np.array([10, 0, 0])
 
     globals().update(locals())
 
 
-
 if __name__ == "__main__":
-     test()
-
-
+    test()

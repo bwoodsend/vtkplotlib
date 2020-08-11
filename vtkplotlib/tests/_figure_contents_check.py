@@ -38,7 +38,8 @@ except ImportError:
     VTKPLOTLIB_WINDOWLESS_TEST = False
     DEFAULT_MODE = ""
 else:
-    VTKPLOTLIB_WINDOWLESS_TEST = bool(int(os.environ.get("VTKPLOTLIB_WINDOWLESS_TEST", "0")))
+    VTKPLOTLIB_WINDOWLESS_TEST = bool(
+        int(os.environ.get("VTKPLOTLIB_WINDOWLESS_TEST", "0")))
 
     if VTKPLOTLIB_WINDOWLESS_TEST:
         DEFAULT_MODE = "r"
@@ -47,10 +48,10 @@ else:
 
 
 class AutoChecker(object):
+
     def __init__(self):
         self.path = DATA_FOLDER / "test-data.json"
         self.load()
-#        super().__init__()
 
     def auto_check_contents(self, test_func):
         name = self.name_function(test_func)
@@ -79,7 +80,6 @@ class AutoChecker(object):
 
             if mode == "r":
                 correct_value = self.data[name]
-#                self.assertDictEqual(check_value, correct_value)
                 self.validate(self.reduce(out), correct_value)
                 close(fig=fig)
             elif mode == "w":
@@ -97,9 +97,11 @@ class AutoChecker(object):
     @staticmethod
     def reduce_image_array(arr):
         import zlib, bz2, base64
-        return {"shape": list(arr.shape),
-                "crc32_checksum": zlib.crc32(arr.tobytes("C")),
-                "image": base64.b64encode(bz2.compress(arr.tobytes("C"))).decode()}
+        return {
+            "shape": list(arr.shape),
+            "crc32_checksum": zlib.crc32(arr.tobytes("C")),
+            "image": base64.b64encode(bz2.compress(arr.tobytes("C"))).decode()
+        }
 
     @classmethod
     def reduce_fig(cls, fig):
@@ -152,7 +154,6 @@ class AutoChecker(object):
     def extract_dic_image(dic):
         import bz2, base64
         shape = dic["shape"]
-#        checksum = dic["crc32_checksum"]
         bin = bz2.decompress(base64.b64decode(dic["image"].encode()))
         arr = np.frombuffer(bin, np.uint8).reshape(shape)
         return arr
@@ -168,11 +169,14 @@ _checker = None
 
 def checker(*no_arguments):
     if len(no_arguments):
-        raise TypeError("Checker takes no arguments. You probably forgot the parenthesis. Should be `@checker()\\ndef function...`.")
+        raise TypeError("Checker takes no arguments. You probably forgot the "
+                        "parenthesis. Should be `@checker()\\n"
+                        "def function...`.")
     global _checker
     if _checker is None:
         _checker = AutoChecker()
     return _checker
+
 
 def reset():
     checker().data.clear()
@@ -186,8 +190,8 @@ def test_quick_test_plot():
     import vtkplotlib as vpl
     vpl.quick_test_plot()
 
-def test():
 
+def test():
 
     test_quick_test_plot(mode=DEFAULT_MODE and "w")
 
@@ -195,7 +199,6 @@ def test():
     checker().load()
 
     test_quick_test_plot(mode=DEFAULT_MODE and "r")
-
 
 
 if __name__ == "__main__":

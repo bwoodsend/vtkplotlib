@@ -38,6 +38,7 @@ from vtkplotlib.tests.base import BaseTestCase
 
 
 class TestFigures(BaseTestCase):
+
     def test_figure_io(self):
         vpl.close()
         self.assertIs(vpl.gcf(False), None)
@@ -56,7 +57,6 @@ class TestFigures(BaseTestCase):
         fig = vpl.gcf()
         self.assertTrue(fig is not None)
 
-
         self.assertIs(fig, vpl.gcf())
         vpl.close()
         self.assertIs(vpl.gcf(False), None)
@@ -68,8 +68,6 @@ class TestFigures(BaseTestCase):
         self.assertIs(fig, vpl.gcf())
         vpl.close()
 
-
-
     @checker()
     def test_save(self):
         plots = vpl.scatter(np.random.uniform(-10, 10, (30, 3)))
@@ -77,7 +75,7 @@ class TestFigures(BaseTestCase):
         # I can't get python2 to cooperate with unicode here.
         # The os functions just don't like them.
         if sys.version[0] == "3":
-             path = Path(u"ҢघԝઌƔࢳܢˀા", u"Հએࡓ\u061cཪЈतயଯ\u0886.png")
+            path = Path(u"ҢघԝઌƔࢳܢˀા", u"Հએࡓ\u061cཪЈतயଯ\u0886.png")
         else:
             path = Path("boring", "name.png")
         path = Path.cwd() / path
@@ -107,12 +105,11 @@ class TestFigures(BaseTestCase):
         shape = tuple(i * j for (i, j) in zip(vpl.gcf().render_size, (2, 3)))
         vpl.screenshot_fig(pixels=shape).shape
         # The following will fail depending on VTK version
-#        self.assertEqual(vpl.screenshot_fig(pixels=shape).shape,
-#                         shape[::-1] + (3,))
+        # self.assertEqual(vpl.screenshot_fig(pixels=shape).shape,
+        #                  shape[::-1] + (3,))
 
         vpl.close()
         return array
-
 
     @checker()
     def test_view(self):
@@ -120,25 +117,16 @@ class TestFigures(BaseTestCase):
         vpl.close()
         grads = np.array(vpl.geometry.orthogonal_bases(np.random.rand(3)))
         point = np.random.uniform(-10, 10, 3)
-        vpl.quiver(np.broadcast_to(point, (3, 3)),
-                   grads,
-                   color=np.eye(3))
+        vpl.quiver(np.broadcast_to(point, (3, 3)), grads, color=np.eye(3))
 
-        vpl.view(focal_point=point,
-                 camera_position=point-grads[0],
+        vpl.view(focal_point=point, camera_position=point - grads[0],
                  up_view=grads[1])
-#        vpl.view(camera_direction=grads[0],
-#                 up_view=grads[1],
-#                 )
-#
         vpl.reset_camera()
-#        vpl.view(point)
 
-
-        vpl.text("Should be looking in the direction of the red arrow, with the green arrow pointing up")
+        vpl.text("Should be looking in the direction of the red arrow, "
+                 "with the green arrow pointing up")
         # Linux seems to need an extra prod to render this for some reason.
         vpl.show(block=False)
-#        vpl.show()
 
     @skipUnless(not VTKPLOTLIB_WINDOWLESS_TEST, "CBA")
     def test_multi_figures(self):
@@ -160,12 +148,10 @@ class TestFigures(BaseTestCase):
 
         vpl.auto_figure(True)
 
-
     @skipUnless(vpl.PyQt5_AVAILABLE, "PyQt5 not installed")
     def test_qfigure(self):
         from vtkplotlib.figures.QtFigure import test
         test()
-
 
     @checker()
     @skipUnless(vpl.PyQt5_AVAILABLE, "PyQt5 not installed")
@@ -178,7 +164,6 @@ class TestFigures(BaseTestCase):
         vpl.quick_test_plot()
 
         fig.add_all()
-
 
         fig.show(block=False)
         fig.qapp.processEvents()
@@ -194,13 +179,14 @@ class TestFigures(BaseTestCase):
 
         fig.show(block=False)
 
-
         for plot in fig.plot_table.rows:
             fig.plot_table.rows[plot].text.released.emit()
             fig.qapp.processEvents()
             self.assertFalse(plot.visible)
 
-        self.assertTrue(np.allclose(vpl.screenshot_fig(fig=fig), np.array(255) * fig.background_color))
+        self.assertTrue(
+            np.allclose(vpl.screenshot_fig(fig=fig),
+                        np.array(255) * fig.background_color))
 
         for plot in fig.plot_table.rows:
             fig.plot_table.rows[plot].text.released.emit()
@@ -208,8 +194,6 @@ class TestFigures(BaseTestCase):
             self.assertTrue(plot.visible)
 
         fig.plot_table.close()
-
-#        fig.show()
 
     def test_add_remove(self):
         fig = vpl.figure()

@@ -30,7 +30,6 @@ import numpy as np
 from vtkplotlib.plots.BasePlot import Base2DPlot
 
 
-
 class ScalarBar(Base2DPlot):
     """Create a scalar bar. Also goes by the alias `colorbar`.
 
@@ -50,6 +49,7 @@ class ScalarBar(Base2DPlot):
     `scalars` as an argument.
 
     """
+
     def __init__(self, plot, title="", fig="gcf"):
 
         super().__init__(fig)
@@ -68,8 +68,6 @@ class ScalarBar(Base2DPlot):
             self.lookup_table.ForceBuild()
         self.actor.SetLookupTable(self.lookup_table)
 
-
-#        self.fig += self
         self.fig.renderer.AddActor2D(self.actor)
         self.fig.plots.add(self)
 
@@ -77,9 +75,9 @@ class ScalarBar(Base2DPlot):
         self.set_vertical = self.actor.SetOrientationToVertical
 
 
-
-
 from vtkplotlib.tests._figure_contents_check import checker
+
+
 @checker()
 def test():
     from stl.mesh import Mesh
@@ -87,7 +85,6 @@ def test():
 
     mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
     plot = vpl.mesh_plot(mesh, scalars=mesh.x)
-#    plot.scalar_range = -1, 2
 
     self = vpl.scalar_bar(plot, "X Values")
 
@@ -96,4 +93,3 @@ def test():
 
 if __name__ == "__main__":
     test()
-

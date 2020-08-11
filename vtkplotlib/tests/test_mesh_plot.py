@@ -23,7 +23,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-
 import numpy as np
 import sys
 import os
@@ -44,11 +43,13 @@ class TestMeshPlot(BaseTestCase):
         mesh = Mesh.from_file(path)
         vectors = mesh.vectors
 
-        unique_points = set(tuple(i) for i in vectors.reshape(len(vectors) * 3, 3))
+        unique_points = set(
+            tuple(i) for i in vectors.reshape(len(vectors) * 3, 3))
         points_enum = {point: i for (i, point) in enumerate(unique_points)}
 
         points = np.array(sorted(unique_points, key=points_enum.get))
-        point_args = np.apply_along_axis(lambda x: points_enum[tuple(x)], -1, vectors)
+        point_args = np.apply_along_axis(lambda x: points_enum[tuple(x)], -1,
+                                         vectors)
 
         vpl.plots.MeshPlot.NUMPY_STL_AVAILABLE = False
 
@@ -61,12 +62,3 @@ class TestMeshPlot(BaseTestCase):
         vpl.close()
 
         vpl.plots.MeshPlot.test()
-
-
-
-
-
-
-
-
-

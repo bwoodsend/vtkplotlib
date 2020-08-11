@@ -22,7 +22,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-
 from builtins import super
 
 from vtkplotlib._get_vtk import vtk
@@ -34,7 +33,9 @@ from vtkplotlib import geometry as geom
 
 class Arrow(SourcedPlot):
     """Draw a single arrow from **start** to **end**."""
-    def __init__(self, start, end, length=None, width_scale=1, color=None, opacity=None, fig="gcf", label=None):
+
+    def __init__(self, start, end, length=None, width_scale=1, color=None,
+                 opacity=None, fig="gcf", label=None):
         super().__init__(fig)
 
         diff = end - start
@@ -49,23 +50,21 @@ class Arrow(SourcedPlot):
         eX, eY, eZ = geom.orthogonal_bases(diff)
         arrowSource = vtk.vtkArrowSource()
 
-
         # This next bit puts the arrow where it's supposed to go
         matrix = vtk.vtkMatrix4x4()
 
         # Create the direction cosine matrix
         matrix.Identity()
         for i in range(3):
-          matrix.SetElement(i, 0, eX[i])
-          matrix.SetElement(i, 1, eY[i])
-          matrix.SetElement(i, 2, eZ[i])
+            matrix.SetElement(i, 0, eX[i])
+            matrix.SetElement(i, 1, eY[i])
+            matrix.SetElement(i, 2, eZ[i])
 
         # Apply the transforms
         transform = vtk.vtkTransform()
         transform.Translate(start)
         transform.Concatenate(matrix)
         transform.Scale(length, length * width_scale, length * width_scale)
-
 
         self.source = arrowSource
 
@@ -76,8 +75,8 @@ class Arrow(SourcedPlot):
         self.label = label
 
 
-
-def arrow(start, end, length=None, width_scale=1., color=None, opacity=None, fig="gcf", label=None):
+def arrow(start, end, length=None, width_scale=1., color=None, opacity=None,
+          fig="gcf", label=None):
     """Draw (an) arrow(s) from **start** to **end**.
 
     :param start: The starting point(s) of the arrow(s).
@@ -133,13 +132,11 @@ def arrow(start, end, length=None, width_scale=1., color=None, opacity=None, fig
     out = np.empty(shape, object)
     out_flat = out.ravel()
 
-
-    for (i, s, e, l, c, lab) in zip(range(out.size),
-                                _iter_points(start),
-                                _iter_points(end),
-                                _iter_scalar(length, shape),
-                                _iter_colors(color, shape),
-                                _iter_scalar(label, shape)):
+    for (i, s, e, l, c, lab) in zip(range(out.size), _iter_points(start),
+                                    _iter_points(end),
+                                    _iter_scalar(length, shape),
+                                    _iter_colors(color, shape),
+                                    _iter_scalar(label, shape)):
 
         out_flat[i] = Arrow(s, e, l, width_scale, c, opacity, fig, lab)
 
@@ -148,7 +145,8 @@ def arrow(start, end, length=None, width_scale=1., color=None, opacity=None, fig
     return out
 
 
-def quiver(point, gradient, length=None, length_scale=1., width_scale=1., color=None, opacity=None, fig="gcf", label=None):
+def quiver(point, gradient, length=None, length_scale=1., width_scale=1.,
+           color=None, opacity=None, fig="gcf", label=None):
     """Create arrow(s) from 'point' towards a direction given by 'gradient' to
     make field/quiver plots. Arrow lengths by default are the magnitude of
     'gradient but can be scaled with 'length_scale' or frozen with 'length'.
@@ -193,8 +191,8 @@ def quiver(point, gradient, length=None, length_scale=1., width_scale=1., color=
     if length_scale != 1:
         length *= length_scale
 
-    return arrow(point, point + gradient, length, width_scale, color, opacity, fig, label)
-
+    return arrow(point, point + gradient, length, width_scale, color, opacity,
+                 fig, label)
 
 
 if __name__ == "__main__":

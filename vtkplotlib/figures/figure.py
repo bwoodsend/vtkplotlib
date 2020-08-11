@@ -41,6 +41,7 @@ class Figure(BaseFigure):
     :type name: str, optional
 
     """
+
     def __init__(self, name=""):
         super().__init__(name)
 
@@ -82,7 +83,6 @@ class Figure(BaseFigure):
         iren.SetInteractorStyle(self.style)
         return iren
 
-
     def close(self):
         if hasattr(self, "renWin"):
             self.renWin.Finalize()
@@ -116,23 +116,19 @@ class Figure(BaseFigure):
         self._window_name = window_name
 
 
-
 if __name__ == "__main__":
     Figure._abc_assert_no_abstract_methods()
     import vtkplotlib as vpl
 
     self = vpl.figure("a normal vtk figure")
 
-
-#    vpl.plot(np.random.uniform(-10, 10, (20, 3)))
+    # vpl.plot(np.random.uniform(-10, 10, (20, 3)))
 
     direction = np.array([1, 0, 0])
     vpl.quiver(np.array([0, 0, 0]), direction)
     vpl.view(camera_direction=direction)
     vpl.reset_camera()
 
-#    vpl.save_fig(Path.home() / "img.jpg", 1080)
+    # vpl.save_fig(Path.home() / "img.jpg", 1080)
 
     self.show()
-
-

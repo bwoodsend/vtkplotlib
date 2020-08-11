@@ -26,10 +26,8 @@ from builtins import super
 
 import numpy as np
 
-
 from vtkplotlib.plots.BasePlot import ConstructedPlot
 from vtkplotlib.plots.polydata import join_line_ends
-
 
 
 class Lines(ConstructedPlot):
@@ -110,19 +108,19 @@ class Lines(ConstructedPlot):
 
     """
 
-    def __init__(self, vertices, color=None, opacity=None, line_width=1.0, join_ends=False, cmap=None, fig="gcf", label=None):
+    def __init__(self, vertices, color=None, opacity=None, line_width=1.0,
+                 join_ends=False, cmap=None, fig="gcf", label=None):
         super().__init__(fig)
         self.connect()
 
         self.shape = ()
         self.join_ends = join_ends
         self.vertices = vertices
-#        self.opacity = opacity
-#        self.color = color
-#        self.line_width = line_width
+        # self.opacity = opacity
+        # self.color = color
+        # self.line_width = line_width
         del vertices
         self.__setstate__(locals())
-
 
     @property
     def line_width(self):
@@ -167,7 +165,8 @@ class Lines(ConstructedPlot):
             if c.shape == self.shape[:-1]:
                 c = c[..., np.newaxis]
             # TODO: put a proper failsafe in here
-#            assert self.shape[:-1] == c.shape[:-1]
+
+            # assert self.shape[:-1] == c.shape[:-1]
             self.polydata.point_colors = c.reshape((-1, c.shape[-1]))
 
             if not self._freeze_scalar_range:
@@ -179,31 +178,29 @@ class Lines(ConstructedPlot):
             self.polydata.point_colors = None
 
 
-
-
 from vtkplotlib.tests._figure_contents_check import checker
+
+
 @checker()
 def test():
     import vtkplotlib as vpl
 
     t = np.arange(0, 1, .001) * 2 * np.pi
-    vertices = np.array([np.cos(2 * t),
-                         np.sin(3 * t),
-                         np.cos(5 * t) * np.sin(7 *t)]).T
+    vertices = np.array(
+        [np.cos(2 * t),
+         np.sin(3 * t),
+         np.cos(5 * t) * np.sin(7 * t)]).T
     vertices = np.array([vertices, vertices + 2])
 
     t = np.arange(0, 1, .125) * 2 * np.pi
-    vertices = vpl.zip_axes(np.cos(t),
-                            np.sin(t),
-                            0)
+    vertices = vpl.zip_axes(np.cos(t), np.sin(t), 0)
 
-#    vertices = np.random.uniform(-30, 30, (3, 3))
-#    color = np.broadcast_to(t, vertices.shape[:-1])
+    # vertices = np.random.uniform(-30, 30, (3, 3))
+    # color = np.broadcast_to(t, vertices.shape[:-1])
 
-    self = vpl.plot(vertices, line_width=6, join_ends=True,
-                    color=t)
-#    self.polydata.point_scalars = vpl.geometry.distance(vertices)
-#    self.polydata.point_colors = t
+    self = vpl.plot(vertices, line_width=6, join_ends=True, color=t)
+    # self.polydata.point_scalars = vpl.geometry.distance(vertices)
+    # self.polydata.point_colors = t
     fig = vpl.gcf()
     fig.background_color = "grey"
 

@@ -26,11 +26,11 @@
 from builtins import super
 from unittest import TestCase
 
+
 class BaseTestCase(TestCase):
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         from vtkplotlib._get_vtk import _disable_numpy_complex_warning
         _disable_numpy_complex_warning()
-        
-        

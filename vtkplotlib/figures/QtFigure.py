@@ -191,14 +191,11 @@ class QtFigure(BaseFigure, QWidget):
 
     .. seealso:: :class:`vtkplotlib.QtFigure2` is an extension of this to provide some standard GUI elements, ready-made.
 
-
     """
 
     def __init__(self, name="qt vtk figure", parent=None):
 
         self.qapp = QApplication.instance() or QApplication(sys.argv)
-#        debug(self.qapp)
-#        debug("qw init")
         QWidget.__init__(self, parent)
         BaseFigure.__init__(self, name)
 
@@ -210,7 +207,6 @@ class QtFigure(BaseFigure, QWidget):
 
         self.renWin
         self.iren
-
 
     def _re_init(self):
         debug("re init")
@@ -225,14 +221,13 @@ class QtFigure(BaseFigure, QWidget):
 
         self.renWin, self.iren
 
-
     @property
     def vtkWidget(self):
         if not hasattr(self, "_vtkWidget"):
             self._re_init()
         return self._vtkWidget
-    @vtkWidget.setter
 
+    @vtkWidget.setter
     def vtkWidget(self, widget):
         self._vtkWidget = widget
 
@@ -249,6 +244,7 @@ class QtFigure(BaseFigure, QWidget):
         """
 
         QWidget_show = getattr(QWidget, QWidget_show_name, QWidget.show)
+
         def show(self, block=None):
             if not hasattr(self, "vtkWidget"):
                 self._re_init()
@@ -260,7 +256,6 @@ class QtFigure(BaseFigure, QWidget):
             self.renWin.Render()
             self.iren.Start()
 
-    #        self.setWindowTitle(self.window_name)
             if block is None:
                 block = self.parent() is None
             if block:
@@ -269,8 +264,10 @@ class QtFigure(BaseFigure, QWidget):
             BaseFigure.show(self, block)
 
         show.__name__ = QWidget_show.__name__
-        try: show.__qualname__ = QWidget_show.__qualname__
-        except (AttributeError, TypeError): pass
+        try:
+            show.__qualname__ = QWidget_show.__qualname__
+        except (AttributeError, TypeError):
+            pass
 
         return show
 
@@ -279,8 +276,6 @@ class QtFigure(BaseFigure, QWidget):
     showMinimized = _base_show_wrap("showMinimized")
     showFullScreen = _base_show_wrap("showFullScreen")
     showNormal = _base_show_wrap("showNormal")
-#    showBanana = _base_show_wrap("showBanana")
-
 
     @nuts_and_bolts.init_when_called
     def renWin(self):
@@ -316,6 +311,8 @@ class QtFigure(BaseFigure, QWidget):
         if hasattr(self, "_vtkWidget"):
             self._vtkWidget_replace_index = self.vl.indexOf(self.vtkWidget)
             self.vl.removeWidget(self.vtkWidget)
+
+
 #        self.renderer.RemoveAllViewProps()
 
         del self.vtkWidget, self.iren, self.renWin
@@ -323,21 +320,14 @@ class QtFigure(BaseFigure, QWidget):
     def closeEvent(self, event):
         self.on_close()
 
-
     window_name = property(QWidget.windowTitle, QWidget.setWindowTitle)
 
-
     def __del__(self):
-#        debug("delete")
         try:
             self.renderer.RemoveAllViewProps()
         except (AttributeError, TypeError):
             # In Python2, RemoveAllViewProps is already None
             pass
-#        BaseFigure.__del__(self)
-#        self.renderer.FastDelete()
-#        self.renWin.FastDelete()
-#        self.vtkWidget.FastDelete()
 
     def _prep_for_screenshot(self, off_screen=False):
         BaseFigure._prep_for_screenshot(self, off_screen)
@@ -351,8 +341,9 @@ class QtFigure(BaseFigure, QWidget):
         self.on_close()
         BaseFigure.close(self)
 
-
 from vtkplotlib.tests._figure_contents_check import checker, VTKPLOTLIB_WINDOWLESS_TEST
+
+
 @checker()
 def test():
     import vtkplotlib as vpl
@@ -368,7 +359,7 @@ def test():
     vpl.view(camera_direction=direction)
     vpl.reset_camera()
 
-#    self.show()
+    # self.show()
 
     self.show(block=False)
     self.close()
@@ -381,7 +372,5 @@ def test():
     return out
 
 
-
 if __name__ == "__main__":
     test()
-

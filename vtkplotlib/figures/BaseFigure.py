@@ -22,7 +22,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-
 from __future__ import print_function
 from builtins import super
 
@@ -53,28 +52,30 @@ class BaseFigure(object):
                 self.window_name = "VTK figure"
         self.plots = set()
 
-        self.background_color = "light grey"#20, 50, 100
-
+        self.background_color = "light grey"
 
     #################  Create core VTK components  ############################
 
     @property
     def camera(self):
         return self.renderer.GetActiveCamera()
+
     @camera.setter
     def camera(self, camera):
         self.renderer.SetActiveCamera(camera)
 
-    @abc.abstractproperty
+    @abc.abstractmethod
     def iren(self):
         pass
-    @abc.abstractproperty
+
+    @abc.abstractmethod
     def renWin(self):
         pass
 
     @nuts_and_bolts.init_when_called
     def style(self):
         return vtk.vtkInteractorStyleTrackballCamera()
+
     @style.setter
     def style(self, style):
         self._style = style
@@ -92,8 +93,6 @@ class BaseFigure(object):
         if self.renderer.GetRenderWindow():
             self.renWin.RemoveRenderer(self.renderer)
         self.style.SetCurrentRenderer(None)
-
-
 
     ########## Opening, closing, updating the figure  ##########################
 
@@ -114,7 +113,6 @@ class BaseFigure(object):
     def update(self):
         self._connect_renderer()
         self.renWin.Render()
-
 
     ########  Adding and removing plot elements to the figure  #################
 
@@ -156,7 +154,6 @@ class BaseFigure(object):
         self.remove_plot(plot)
         return self
 
-
     #########  Configuring the figure  #########################################
 
     @property
@@ -184,7 +181,6 @@ class BaseFigure(object):
         if opacity is not None:
             self.renderer.SetBackgroundAlpha(opacity)
 
-
     #########  figure_manager.py methods  #####################################
 
     _reset_camera = True
@@ -197,7 +193,6 @@ class BaseFigure(object):
         if self._reset_camera:
             self.reset_camera()
             self._reset_camera = False
-
 
     ############  some other bits  #############################################
 
@@ -212,8 +207,8 @@ class BaseFigure(object):
         for name in dir(cls):
             meth = getattr(cls, name)
             if getattr(meth, "__isabstractmethod__", False):
-                raise Exception(name + " is abstract and has not been re-implemented.")
-
+                raise Exception(name +
+                                " is abstract and has not been re-implemented.")
 
     @staticmethod
     def _flush_stdout():

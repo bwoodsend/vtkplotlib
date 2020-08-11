@@ -28,7 +28,6 @@ from vtkplotlib._get_vtk import vtk
 import numpy as np
 from pathlib2 import Path
 
-
 from vtkplotlib.plots.BasePlot import ConstructedPlot
 from vtkplotlib.plots.Lines import Lines
 from vtkplotlib.tests._figure_contents_check import checker
@@ -40,9 +39,8 @@ except ImportError:
     NumpyMesh = None
     NUMPY_STL_AVAILABLE = False
 
-
-MESH_DATA_TYPE_EX = lambda msg :ValueError("Invalid mesh_data argument. {}"\
-                                           .format(msg))
+MESH_DATA_TYPE_EX = lambda msg: ValueError("Invalid mesh_data argument. {}".
+                                           format(msg))
 
 
 def vtk_read_stl(path):
@@ -60,12 +58,14 @@ def vtk_read_stl(path):
         reader.Update()
         pd = PolyData(reader.GetOutput())
 
-
     # For some reason VTK just doesn't like some files. There are some vague
     # warnings in their docs - this could be what they're on about. If it
     # doesn't work ``reader.GetOutput()`` gives an empty polydata.
     if pd.vtk_polydata.GetNumberOfPoints() == 0:
-        raise RuntimeError("VTK's STLReader failed to read the STL file and no STL io backend is installed. VTK's STLReader is rather patchy. To read this file please ``pip install numpy-stl`` first.")
+        raise RuntimeError(
+            "VTK's STLReader failed to read the STL file and no STL io backend "
+            "is installed. VTK's STLReader is rather patchy. To read this file "
+            "please ``pip install numpy-stl`` first.")
 
     return pd
 
@@ -85,27 +85,27 @@ def set_from_path(self, path, ignore_numpystl=False):
 def set_vertices_index_pair(self, mesh_data):
     vertices, args = mesh_data
     if not isinstance(vertices, np.ndarray):
-        raise MESH_DATA_TYPE_EX("First argument is of invalid type {}"\
-                                .format(type(vertices)))
+        raise MESH_DATA_TYPE_EX("First argument is of invalid type {}".format(
+            type(vertices)))
 
     if vertices.shape[1:] != (3,):
-        raise MESH_DATA_TYPE_EX("First argument has invalid shape {}. Should be (..., 3)."\
-                         .format(vertices.shape))
+        raise MESH_DATA_TYPE_EX("First argument has invalid shape {}. Should be"
+                                " (..., 3).".format(vertices.shape))
 
     if not isinstance(args, np.ndarray):
-        raise MESH_DATA_TYPE_EX("Second argument is of invalid type {}"\
-                                .format(type(args)))
+        raise MESH_DATA_TYPE_EX("Second argument is of invalid type {}".format(
+            type(args)))
 
     if args.shape[1:] != (3,):
-        raise MESH_DATA_TYPE_EX("Second argument has invalid shape {}. Should be (n, 3)."\
-                         .format(args.shape))
+        raise MESH_DATA_TYPE_EX(
+            "Second argument has invalid shape {}. Should be"
+            " (n, 3).".format(args.shape))
 
     if args.dtype.kind not in "iu":
         raise MESH_DATA_TYPE_EX("Second argument must be an int dtype array")
 
     self.vertices = vertices
     self.indices = args
-
 
 
 def normalise_mesh_type(self, mesh_data):
@@ -133,7 +133,6 @@ def normalise_mesh_type(self, mesh_data):
     else:
         raise MESH_DATA_TYPE_EX("")
 
-
     # Check shapes
 
     if vectors.shape[1:] != (3, 3):
@@ -141,7 +140,8 @@ def normalise_mesh_type(self, mesh_data):
         vectors = vectors[:, :3, :3]
 
     if vectors.shape[1:] != (3, 3):
-        raise MESH_DATA_TYPE_EX("mesh_data is invalid shape {}".format(vectors.shape))
+        raise MESH_DATA_TYPE_EX("mesh_data is invalid shape {}".format(
+            vectors.shape))
 
     self.vectors = vectors
 
@@ -177,7 +177,7 @@ class MeshPlot(ConstructedPlot):
     :param label: Give the plot a label to use in legends, defaults to None.
     :type label: str, optional
 
-    :return: A meshplot object.
+    :return: A mesh object.
     :rtype: :class:`vtkplotlib.plots.MeshPlot.MeshPlot`
 
 
@@ -274,12 +274,9 @@ class MeshPlot(ConstructedPlot):
     with the :class:`vtkplotlib.PolyData` class.
 
 
-
     **Mesh plotting with scalars:**
 
-
     To create a heat map like image use the **scalars** or **tri_scalars** options.
-
 
     Use the **scalars** option to assign a scalar value to each point/corner:
 
@@ -301,7 +298,6 @@ class MeshPlot(ConstructedPlot):
 
         vpl.show()
 
-
     Use the **tri_scalars** option to assign a scalar value to each triangle:
 
     .. code-block:: python
@@ -322,25 +318,23 @@ class MeshPlot(ConstructedPlot):
 
         vpl.show()
 
-
     .. note:: **scalars** and **tri_scalars** overwrite each other and can't be used simultaneously.
 
     .. seealso::
 
         Having per-triangle-edge scalars doesn't fit well with VTK. So it got
-        its own seperate function :meth:`mesh_plot_with_edge_scalar`.
-
+        its own separate function :meth:`mesh_plot_with_edge_scalar`.
 
     """
-    def __init__(self, mesh_data, tri_scalars=None, scalars=None, color=None, opacity=None, cmap=None, fig="gcf", label=None):
+
+    def __init__(self, mesh_data, tri_scalars=None, scalars=None, color=None,
+                 opacity=None, cmap=None, fig="gcf", label=None):
         super().__init__(fig)
         self.connect()
         self.shape = (0, 3, 3)
         self._last_used_default_indices = False
 
-
         self.set_mesh_data(mesh_data)
-#        self.vectors = np.ascontiguousarray(normalise_mesh_type(mesh_data))
         del mesh_data
 
         self.__setstate__(locals())
@@ -368,6 +362,7 @@ class MeshPlot(ConstructedPlot):
             # If shape not changed, indices should be identical.
             return
 
+
 #        print("rewrite indices")
         self.shape = vectors.shape
 
@@ -384,10 +379,10 @@ class MeshPlot(ConstructedPlot):
         self.polydata.polygons = args
         self._last_used_default_indices = True
 
-
     @property
     def vertices(self):
         return self.polydata.points
+
     @vertices.setter
     def vertices(self, v):
         self.polydata.points = v
@@ -395,12 +390,12 @@ class MeshPlot(ConstructedPlot):
     @property
     def indices(self):
         return self.polydata.polygons
+
     @indices.setter
     def indices(self, i):
         self.polydata.polygons = i
         self.shape = i.shape + (3,)
         self._last_used_default_indices = False
-
 
     scalars = Lines.color
 
@@ -418,13 +413,17 @@ class MeshPlot(ConstructedPlot):
     def tri_scalars(self, tri_scalars):
         if tri_scalars is not None:
             if len(tri_scalars) != self.shape[0]:
-                raise ValueError("`tri_scalars` should have the same length as `self.vectors` or `self.args` to be one value per triangle.")
+                raise ValueError("`tri_scalars` should have the same length as "
+                                 "`self.vectors` or `self.args` to be one value"
+                                 " per triangle.")
 
             reshaped = tri_scalars.reshape((self.shape[0], -1))
-            if (1 <= reshaped.shape[1] <= 3):
+            if 1 <= reshaped.shape[1] <= 3:
                 tri_scalars = reshaped
             else:
-                raise ValueError("`tri_scalars` should have shape ({0},), ({0}, 1), ({0}, 2) or ({0}, 3). Received {1}".format(self.shape[0], tri_scalars.shape))
+                raise ValueError("`tri_scalars` should have shape ({0},), "
+                                 "({0}, 1), ({0}, 2) or ({0}, 3). Received {1}"
+                                 .format(self.shape[0], tri_scalars.shape)) # yapf: disable
 
         self.polydata.polygon_colors = tri_scalars
 
@@ -436,7 +435,8 @@ class MeshPlot(ConstructedPlot):
         del self.polydata.polygon_colors
 
 
-def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", opacity=None, cmap=None, fig="gcf", label=None):
+def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean",
+                                opacity=None, cmap=None, fig="gcf", label=None):
     """Like :meth:`mesh_plot` but able to add scalars per triangle's edge. By default,
     the scalar value at centre of each triangle is taken to be the mean of the
     scalars of its edges, but it can be far more visually effective to use
@@ -463,17 +463,17 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", o
     :param label: Give the plot a label to use in legends, defaults to None.
     :type label: str, optional
 
-    :return: A meshplot object.
-    :rtype: vtkplotlib.plots.MeshPlot.MeshPlot
+    :return: A mesh plot object.
+    :rtype: :class:`vtkplotlib.plots.MeshPlot.MeshPlot`
 
 
-    Edge scalars are very much not the way VTK likes it. Infact VTK doesn't
+    Edge scalars are very much not the way VTK likes it. In fact VTK doesn't
     allow it. To overcome this, this function triple-ises each triangle. See
     the diagram below to see how this is done:
 
     .. code-block:: text
 
-        (The diagrams's tacky, I know)
+        (The diagram's tacky, I know)
 
                    p1
 
@@ -510,7 +510,7 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", o
 
 
 
-    I wrote this orginally to visualise curvature. The calculation is ugly, but
+    I wrote this originally to visualise curvature. The calculation is ugly, but
     on the off chance someone needs it, here it is.
 
     .. code-block:: python
@@ -580,7 +580,7 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", o
         # And finally, to plot it.
         plot = vpl.mesh_plot_with_edge_scalars(mesh, signed_curvatures)
 
-        # Curvature must be clipped to prevent anomalies overwidenning the
+        # Curvature must be clipped to prevent anomalies overwidening the
         # scalar range.
         plot.scalar_range = -.1, .1
 
@@ -589,8 +589,6 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", o
 
         vpl.show()
 
-
-
     """
 
     self = MeshPlot(mesh_data, fig=fig)
@@ -598,11 +596,11 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", o
     tri_centres = np.mean(vectors, 1)
 
     new_vectors = np.empty((len(vectors) * 3, 3, 3), vectors.dtype)
-#    new_vectors.fill(np.nan)
+    # new_vectors.fill(np.nan)
 
     for i in range(3):
         for j in range(2):
-            new_vectors[i::3, j % 3] = vectors[:, (i+j) % 3]
+            new_vectors[i::3, j % 3] = vectors[:, (i + j) % 3]
 
         new_vectors[i::3, 2 % 3] = tri_centres
 
@@ -611,7 +609,7 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", o
         centre_scalars = np.mean(edge_scalars, 1)
     else:
         centre_scalars = centre_scalar
-#
+
     new_scalars = np.empty((len(tri_scalars), 3), dtype=tri_scalars.dtype)
     new_scalars[:, 0] = new_scalars[:, 1] = tri_scalars
     for i in range(3):
@@ -626,6 +624,7 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean", o
 
     return self
 
+
 @checker()
 def test():
     import vtkplotlib as vpl
@@ -634,19 +633,17 @@ def test():
     fig = vpl.gcf()
 
     path = vpl.data.get_rabbit_stl()
-#    path = "rabbit2.stl"
     _mesh = Mesh.from_file(path)
 
     mesh_data = _mesh.vectors
     mesh_data = path
 
-#    vpl.mesh_plot(mesh_data)
-
-    edge_scalars = vpl.geometry.distance(_mesh.vectors[:, np.arange(1, 4) % 3] - _mesh.vectors)
+    edge_scalars = vpl.geometry.distance(_mesh.vectors[:,
+                                                       np.arange(1, 4) % 3] -
+                                         _mesh.vectors)
 
     self = vpl.mesh_plot_with_edge_scalars(_mesh, edge_scalars, centre_scalar=0)
     self.cmap = "Reds"
-#    mesh_data = _mesh
     globals().update(locals())
 
 

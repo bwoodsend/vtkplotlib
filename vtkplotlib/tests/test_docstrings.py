@@ -24,7 +24,6 @@
 """
 """
 
-
 from unittest import TestCase, skipUnless
 
 from vtkplotlib import PyQt5_AVAILABLE, NUMPY_STL_AVAILABLE
@@ -43,8 +42,6 @@ class TestDocs(BaseTestCase):
     @checker()
     @skipUnless(PyQt5_AVAILABLE, "PyQt5 not installed")
     def test_doc_00(self):
-#        import vtkplotlib as vpl
-
         # Create the figure. This automatically sets itself as the current
         # working figure. The qapp is created automatically if one doesn't
         # already exist.
@@ -56,7 +53,6 @@ class TestDocs(BaseTestCase):
 
         # Automatically calls ``qapp.exec_()``. If you don't want it to then
         # use ``vpl.show(False)``.
-#        vpl.show()
 
     @checker()
     @skipUnless(PyQt5_AVAILABLE, "PyQt5 not installed")
@@ -69,8 +65,8 @@ class TestDocs(BaseTestCase):
         # python 2 compatibility
         from builtins import super
 
-
         class FigureAndButton(QtWidgets.QWidget):
+
             def __init__(self):
                 super().__init__()
 
@@ -89,7 +85,6 @@ class TestDocs(BaseTestCase):
                 vbox.addWidget(self.figure)
                 vbox.addWidget(self.button)
 
-
             def button_pressed_cb(self):
                 """Plot commands can be called in callbacks. The current working
                 figure is still self.figure and will remain so until a new
@@ -100,15 +95,13 @@ class TestDocs(BaseTestCase):
 
                 # Randomly place a ball.
                 vpl.scatter(np.random.uniform(-30, 30, 3),
-                            color=np.random.rand(3),
-                            fig=self.figure)
+                            color=np.random.rand(3), fig=self.figure)
 
                 # Reposition the camera to better fit to the balls.
                 vpl.reset_camera(self.figure)
 
                 # Without this the figure will not redraw unless you click on it.
                 self.figure.update()
-
 
             def show(self):
                 # The order of these two are interchangeable.
@@ -124,8 +117,8 @@ class TestDocs(BaseTestCase):
                 """
                 self.figure.closeEvent(event)
 
-
-        qapp = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
+        qapp = QtWidgets.QApplication.instance() or QtWidgets.QApplication(
+            sys.argv)
 
         window = FigureAndButton()
         window.show()
@@ -142,7 +135,6 @@ class TestDocs(BaseTestCase):
         self._do_not_delete_yet = window
 
         return output_to_verify
-
 
 #    @checker()
 #    @skipUnless(PyQt5_AVAILABLE, "PyQt5 not installed")
@@ -175,7 +167,7 @@ class TestDocs(BaseTestCase):
     @checker()
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_03(self):
-#        import vtkplotlib as vpl
+        import vtkplotlib as vpl
         from stl.mesh import Mesh
 
         mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
@@ -186,34 +178,29 @@ class TestDocs(BaseTestCase):
 
     @checker()
     def test_doc_04(self):
-#        import vtkplotlib as vpl
+        import vtkplotlib as vpl
         import numpy as np
 
         # Create an octagon, using `t` as scalar values.
-
         t = np.arange(0, 1, .125) * 2 * np.pi
-        vertices = vpl.zip_axes(np.cos(t),
-                                np.sin(t),
-                                0)
+        vertices = vpl.zip_axes(np.cos(t), np.sin(t), 0)
 
         # Plot the octagon.
-        vpl.plot(vertices,
-                 line_width=6,   # use a chunky (6pt) line
-                 join_ends=True, # join the first and last points
-                 color=t,        # use `t` as scalar values to color it
-                 )
+        vpl.plot(
+            vertices,
+            line_width=6,  # use a chunky (6pt) line
+            join_ends=True,  # join the first and last points
+            color=t,  # use `t` as scalar values to color it
+        )
 
         # use a dark background for contrast
         fig = vpl.gcf()
         fig.background_color = "grey"
 
-#        vpl.show()
-
-
     @checker()
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_05(self):
-#        import vtkplotlib as vpl
+        import vtkplotlib as vpl
         from stl.mesh import Mesh
 
         # path = "if you have an STL file then put it's path here."
@@ -227,12 +214,10 @@ class TestDocs(BaseTestCase):
         vpl.mesh_plot(mesh)
 
         # Show the figure
-#        vpl.show()
-
 
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_06(self):
-#        import vtkplotlib as vpl
+        import vtkplotlib as vpl
         from stl.mesh import Mesh
 
         # Open an STL as before
@@ -246,12 +231,10 @@ class TestDocs(BaseTestCase):
         # Optionally the plot created by mesh_plot can be passed to color_bar
         vpl.color_bar(plot, "Heights")
 
-#        vpl.show()
-
     @checker()
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_07(self):
-#        import vtkplotlib as vpl
+        import vtkplotlib as vpl
         from stl.mesh import Mesh
         import numpy as np
 
@@ -265,34 +248,32 @@ class TestDocs(BaseTestCase):
 
         vpl.mesh_plot(mesh, tri_scalars=tri_scalars)
 
-#        vpl.show()
-
-
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_08(self):
-#        import vtkplotlib as vpl
+        import vtkplotlib as vpl
         from stl.mesh import Mesh
         import numpy as np
-
 
         path = vpl.data.get_rabbit_stl()
         mesh = Mesh.from_file(path)
 
         # This is the length of each side of each triangle.
-        edge_scalars = vpl.geometry.distance(mesh.vectors[:, np.arange(1, 4) % 3] - mesh.vectors)
+        edge_scalars = vpl.geometry.distance(mesh.vectors[:,
+                                                          np.arange(1, 4) % 3] -
+                                             mesh.vectors)
 
-        vpl.mesh_plot_with_edge_scalars(mesh, edge_scalars, centre_scalar=0, cmap="Greens")
+        vpl.mesh_plot_with_edge_scalars(mesh, edge_scalars, centre_scalar=0,
+                                        cmap="Greens")
 
 #        vpl.show()
 
     @checker()
     def test_doc_09(self):
-#        import vtkplotlib as vpl
+        import vtkplotlib as vpl
         import numpy as np
 
         phi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 1024),
-                             np.linspace(0, np.pi, 1024))
-
+                                 np.linspace(0, np.pi, 1024))
 
         x = np.cos(phi) * np.sin(theta)
         y = np.sin(phi) * np.sin(theta)
@@ -304,54 +285,42 @@ class TestDocs(BaseTestCase):
 
     @checker()
     def test_doc_10(self):
-#        import vtkplotlib as vpl
+        import vtkplotlib as vpl
         import numpy as np
 
         # Create a ball at a point in space.
         point = np.array([1, 2, 3])
         vpl.scatter(point)
 
-        vpl.annotate(point,
-                     "This ball is at {}".format(point),
+        vpl.annotate(point, "This ball is at {}".format(point),
                      np.array([0, 0, 1]))
 #        vpl.show()
 
     @checker()
     def test_doc_11(self):
-#        import vtkplotlib as vpl
+        import vtkplotlib as vpl
         import numpy as np
 
         # Create several balls.
         points = np.random.uniform(-30, 30, (30, 3))
         vpl.scatter(points, color=np.random.random(points.shape))
 
-        vpl.annotate(points,
-                     "This ball is the highest",
-                     np.array([0, 0, 1]),
-                     text_color="k",
-                     arrow_color="orange"
-                     )
+        vpl.annotate(points, "This ball is the highest", np.array([0, 0, 1]),
+                     text_color="k", arrow_color="orange")
 
-        vpl.annotate(points,
-                     "This ball is the lowest",
-                     np.array([0, 0, -1]),
-                     text_color="rust",
-                     arrow_color="hunter green"
-                     )
+        vpl.annotate(points, "This ball is the lowest", np.array([0, 0, -1]),
+                     text_color="rust", arrow_color="hunter green")
+
 
 #        vpl.show()
 
     @checker()
     def test_doc_12(self):
-#        import vtkplotlib as vpl
         import numpy as np
-
 
         polydata = vpl.PolyData()
 
-        polydata.points = np.array([[1, 0, 0],
-                                    [0, 1, 0],
-                                    [0, 0, 1]], float)
+        polydata.points = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]], float)
 
         # Create a wire-frame triangle passing points [0, 1, 2, 0].
         polydata.lines = np.array([[0, 1, 2, 0]])
@@ -367,22 +336,15 @@ class TestDocs(BaseTestCase):
         # object like those output from other ``vpl.***()`` commands. It will be
         # automatically added to ``vpl.gcf()`` unless told otherwise.
         plot = polydata.to_plot()
-#        vpl.show()
 
     @checker()
     def test_doc_13(self):
-#        import vtkplotlib as vpl
-
         vpl.quick_test_plot()
-#        vpl.show()
 
     def test_doc_14(self):
-#        import vtkplotlib as vpl
         import numpy as np
 
-        vpl.zip_axes(np.arange(10),
-                     4,
-                     np.arange(-5, 5))
+        vpl.zip_axes(np.arange(10), 4, np.arange(-5, 5))
 
         # Out: array([[ 0,  4, -5],
         #             [ 1,  4, -4],
@@ -397,11 +359,7 @@ class TestDocs(BaseTestCase):
 
     @checker()
     def test_doc_035(self):
-#        import vtkplotlib as vpl
         import numpy as np
-#        import sys
-#        import crash_post_mortum
-#        sys.settrace(crash_post_mortum.Tracker().trace)
 
         # Define the 2 independent variables
         phi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 1024),
@@ -422,16 +380,11 @@ class TestDocs(BaseTestCase):
         path = vpl.data.ICONS["Right"]
         texture_map = vpl.TextureMap(path, interpolate=True)
 
-
         # You could convert ``texture_coords`` to ``colors`` now using.
         # colors = texture_map(texture_coords)
         # then pass ``colors`` as the `scalars` argument instead.
 
-        vpl.surface(x, y, z,
-                    scalars=texture_coords,
-                    texture_map=texture_map)
-
-#        vpl.show()
+        vpl.surface(x, y, z, scalars=texture_coords, texture_map=texture_map)
 
     @classmethod
     def tearDownClass(cls):
@@ -441,11 +394,6 @@ class TestDocs(BaseTestCase):
             if qapp:
                 qapp.exit()
                 qapp.quit()
-
-
-
-
-
 
 if __name__ == "__main__":
     pass

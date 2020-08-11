@@ -32,16 +32,16 @@ import numpy as np
 from vtkplotlib import nuts_and_bolts
 
 
-
 def distance(points, keepdims=False):
-    return np.sqrt(np.sum(points ** 2, axis=-1, keepdims=keepdims))
+    return np.sqrt(np.sum(points**2, axis=-1, keepdims=keepdims))
+
 
 def inner_product(a, b):
     return np.sum(a * b, axis=-1)
 
+
 #def distance_sqr(points):
 #    return np.sum(points ** 2, axis=-1)
-
 
 #def components_perpendicular_to_direction(vectors, normalised_direction):
 #    return vectors - inner_product(vectors, normalised_direction)[..., np.newaxis] * normalised_direction
@@ -58,10 +58,10 @@ def highest(points, up=np.array([0, 0, 1]), include_height=False):
     else:
         return points[arg]
 
+
 #def stagger(points, depth=1):
 #    ijs = [(i, len(points) - depth + i) for i in range(depth + 1)]
 #    return tuple(points[i:j] for (i, j) in ijs)
-
 
 #def separate_path_components(path, direction):
 #    direction_mag = distance(direction)
@@ -72,9 +72,6 @@ def highest(points, up=np.array([0, 0, 1]), include_height=False):
 #    perpendicular_components_vects = components_perpendicular_to_direction(path, direction)
 #
 #    return perpendicular_components_vects, parallel_components
-
-
-
 
 #def rotation_matrix(theta_rad):
 #    return np.array([[np.cos(theta_rad), np.sin(theta_rad)],
@@ -150,15 +147,17 @@ def highest(points, up=np.array([0, 0, 1]), include_height=False):
 def normalise(vects):
     vects /= distance(vects)[..., np.newaxis]
 
+
 def normalised(vects):
     return vects / distance(vects)[..., np.newaxis]
+
+
 #
 #def get_components(points, *unit_vectors):
 #    return tuple(inner_product(points, uv) for uv in unit_vectors)
 #
 #def tri_centres(mesh):
 #    return np.mean(mesh.vectors, axis=1)
-
 
 #def spherical(vects):
 #    r = distance(vects)
@@ -192,8 +191,8 @@ def orthogonal_bases(vector0):
 
         to_do_mask &= np.logical_not(np.isfinite(vector2).all(-1))
 
-    return vector0.reshape(old_shape), vector1.reshape(old_shape), vector2.reshape(old_shape)
-
+    return vector0.reshape(old_shape), vector1.reshape(
+        old_shape), vector2.reshape(old_shape)
 
 
 #class UnitVector(object):
@@ -349,8 +348,6 @@ def orthogonal_bases(vector0):
 #
 #UnitVector._uv_new = UnitVector.__new__
 #UnitVector.__new__ = np.ndarray.__new__#UnitVector._np_new
-
-
 
 #    def __getattribute__(self, name):
 #        print(name)

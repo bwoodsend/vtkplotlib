@@ -27,7 +27,6 @@ from builtins import super
 from vtkplotlib._get_vtk import vtk
 import numpy as np
 
-
 from vtkplotlib.plots.BasePlot import SourcedPlot
 from vtkplotlib import geometry as geom
 from vtkplotlib.plots.Arrow import Arrow
@@ -77,12 +76,13 @@ class Text3D(SourcedPlot):
 
 
     """
-    def __init__(self, text, position=(0, 0, 0), follow_cam=True, scale=1, color=None, opacity=None, fig="gcf", label=None):
+
+    def __init__(self, text, position=(0, 0, 0), follow_cam=True, scale=1,
+                 color=None, opacity=None, fig="gcf", label=None):
         super().__init__(fig)
         # Create the 3D text and the associated mapper and follower (a type of
         # actor). Position the text so it is displayed over the origin of the
         # axes.
-
 
         self.source = vtk.vtkVectorText()
         # This chunk is different to how most plots objects construct
@@ -92,9 +92,7 @@ class Text3D(SourcedPlot):
         self.property = self.actor.GetProperty()
         self.mapper.SetInputConnection(self.source.GetOutputPort())
 
-
         self.__setstate__(locals())
-
 
         self.fig += self
 
@@ -119,13 +117,12 @@ class Text3D(SourcedPlot):
     @scale.setter
     def scale(self, scale):
         if np.isscalar(scale):
-            scale = (scale, ) * 3
+            scale = (scale,) * 3
         self.actor.SetScale(*scale)
 
 
-
-
-def annotate(points, text, direction, text_color="w", arrow_color="k", distance=3., text_size=1., fig="gcf"):
+def annotate(points, text, direction, text_color="w", arrow_color="k",
+             distance=3., text_size=1., fig="gcf"):
     """Annotate a feature with an arrow pointing at a point and a text label
     on the reverse end of the arrow. This is just a convenience call to
     :meth:`arrow` and :meth:`text3d`. See there for just one or the other.
@@ -212,35 +209,29 @@ def annotate(points, text, direction, text_color="w", arrow_color="k", distance=
 
     point = geom.highest(points, direction)
 
-    arrow = Arrow(point + (distance - .5 * text_size) * direction,
-                  point,
-                  color=arrow_color,
-                  fig=fig)
+    arrow = Arrow(point + (distance - .5 * text_size) * direction, point,
+                  color=arrow_color, fig=fig)
 
-    text = Text3D(text,
-                  point + distance * direction,
-                  color=text_color,
-                  scale=text_size,
-                  fig=fig)
+    text = Text3D(text, point + distance * direction, color=text_color,
+                  scale=text_size, fig=fig)
 
     return (arrow, text)
 
 
-
 from vtkplotlib.tests._figure_contents_check import checker
+
+
 @checker()
 def test():
     import vtkplotlib as vpl
 
-#    self = vpl.text3d("some text", follow_cam=True)
-
     point = np.array([1, 2, 3])
     vpl.scatter(point)
 
-    arrow, self = vpl.annotate(point, point, np.array([0, 0, 1]), text_color="green", arrow_color="purple")
+    arrow, self = vpl.annotate(point, point, np.array([0, 0, 1]),
+                               text_color="green", arrow_color="purple")
 
     globals().update(locals())
-
 
 
 if __name__ == "__main__":

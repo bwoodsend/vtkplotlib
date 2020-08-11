@@ -108,3 +108,6 @@ spellcheck.txt
 
 # Test data
 vtkplotlib/data/test-data.json
+
+# PyCharm project
+.idea/

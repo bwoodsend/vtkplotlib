@@ -31,7 +31,6 @@ try:
 except ImportError:
     PyQt5_AVAILABLE = False
 
-
 try:
 
     class vtk(object):
@@ -40,19 +39,13 @@ try:
         vtkplotlib uses. This makes import quicker and pyinstaller builds
         smaller.
         """
-        from vtkmodules.vtkCommonCore import (VTK_ID_TYPE,
-                                                    vtkCommand,
-                                                    VTK_COLOR_MODE_DEFAULT,
-                                                    vtkPoints,
-                                                    VTK_COLOR_MODE_MAP_SCALARS,
-                                                    VTK_MAJOR_VERSION,
-                                                    VTK_COLOR_MODE_DIRECT_SCALARS,
-                                                    vtkLookupTable,
-                                                    vtkObject)
+        from vtkmodules.vtkCommonCore import (
+            VTK_ID_TYPE, vtkCommand, VTK_COLOR_MODE_DEFAULT, vtkPoints,
+            VTK_COLOR_MODE_MAP_SCALARS, VTK_MAJOR_VERSION,
+            VTK_COLOR_MODE_DIRECT_SCALARS, vtkLookupTable, vtkObject)
 
-        from vtkmodules.vtkCommonDataModel import (vtkImageData,
-                                                         vtkCellArray,
-                                                         vtkPolyData)
+        from vtkmodules.vtkCommonDataModel import (vtkImageData, vtkCellArray,
+                                                   vtkPolyData)
 
         from vtkmodules.vtkCommonMath import (vtkMatrix4x4)
 
@@ -60,60 +53,59 @@ try:
 
         from vtkmodules.vtkFiltersGeneral import (vtkCursor3D)
 
-        from vtkmodules.vtkFiltersSources import (vtkCubeSource,
-                                                        vtkSphereSource,
-                                                        vtkArrowSource)
+        from vtkmodules.vtkFiltersSources import (
+            vtkCubeSource, vtkSphereSource, vtkArrowSource)
 
         from vtkmodules.vtkIOGeometry import (vtkSTLReader)
 
         from vtkmodules.vtkIOLegacy import (vtkPolyDataReader,
-                                                  vtkPolyDataWriter)
+                                            vtkPolyDataWriter)
 
-        from vtkmodules.vtkInteractionStyle import (vtkInteractorStyleTrackballCamera,
-                                                          vtkInteractorStyleImage,
-                                                          )
+        from vtkmodules.vtkInteractionStyle import (
+            vtkInteractorStyleTrackballCamera,
+            vtkInteractorStyleImage,
+        )
 
         from vtkmodules.vtkRenderingAnnotation import (vtkScalarBarActor,
-                                                             vtkLegendBoxActor)
+                                                       vtkLegendBoxActor)
 
-        from vtkmodules.vtkRenderingCore import (vtkActor,
-                                                       vtkRenderer,
-                                                       vtkWindowToImageFilter,
-                                                       vtkTextActor,
-                                                       VTK_SCALAR_MODE_DEFAULT,
-                                                       VTK_SCALAR_MODE_USE_POINT_DATA,
-                                                       vtkImageMapper,
-                                                       vtkPolyDataMapper,
-                                                       vtkActor2D,
-                                                       VTK_SCALAR_MODE_USE_CELL_DATA,
-                                                       vtkRenderWindowInteractor,
-                                                       vtkRenderWindow,
-                                                       vtkFollower,
-                                                       vtkPropPicker,
-                                                       vtkActorCollection,
-                                                       vtkInteractorStyle,)
+        from vtkmodules.vtkRenderingCore import (
+            vtkActor,
+            vtkRenderer,
+            vtkWindowToImageFilter,
+            vtkTextActor,
+            VTK_SCALAR_MODE_DEFAULT,
+            VTK_SCALAR_MODE_USE_POINT_DATA,
+            vtkImageMapper,
+            vtkPolyDataMapper,
+            vtkActor2D,
+            VTK_SCALAR_MODE_USE_CELL_DATA,
+            vtkRenderWindowInteractor,
+            vtkRenderWindow,
+            vtkFollower,
+            vtkPropPicker,
+            vtkActorCollection,
+            vtkInteractorStyle,
+        )
 
         from vtkmodules.vtkRenderingFreeType import (vtkVectorText)
 
-        from vtkmodules.vtkIOImage import (vtkJPEGReader,
-                                                 vtkJPEGWriter,
-                                                 vtkPNGReader,
-                                                 vtkPNGWriter,
-                                                 vtkTIFFReader,
-                                                 vtkTIFFWriter,
-                                                 vtkBMPReader,
-                                                 vtkBMPWriter)
+        from vtkmodules.vtkIOImage import (
+            vtkJPEGReader, vtkJPEGWriter, vtkPNGReader, vtkPNGWriter,
+            vtkTIFFReader, vtkTIFFWriter, vtkBMPReader, vtkBMPWriter)
 
     # These aren't used directly by vtkplotlib but are by other vtk modules.
     # Explicitly importing them here is the easiest way to tell PyInstaller
     # to include them.
     if vtk.VTK_MAJOR_VERSION >= 9:
-        from vtkmodules import (vtkCommonExecutionModel,
-                                vtkCommonMisc,
-                                vtkCommonTransforms,
-                                vtkFiltersCore,
-                                vtkIOCore,
-                                vtkImagingCore,)
+        from vtkmodules import (
+            vtkCommonExecutionModel,
+            vtkCommonMisc,
+            vtkCommonTransforms,
+            vtkFiltersCore,
+            vtkIOCore,
+            vtkImagingCore,
+        )
 
     from vtkmodules.util import numpy_support
 
@@ -125,15 +117,13 @@ try:
 
     from vtkmodules import vtkRenderingGL2PSOpenGL2
 
-
 except ImportError:
-#    pass
+    #    pass
     import vtk
     from vtk.util import numpy_support
 
     if PyQt5_AVAILABLE:
         from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-
 
 numpy_to_vtk = numpy_support.numpy_to_vtk
 get_vtk_array_type = numpy_support.get_vtk_array_type
@@ -141,9 +131,11 @@ vtk_to_numpy = numpy_support.vtk_to_numpy
 get_vtk_to_numpy_typemap = numpy_support.get_vtk_to_numpy_typemap
 numpy_to_vtkIdTypeArray = numpy_support.numpy_to_vtkIdTypeArray
 
+
 def _disable_numpy_complex_warning():
     """VTK's numpy_to_vtk function has a very noisy warning - disable it here."""
     import warnings
     warnings.filterwarnings("ignore", module=numpy_support.__name__)
+
 
 _disable_numpy_complex_warning()

@@ -34,7 +34,7 @@ import importlib
 
 from unittest import TestCase, main
 from vtkplotlib.tests.base import BaseTestCase
-MODULES = ("PIL", "PyQt5", "stl", )
+MODULES = ("PIL", "PyQt5", "stl")
 #
 #class TestOptionalDependencyFallbacks(TestCase):
 #    def setUp(self):

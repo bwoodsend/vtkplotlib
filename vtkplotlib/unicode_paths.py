@@ -23,7 +23,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
-
 """
 VTK uses whatever encoding your machine's "current codepage". But you have
 to explicitly string.encode(codepage) strings to bytes then hand those to VTK.
@@ -58,16 +57,15 @@ else:
 
 
 class PathHandler(object):
+
     def __init__(self, path, mode="r", ALLOWED_ENCODING=ALLOWED_ENCODING):
         self.path = Path(path).absolute()
         del path
         self.str_path = str(self.path)
         self.ALLOWED_ENCODING = ALLOWED_ENCODING
 
-
         self.folder = self.path.parent
         self.name = self.path.name
-
 
         if mode == "r":
             if not self.path.exists():
@@ -75,13 +73,15 @@ class PathHandler(object):
 
         elif mode == "w":
             if not self.folder.exists():
-                raise FileNotFoundError("The folder {} does not exist".format(self.path.parent))
+                raise FileNotFoundError("The folder {} does not exist".format(
+                    self.path.parent))
 
         elif mode == "i":
             pass
 
         else:
-            raise ValueError("Mode must be either 'r' or 'w'. Not '{}'".format(mode))
+            raise ValueError(
+                "Mode must be either 'r' or 'w'. Not '{}'".format(mode))
         self.mode = mode
 
         # Test both the folder and the file name to see if they are safe to use.
@@ -102,6 +102,7 @@ class PathHandler(object):
     @property
     def access_path(self):
         return os.path.join(self.access_folder, self.access_name)
+
     @property
     def py_access_path(self):
         return self.access_path.decode(self.ALLOWED_ENCODING)
@@ -109,35 +110,28 @@ class PathHandler(object):
     def __enter__(self):
 
         if not self.folder_ok:
-#            _print("Warning - non-ascii folder", self.folder)
             _print("Setting the cwd to folder")
             self.old_folder = Path.cwd()
             os.chdir(str(self.folder))
             self.access_folder = "".encode(self.ALLOWED_ENCODING)
 
-
         if not self.name_ok:
-#            _print("Warning - non-ascii file name '{}'. Will give file a temporary name then change back afterwards."\
-#                  .format(self.name))
-
             # Test the suffix encodes OK
             suffix = self.path.suffix.encode(self.ALLOWED_ENCODING)
 
             while True:
-                self.access_name = str(np.random.randint(1 << 31,)).encode(self.ALLOWED_ENCODING) + suffix
+                self.access_name = str(np.random.randint(1 << 31,)).encode(
+                    self.ALLOWED_ENCODING) + suffix
                 if not os.path.exists(self.py_access_path):
                     break
 
             if self.mode == "r":
                 os.rename(str(self.path), self.py_access_path)
 
-
         return self
 
-
-
     def __exit__(self, *spam):
-#        self.access_path = Path(self.access_path)
+        #        self.access_path = Path(self.access_path)
 
         if not self.name_ok and os.path.exists(self.py_access_path):
             _print("Reverting name changes")
@@ -154,12 +148,9 @@ class PathHandler(object):
             os.chdir(str(self.old_folder))
 
 
-
 def test_path(path):
-#    from vtkplotlib.unicode_paths import PathHandler
     import vtkplotlib as vpl
     from vtkplotlib._get_vtk import vtk
-
 
     path.parent.mkdir(parents=True, exist_ok=True)
     polydata = vpl.scatter([0, 0, 0]).polydata.vtk_polydata
@@ -181,20 +172,20 @@ def test_path(path):
         reader.Update()
         read_polydata = reader.GetOutput()
         reader.CloseVTKFile()
-#        str(self.access_path).encode(self.ALLOWED_ENCODING)
 
-    dicts = [vpl.PolyData(pd).__getstate__() for pd in (polydata, read_polydata)]
+    dicts = [
+        vpl.PolyData(pd).__getstate__() for pd in (polydata, read_polydata)
+    ]
 
     for key in dicts[0]:
         # bit weird that allclose is needed here
-        assert np.all(dicts[0][key] == dicts[1][key]) or np.allclose(dicts[0][key], dicts[1][key])
+        assert np.all(dicts[0][key] == dicts[1][key]) or np.allclose(
+            dicts[0][key], dicts[1][key])
 
     os.remove(str(path))
     os.removedirs(str(path.parent))
 
     return self
-
-
 
 
 def test():
@@ -208,7 +199,9 @@ def test():
     if version >= (3, 6):
         NAMES.append(u"Ñ mé")
     if version >= (3, 6):
-        NAMES.append(np.arange(0x100, 0xd800, 0x500, np.int32).tobytes().decode("utf-32"))
+        NAMES.append(
+            np.arange(0x100, 0xd800, 0x500,
+                      np.int32).tobytes().decode("utf-32"))
 
     import itertools
     for path in itertools.combinations_with_replacement(NAMES, 2):

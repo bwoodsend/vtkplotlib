@@ -27,9 +27,8 @@ from builtins import super
 from vtkplotlib._get_vtk import vtk
 import numpy as np
 
-
-
 from vtkplotlib.plots.BasePlot import Base2DPlot
+
 
 class Text(Base2DPlot):
     """2D text at a fixed point on the window (independent of camera
@@ -63,6 +62,7 @@ class Text(Base2DPlot):
     .. seealso:: ``vpl.text3D``
 
     """
+
     def __init__(self, text_str, position=(0, 0), fontsize=18, use_pixels=False,
                  color=(1, 1, 1), opacity=None, fig="gcf"):
         # create a text actor
@@ -86,6 +86,8 @@ class Text(Base2DPlot):
         self.fig += self
 
     # TODO: make this work
+
+
 #    @property
 #    def position(self):
 #        position = self._position

@@ -22,7 +22,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
-
 """
 Colors
 ======
@@ -174,15 +173,12 @@ normalise
 
 """
 
-
 from __future__ import division
 from future import utils as _future
 
 import numpy as np
 from matplotlib import colors, cm
 from vtkplotlib._get_vtk import vtk, numpy_to_vtk, vtk_to_numpy
-
-
 
 mpl_colors = {}
 mpl_colors.update(colors.BASE_COLORS)
@@ -235,25 +231,42 @@ def as_rgb_a(color=None, opacity=None):
 
             if color[0] == "#":
                 if len(color) not in (7, 9):
-                    raise ValueError("HTML Hex string color \"{}\" is not a valid length.".format(color))
+                    raise ValueError(
+                        "HTML Hex string color \"{}\" is not a valid length.".
+                        format(color))
                 # allow #RRGGBB hex colors
                 # mpl's hex2rgb doesn't allow opacity. Otherwise I'd just use that
-                return as_rgb_a(tuple(int(color[i: 2 + i], 16) for i in range(1, len(color), 2)),
-                                     opacity)
+                return as_rgb_a(tuple(int(color[i:2 + i], 16)
+                                      for i in range(1, len(color), 2)),
+                                opacity) # yapf: disable
             else:
                 # use matplotlib's color library
                 if color in mpl_colors:
                     color = mpl_colors[color]
                 else:
                     # If not in mpl's library try to correct user input and try again
-                    corrected = color.lower().replace("_", " ").replace("-", " ")
+                    corrected = color.lower().replace("_", " ").replace(
+                        "-", " ")
+                    import warnings
+
                     if corrected in mpl_colors:
-                        print("Auto-correcting color {!r} to {!r}.\nMatplotlib colors are all lowercase and use spaces instead of underscores.".format(color, corrected))
+                        warnings.warn(
+                            "Auto-correcting color {!r} to {!r}.\nMatplotlib "
+                            "colors are all lowercase and use spaces instead of"
+                            " underscores.".format(color, corrected),
+                            UserWarning
+                        ) # yapf: disable
                         color = mpl_colors[corrected]
 
                     else:
-                        # If still not found then cancel the whole operation (including opacity)
-                        print("Color {!r} not found. Skipping color assignment. See vtkplotlib.colors.mpl_colors.keys() for a list of available colors.".format(color))
+                        # If still not found then cancel the whole operation
+                        # (including opacity)
+                        warnings.warn(
+                            "Color {!r} not found. Skipping color assignment. "
+                            "See vtkplotlib.colors.mpl_colors.keys() for a list"
+                            " of available colors.".format(color),
+                            UserWarning
+                        ) # yapf: disable
                         return None, None
 
         # QColors
@@ -276,7 +289,6 @@ def as_rgb_a(color=None, opacity=None):
 
     if opacity is not None:
         opacity_out = opacity
-
 
     return color_out, opacity_out
 
@@ -314,7 +326,6 @@ def normalise(colors, axis=None):
     colors = colors - np.nanmin(colors, axis=axis, keepdims=True)
     colors /= np.nanmax(colors, axis=axis, keepdims=True)
     return colors
-
 
 
 class TextureMap(object):
@@ -398,7 +409,6 @@ class TextureMap(object):
 
     """
 
-
     def __init__(self, array, interpolate=False):
         from vtkplotlib.nuts_and_bolts import isinstance_PathLike
         if isinstance_PathLike(array):
@@ -409,11 +419,13 @@ class TextureMap(object):
             array = read(path)
             if array is NotImplemented:
                 try:
-    #                raise ValueError()
                     from matplotlib.pylab import imread
                     array = imread(path)
                 except (ValueError, ImportError) as ex:
-                    raise NotImplementedError("Could not find a suitable VTKImageReader for \"{}\" and matplotlib's search failed with the following error - {}".format(path, ex))
+                    raise NotImplementedError(
+                        "Could not find a suitable VTKImageReader for \"{}\" "
+                        "and matplotlib's search failed with the following:") \
+                        from ex
 
             array = np.swapaxes(array, 0, 1)[:, ::-1]
         from vtkplotlib.nuts_and_bolts import isinstance_no_import
@@ -421,10 +433,12 @@ class TextureMap(object):
             array = np.array(array)
             array = np.swapaxes(array, 0, 1)[:, ::-1]
 
-        ex = lambda x: TypeError("`array` must be an np.ndarray with shape (m, n, 3) or (m, n, 4). Got {} {}".format(x, repr(array)))
-        if (not isinstance(array, np.ndarray)):
+        ex = lambda x: TypeError("`array` must be an np.ndarray with shape"
+                                 " (m, n, 3) or (m, n, 4). Got {} {}".format(
+                                     x, repr(array)))
+        if not isinstance(array, np.ndarray):
             raise ex(type(array))
-        if (len(array.shape) != 3):
+        if len(array.shape) != 3:
             raise ex(array.shape)
         if not (3 <= array.shape[2] <= 4):
             raise ex(array.shape)
@@ -436,8 +450,6 @@ class TextureMap(object):
         self.interpolate = interpolate
 
         self.shape = np.array(self.array.shape[:2])
-
-
 
     def __call__(self, uv):
         uv = (uv * (self.shape - 1))
@@ -456,23 +468,26 @@ class TextureMap(object):
             uv_corners[1, :, ..., 0] = u_right
             uv_corners[:, 0, ..., 1] = v_bottom
 
-            weights = np.sum(np.abs(uv_corners - uv[np.newaxis, np.newaxis]), -1)
+            weights = np.sum(np.abs(uv_corners - uv[np.newaxis, np.newaxis]),
+                             -1)
             weights = np.max(weights, (0, 1)) - weights
             weights += np.all(weights == 0, (0, 1), keepdims=True)
             total_weights = np.sum(weights, (0, 1), keepdims=True)
 
             normed_weights = weights / total_weights
 
-            return np.sum(self.array[uv_corners[..., 0], uv_corners[..., 1]] \
-                          * normed_weights[..., np.newaxis],
-                          (0, 1))
+            return np.sum(
+                self.array[uv_corners[..., 0], uv_corners[..., 1]] *
+                normed_weights[..., np.newaxis], (0, 1))
 
         else:
             uv = uv.astype(np.uint)
             return self.array[uv[..., 0], uv[..., 1]]
 
+
 converted_cmaps = {}
 _temp = []
+
 
 def as_vtk_cmap(cmap, cache=True):
     """Colormaps are generally converted implicitly from any valid format to a
@@ -513,7 +528,8 @@ def as_vtk_cmap(cmap, cache=True):
     if isinstance(cmap, vtk.vtkLookupTable):
         return cmap
 
-    if cache and isinstance(cmap, (colors.ListedColormap, colors.LinearSegmentedColormap)):
+    if cache and isinstance(
+            cmap, (colors.ListedColormap, colors.LinearSegmentedColormap)):
         name = cmap.name
         if name in converted_cmaps:
             return converted_cmaps[name]
@@ -533,7 +549,8 @@ def as_vtk_cmap(cmap, cache=True):
         raise TypeError()
 
     if cmap.ndim == 2 and 3 <= cmap.shape[1] <= 4:
-        cmap = np.ascontiguousarray((colors.to_rgba_array(cmap) * 255).astype(np.uint8))
+        cmap = np.ascontiguousarray(
+            (colors.to_rgba_array(cmap) * 255).astype(np.uint8))
         table = vtk.vtkLookupTable()
         table.SetTable(numpy_to_vtk(cmap))
         table._numpy_ref = cmap
@@ -544,7 +561,9 @@ def as_vtk_cmap(cmap, cache=True):
         return table
 
     else:
-        raise ValueError("`cmap` should have shape (n, 3) or (n, 4). Received {}.".format(cmap.shape))
+        raise ValueError(
+            "`cmap` should have shape (n, 3) or (n, 4). Received {}.".format(
+                cmap.shape))
 
 
 def cmap_from_list(colors, opacities=None, scalars=None, resolution=None):
@@ -577,7 +596,8 @@ def cmap_from_list(colors, opacities=None, scalars=None, resolution=None):
 
     rgbas = np.empty((len(colors), 4))
 
-    for (i, color, opacity) in zip(range(n), colors, _iter_scalar(opacities, n)):
+    for (i, color, opacity) in zip(range(n), colors, _iter_scalar(opacities,
+                                                                  n)):
         color, opacity = as_rgb_a(color, opacity)
         rgbas[i, :3], rgbas[i:, 3] = color, (1. if opacity is None else opacity)
 
@@ -595,9 +615,6 @@ def cmap_from_list(colors, opacities=None, scalars=None, resolution=None):
 
 
 #plt.imshow(np.broadcast_to(arr[:, np.newaxis], (len(arr), 100, 4)))
-
-
-
 
 #if __name__ == "__main__":
 #    import vtkplotlib as vpl

@@ -22,7 +22,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-
 from unittest import TestCase, main, skipUnless
 import numpy as np
 
@@ -35,8 +34,8 @@ except ImportError:
     Mesh = None
 
 
-
 class TestPlots(BaseTestCase):
+
     @vpl.tests._figure_contents_check.checker()
     def test_arrow(self):
         points = np.random.uniform(-10, 10, (2, 3))
@@ -58,7 +57,6 @@ class TestPlots(BaseTestCase):
         points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
         vpl.plot(points, color="r", line_width=3, join_ends=True)
 
-
     @vpl.tests._figure_contents_check.checker()
     @skipUnless(Mesh, "numpy-stl is not installed")
     def test_mesh(self):
@@ -71,12 +69,9 @@ class TestPlots(BaseTestCase):
 
         self = vpl.mesh_plot(_mesh.vectors)
 
-
         fig.show(False)
 
         for i in range(10):
-    #        self.color = np.random.random(3)
-    #        print(self.color)
             self.tri_scalars = (_mesh.x[:, 0] + 3 * i) % 20
             _mesh.rotate(np.ones(3), .1, np.mean(_mesh.vectors, (0, 1)))
             self.vectors = _mesh.vectors
@@ -84,11 +79,9 @@ class TestPlots(BaseTestCase):
 
             time.sleep(.01)
 
-
     def test_polygon(self):
         vpl.plots.Polygon.test()
         vpl.plots.Lines.test()
-
 
     @skipUnless(Mesh, "numpy-stl is not installed")
     def test_scalar_bar(self):
@@ -101,7 +94,6 @@ class TestPlots(BaseTestCase):
     def test_text(self):
         vpl.text("text", (100, 100), color="g")
 
-
     def test_annotate(self):
         vpl.text3d
         vpl.plots.Text3D.test()
@@ -109,8 +101,7 @@ class TestPlots(BaseTestCase):
     @vpl.tests._figure_contents_check.checker()
     def test_surface(self):
         thi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 100),
-                         np.linspace(0, np.pi, 50))
-
+                                 np.linspace(0, np.pi, 50))
 
         x = np.cos(thi) * np.sin(theta)
         y = np.sin(thi) * np.sin(theta)
@@ -118,10 +109,8 @@ class TestPlots(BaseTestCase):
 
         vpl.surface(x, y, z, scalars=x.ravel())
 
-
     def test_surface_and_texturemap(self):
         vpl.plots.Surface.test()
-
 
     def test_polydata(self):
         vpl.plots.polydata.test()
@@ -129,5 +118,3 @@ class TestPlots(BaseTestCase):
 
     def test_legend(self):
         vpl.plots.Legend.test()
-
-

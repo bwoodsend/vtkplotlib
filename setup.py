@@ -17,10 +17,13 @@ with open(path.join(HERE, "README.md"), "r") as fh:
 with open(path.join(HERE, "version"), "r") as fh:
     version = fh.read().strip().lstrip("v")
 
+
 class Build(build):
+
     def run(self):
         with open(path.join(HERE, "vtkplotlib", "__version__.py"), "w") as fh:
-            fh.write("# -*- coding: utf-8 -*-\n__version__ = \"{}\"\n".format(version))
+            fh.write("# -*- coding: utf-8 -*-\n__version__ = \"{}\"\n"
+                     .format(version)) # yapf: disable
         build.run(self)
 
 setup(name='vtkplotlib',
@@ -45,4 +48,4 @@ setup(name='vtkplotlib',
       test_suite='nose.collector',
       tests_require=['nose'],
       cmdclass={"build": Build}
-      )
+      ) # yapf:disable

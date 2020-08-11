@@ -16,7 +16,6 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-
 # -- Project information -----------------------------------------------------
 
 project = 'vtkplotlib'
@@ -27,7 +26,6 @@ author = 'bwoodsend'
 from vtkplotlib import __version__ as release
 # The short X.Y version
 version = ".".join(release.split(".")[:2])
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -75,7 +73,6 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -104,12 +101,10 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
-
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'vtkplotlibdoc'
-
 
 # -- Options for LaTeX output ------------------------------------------------
 
@@ -133,22 +128,16 @@ latex_elements = {
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'vtkplotlib.tex', 'vtkplotlib Documentation',
-     'bwoodsend', 'manual'),
-]
-
+#  author, document-class [howto, manual, or own class]).
+latex_documents = [(master_doc, 'vtkplotlib.tex', 'vtkplotlib Documentation',
+                    author, 'manual')]
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'vtkplotlib', 'vtkplotlib Documentation',
-     [author], 1)
-]
-
+man_pages = [(master_doc, 'vtkplotlib', 'vtkplotlib Documentation', [author], 1)
+            ]
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -156,11 +145,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'vtkplotlib', 'vtkplotlib Documentation',
-     author, 'vtkplotlib', 'One line description of project.',
-     'Miscellaneous'),
+    (master_doc, 'vtkplotlib', 'vtkplotlib Documentation', author, 'vtkplotlib',
+     'One line description of project.', 'Miscellaneous'),
 ]
-
 
 # -- Options for Epub output -------------------------------------------------
 
@@ -179,7 +166,6 @@ epub_title = project
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
 
-
 # -- Extension configuration -------------------------------------------------
 
 # -- Options for todo extension ----------------------------------------------
@@ -187,14 +173,25 @@ epub_exclude_files = ['search.html']
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
-
 # -- Globally defined substitutions to be used in rst files -----------------
 
 rst_epilog = "\n"
 
-for vtk_name in ['vtkActor', 'vtkActor2D', 'vtkArrowSource', 'vtkBMPReader', 'vtkBMPWriter', 'vtkCellArray', 'vtkCommand', 'vtkCubeSource', 'vtkCursor3D', 'vtkFollower', 'vtkImageData', 'vtkImageMapper', 'vtkInteractorStyleImage', 'vtkInteractorStyleTrackballCamera', 'vtkJPEGReader', 'vtkJPEGWriter', 'vtkLegendBoxActor', 'vtkLookupTable', 'vtkMatrix4x4', 'vtkPNGReader', 'vtkPNGWriter', 'vtkPoints', 'vtkPolyData', 'vtkPolyDataMapper', 'vtkPolyDataReader', 'vtkPolyDataWriter', 'vtkRenderWindow', 'vtkRenderWindowInteractor', 'vtkRenderer', 'vtkSTLReader', 'vtkScalarBarActor', 'vtkSphereSource', 'vtkTIFFReader', 'vtkTIFFWriter', 'vtkTextActor', 'vtkTransform', 'vtkVectorText', 'vtkWindowToImageFilter']:
-    rst_epilog += ".. _{0}: https://vtk.org/doc/nightly/html/class{0}.html#details\n".format(vtk_name)
-
+for vtk_name in [
+        'vtkActor', 'vtkActor2D', 'vtkArrowSource', 'vtkBMPReader',
+        'vtkBMPWriter', 'vtkCellArray', 'vtkCommand', 'vtkCubeSource',
+        'vtkCursor3D', 'vtkFollower', 'vtkImageData', 'vtkImageMapper',
+        'vtkInteractorStyleImage', 'vtkInteractorStyleTrackballCamera',
+        'vtkJPEGReader', 'vtkJPEGWriter', 'vtkLegendBoxActor', 'vtkLookupTable',
+        'vtkMatrix4x4', 'vtkPNGReader', 'vtkPNGWriter', 'vtkPoints',
+        'vtkPolyData', 'vtkPolyDataMapper', 'vtkPolyDataReader',
+        'vtkPolyDataWriter', 'vtkRenderWindow', 'vtkRenderWindowInteractor',
+        'vtkRenderer', 'vtkSTLReader', 'vtkScalarBarActor', 'vtkSphereSource',
+        'vtkTIFFReader', 'vtkTIFFWriter', 'vtkTextActor', 'vtkTransform',
+        'vtkVectorText', 'vtkWindowToImageFilter'
+]:
+    rst_epilog += ".. _{0}: https://vtk.org/doc/nightly/html/class{0}.html#details\n".format(
+        vtk_name)
 
 # -- Add this file for Google search console ----------
 html_extra_path = ["google77eb9775385691af.html"]

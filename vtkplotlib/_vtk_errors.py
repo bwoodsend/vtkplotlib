@@ -22,9 +22,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-
 import traceback
 from builtins import super
+
 
 class ErrorObserver(object):
 
@@ -40,15 +40,20 @@ class ErrorObserver(object):
     def attach(self, vtk_obj):
         vtk_obj.AddObserver("ErrorEvent", self)
 
+
 class ErrorSilencer(ErrorObserver):
+
     def __call__(self, obj, event, message):
         pass
+
 
 class VTKException(Exception):
     pass
 
+
 class VTKErrorRaiser(ErrorObserver):
     error_message = None
+
     def __init__(self, vtk_obj):
         super().__init__()
         self.attach(vtk_obj)

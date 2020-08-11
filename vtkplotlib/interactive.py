@@ -21,7 +21,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
-
 """
 """
 
@@ -31,10 +30,14 @@ import sys as _sys
 #from pathlib2 import Path
 import re as _re
 from vtkplotlib._get_vtk import vtk
-vtkCommands = [i for (i, j) in vars(vtk.vtkCommand).items() if isinstance(j, int)]
+vtkCommands = [
+    i for (i, j) in vars(vtk.vtkCommand).items() if isinstance(j, int)
+]
+
 
 def null_callback():
     pass
+
 
 def get_super_callback(invoker=None, event_name=None):
     if invoker is None or event_name is None:
@@ -59,7 +62,9 @@ def get_super_callback(invoker=None, event_name=None):
                 break
             invoker = event_name
         else:
-            raise TypeError("Couldn't determine the event `invoker and `event_name`. Ensure you are calling {}() from a callback which is recieving a vtkObject and str as its arguments.".format(caller.f_code.co_name))
+            raise TypeError(
+                "Couldn't determine the event `invoker and `event_name`. Ensure you are calling {}() from a callback which is recieving a vtkObject and str as its arguments."
+                .format(caller.f_code.co_name))
 
     # VTK has some rather loose naming rules for callbacks and event names.
     name = "On" + _re.match("(.*)Event", event_name).group(1)
@@ -86,6 +91,7 @@ def _actor_collection(actors, collection=None):
 
 
 class pick_point(object):
+
     def __init__(self, style_or_iren):
         if isinstance(style_or_iren, vtk.vtkRenderWindowInteractor):
             iren = style_or_iren
@@ -118,18 +124,23 @@ class pick_point(object):
     @property
     def point(self):
         return self.picker.GetPickPosition()
+
     @property
     def actor(self):
         return self.picker.GetActor()
+
     @property
     def actor_2d(self):
         return self.picker.GetActor2D()
+
     @property
     def prop_3d(self):
         return self.picker.GetProp3D()
+
     @property
     def view_prop(self):
         return self.picker.GetViewProp()
+
     @property
     def volume(self):
         return self.picker.GetVolume()
@@ -139,10 +150,12 @@ class pick_point(object):
             "\n".join("  {}: {}".format(key, _mini_vtk_repr(getattr(self, key))) for key in self.KEYS) +\
             "\n}\n"
 
-    KEYS = sorted(key for (key, val) in locals().items() if isinstance(val, property))
+    KEYS = sorted(
+        key for (key, val) in locals().items() if isinstance(val, property))
 
 
 class CursorTrackor(object):
+
     def __init__(self, fig):
         self.fig = fig
         self.init_labels()
@@ -157,16 +170,22 @@ class CursorTrackor(object):
         self.coord_labels = [QtWidgets.QLabel() for i in range(3)]
 
         self.labels = [self.text_labels[0]]
-        [self.labels.extend(i) for i in zip(self.text_labels[1:], self.coord_labels)]
+        [
+            self.labels.extend(i)
+            for i in zip(self.text_labels[1:], self.coord_labels)
+        ]
 
-        [label.setFrameStyle(QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken) for label in self.coord_labels]
+        [
+            label.setFrameStyle(QtWidgets.QFrame.Panel
+                                | QtWidgets.QFrame.Sunken)
+            for label in self.coord_labels
+        ]
 
         layout = QtWidgets.QHBoxLayout()
         layout.addStretch()
         [layout.addWidget(i) for i in self.labels]
 
         self.fig.vl.addLayout(layout)
-
 
     def set_cursor_position(self, position):
         for (label, axis) in zip(self.coord_labels, position):
@@ -208,8 +227,3 @@ if __name__ == "__main__":
     _actor_collection(balls, fig.iren.GetPicker().GetPickList())
 
     vpl.show()
-
-
-
-
-

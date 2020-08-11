@@ -24,7 +24,6 @@
 """
 """
 
-
 import numpy as np
 import sys
 import os
@@ -32,7 +31,9 @@ from pathlib2 import Path
 
 import collections
 
+
 class FigureHistory(object):
+
     def __init__(self):
         self.deque = collections.deque(maxlen=2)
 
@@ -49,6 +50,7 @@ class FigureHistory(object):
 
     def __repr__(self):
         return "<%s %s>" % (self.__class__.__name__, self.deque)
+
 
 try:
     figure_history

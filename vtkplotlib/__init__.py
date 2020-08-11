@@ -23,27 +23,25 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-
 from ._history import figure_history
 
-from .figures import (Figure as figure,
-                      gcf,
-                      scf,
-                      auto_figure,
-                      show,
-                      view,
-                      reset_camera,
-                      save_fig,
-                      screenshot_fig,
-                      close,
-                      PyQt5_AVAILABLE,
-                      zoom_to_contents,
-                      )
-
+from .figures import (
+    Figure as figure,
+    gcf,
+    scf,
+    auto_figure,
+    show,
+    view,
+    reset_camera,
+    save_fig,
+    screenshot_fig,
+    close,
+    PyQt5_AVAILABLE,
+    zoom_to_contents,
+)
 
 if PyQt5_AVAILABLE:
     from .figures import QtFigure, QtFigure2
-
 
 from .plots.Arrow import arrow, quiver
 from .plots.Lines import Lines as plot
@@ -63,6 +61,7 @@ from . import data, image_io, interactive
 
 color_bar = scalar_bar
 
+
 def quick_test_plot(fig="gcf"):
     """A quick laziness function to create 30 random spheres.
 
@@ -78,7 +77,9 @@ def quick_test_plot(fig="gcf"):
 
     """
     import numpy as np
-    return scatter(np.random.uniform(-30, 30, (30, 3)), np.random.rand(30, 3), fig=fig)
+    return scatter(np.random.uniform(-30, 30, (30, 3)),
+                   color=np.random.rand(30, 3), fig=fig) # yapf: disable
+
 
 from .nuts_and_bolts import zip_axes, unzip_axes
 from .colors import TextureMap

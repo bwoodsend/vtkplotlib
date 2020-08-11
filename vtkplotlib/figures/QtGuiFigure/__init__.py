@@ -22,7 +22,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-
 from builtins import super
 
 import numpy as np
@@ -31,7 +30,6 @@ from pathlib2 import Path
 
 from itertools import zip_longest
 from PyQt5 import QtWidgets, QtGui, QtCore
-
 
 from vtkplotlib.figures import QtFigure, save_fig, view
 from vtkplotlib.data import ICONS_FOLDER
@@ -88,62 +86,54 @@ class QtFigure2(QtFigure):
 
 
     """
+
     def __init__(self, name="qt vtk figure", parent=None):
         super().__init__(name, parent)
-
 
         self.menu = QtWidgets.QHBoxLayout()
         self.vl.insertLayout(0, self.menu)
 
         self.plot_table = None
 
-        self.save_fig_kargs = {}
-
-
+        self.save_fig_kwargs = {}
 
     def add_preset_views(self, names=None, view_params=None, icons=()):
         if view_params is None:
             self.view_buttons = ViewButtons.default(self)
         else:
-            self.view_buttons = ViewButtons(names, view_params, self, icons=())
-#
+            self.view_buttons = ViewButtons(names, view_params, self,
+                                            icons=icons)
+
         self.menu.addLayout(self.view_buttons.to_layout())
 
         return self
 
     def add_preset_views_from_directions(self, directions, ups, mirrors=True):
-        self.view_buttons = ViewButtons.from_directions(directions, ups,
-                                                        mirrors=mirrors, figure=self)
+        self.view_buttons = ViewButtons.from_directions(
+            directions, ups, mirrors=mirrors, figure=self)
         self.menu.addLayout(self.view_buttons.to_layout())
         return self
 
-
-
-    def add_screenshot_button(self, **save_fig_kargs):
+    def add_screenshot_button(self, **save_fig_kwargs):
 
         self.default_screenshot_path = Path() / (self.window_name + ".jpg")
 
-        self.screenshot_button = Button("Screenshot",
-                                        self.screenshot,
+        self.screenshot_button = Button("Screenshot", self.screenshot,
                                         SCREENSHOT_ICON_PATH)
         self.menu.addWidget(self.screenshot_button)
-        self.save_fig_kargs = save_fig_kargs
+        self.save_fig_kwargs = save_fig_kwargs
         return self
 
     def add_cursor_tracker(self):
         from vtkplotlib.interactive import CursorTrackor
         self.cursor_tracker = CursorTrackor(self)
 
-
     def screenshot(self):
-        path = QtWidgets.QFileDialog.getSaveFileName(self,
-                                                     "Save screenshot",
-                                               None, #      str(self.default_screenshot_path),
-                                                     "(*.jpg);;(*.png)")[0]
+        path = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Save screenshot", None, "(*.jpg);;(*.png)")[0]
 
         if path:
-            save_fig(path, fig=self, **self.save_fig_kargs)
-
+            save_fig(path, fig=self, **self.save_fig_kwargs)
 
     def add_show_plot_table_button(self):
         self.show_plot_table_button = Button("Show plots menu",
@@ -152,25 +142,14 @@ class QtFigure2(QtFigure):
 
         return self
 
-
     def show_plot_table(self):
         self.plot_table = table = PlotTable(self)
         table.show()
-
-
-
-#    def show(self, block=False):
-#        super().show(block)
 
     def update(self):
         super().update()
         if self.plot_table is not None:
             self.plot_table.update()
-
-
-#    def close(self):
-#        super().close()
-
 
     def add_all(self):
         self.add_preset_views()
@@ -180,9 +159,8 @@ class QtFigure2(QtFigure):
         return self
 
 
-
-
 class Button(QtWidgets.QPushButton):
+
     def __init__(self, name, callback=None, icon=None, parent=None):
         super().__init__(parent)
 
@@ -202,10 +180,8 @@ class Button(QtWidgets.QPushButton):
         else:
             self.setText(name)
 
-
     def default_callback(self):
         print("QButton", repr(self.text()), "was triggered")
-
 
 
 def as_qicon(obj):
@@ -216,15 +192,13 @@ def as_qicon(obj):
 
     from vtkplotlib.nuts_and_bolts import isinstance_PathLike, isinstance_no_import
     if isinstance_PathLike(obj):
-#                if obj.is_file():
-            pixmap = QtGui.QPixmap(str(obj))
+        pixmap = QtGui.QPixmap(str(obj))
 
     if isinstance_no_import(obj, "PIL.Image", "Image"):
         pixmap = obj.toqpixmap()
 
-
     if pixmap is not None:
-        return QtGui.QIcon(pixmap)#.scaled(00, 100))
+        return QtGui.QIcon(pixmap)
     else:
         raise TypeError("""Icons can be created from any of the following:
     - str
@@ -234,16 +208,15 @@ def as_qicon(obj):
 Received {}""".format(type(obj)))
 
 
-
-
 class ViewButton(Button):
-    def __init__(self, name, parent, icon=None,
-                 view_params={}):
+
+    def __init__(self, name, parent, icon=None, view_params=None):
+        if view_params is None:
+            view_params = {}
 
         super().__init__(name, self.set_view, icon, parent)
 
         self.args = view_params
-
 
     def set_view(self):
         view(**self.args, fig=self.parent())
@@ -252,13 +225,11 @@ class ViewButton(Button):
         self.parent().update()
 
 
-
 class ViewButtons(object):
     DEFAULT_NAMES = ("Right", "Left", "Front", "Back", "Top", "Bottom")
     DEFAULT_ICONS = tuple(ICONS_FOLDER / (i + ".jpg") for i in DEFAULT_NAMES)
-    def __init__(self, fig,
-                 names=DEFAULT_NAMES,
-                 view_params=(),
+
+    def __init__(self, fig, names=DEFAULT_NAMES, view_params=(),
                  icons=DEFAULT_ICONS):
 
         self.buttons = []
@@ -270,7 +241,6 @@ class ViewButtons(object):
 
             self.buttons.append(button)
 
-
     @classmethod
     def default(cls, figure):
 
@@ -279,18 +249,12 @@ class ViewButtons(object):
 
         return self
 
-
     def init_default(self):
-        directions = np.array([[1, 0, 0],
-                               [0, 1, 0],
-                               [0, 0, 1]])
+        directions = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
-        ups = np.array([[0, 0, 1],
-                        [0, 1, 0]])
+        ups = np.array([[0, 0, 1], [0, 1, 0]])
 
         self.init_from_directions(directions, ups)
-
-
 
     def init_from_directions(self, directions, ups, mirrors=True):
 
@@ -310,12 +274,12 @@ class ViewButtons(object):
                         args["up_view"] = up
                         break
                 else:
-                    raise ValueError("All `up_views` are parallel to direction {}".format(d))
+                    raise ValueError(
+                        "All `up_views` are parallel to direction {}".format(d))
                 view_params.append(args)
 
         for (button, args) in zip_longest(self.buttons, view_params):
             button.args = args
-
 
     def to_layout(self, parent=None):
         out = QtWidgets.QHBoxLayout(parent)
@@ -329,8 +293,8 @@ class ViewButtons(object):
                 args[key] = args[key] @ M
 
 
-
 class PlotTable(QtWidgets.QWidget):
+
     def __init__(self, figure):
         super().__init__()
         self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
@@ -343,25 +307,19 @@ class PlotTable(QtWidgets.QWidget):
 
         self.timer = timer = QtCore.QTimer()
         timer.setInterval(50)
-#        timer.timeout.connect(lambda: print(row.text.underMouse()))
+        #timer.timeout.connect(lambda: print(row.text.underMouse()))
         timer.timeout.connect(self.update)
         timer.start()
 
-
         self.update()
 
-
     def add_plot(self, plot):
-#        print("add", plot)
-        row = PlotTableRow(plot, len(self.rows))# + 1
+        row = PlotTableRow(plot, len(self.rows))  # + 1
         row.add_to_grid(self.grid)
         self.rows[plot] = row
 
-
     def remove_plot(self, plot):
-#        print("remove", plot)
         self.rows.pop(plot)
-
 
     def update(self):
         for plot in (self.plots - self.rows.keys()):
@@ -372,13 +330,14 @@ class PlotTable(QtWidgets.QWidget):
 
 
 class PlotTableRow(object):
+
     def __init__(self, plot, row_num):
         self.plot = plot
         self.row_num = row_num
 
-        self.visible_ckbox = QtWidgets.QCheckBox()
-        self.visible_ckbox.setChecked(self.plot.visible)
-        self.visible_ckbox.stateChanged.connect(self.chk_box_change_cb)
+        self.visible_checkbox = QtWidgets.QCheckBox()
+        self.visible_checkbox.setChecked(self.plot.visible)
+        self.visible_checkbox.stateChanged.connect(self.chk_box_change_cb)
 
         if hasattr(self.plot, "name"):
             name = self.plot.name
@@ -387,24 +346,18 @@ class PlotTableRow(object):
         self.text = QLabel_alterada(name)
         self.text.released.connect(self.toggle_visible)
 
-
-
     def chk_box_change_cb(self):
-        state = bool(self.visible_ckbox.checkState())
-#        print("setting", self.plot, "visibility to", state)
+        state = bool(self.visible_checkbox.checkState())
 
         self.plot.visible = bool(state)
         self.plot.fig.update()
 
-
     def toggle_visible(self):
-        self.visible_ckbox.setChecked(not self.visible_ckbox.checkState())
-
+        self.visible_checkbox.setChecked(not self.visible_checkbox.checkState())
 
     def add_to_grid(self, grid):
-        grid.addWidget(self.visible_ckbox, self.row_num, 0)
+        grid.addWidget(self.visible_checkbox, self.row_num, 0)
         grid.addWidget(self.text, self.row_num, 1)
-
 
 
 class QLabel_alterada(QtWidgets.QLabel):
@@ -416,27 +369,23 @@ class QLabel_alterada(QtWidgets.QLabel):
 
 if __name__ == "__main__":
     import vtkplotlib as vpl
-    from stl.mesh import Mesh
 
     app = None
     app = QtWidgets.QApplication(sys.argv)
 
     self = vpl.QtFigure2("Rabbits")
-#    vpl.scatter(np.random.uniform(-5, 5, (5, 3)), fig=self)
-#    vpl.quiver(np.zeros((3, 3)), np.eye(3) * 5, color=np.eye(3))
 
     plot = vpl.mesh_plot(Mesh.from_file(vpl.data.get_rabbit_stl()))
-#    plot.name = "rabbit"
-#    mesh_2 = Mesh.from_file(vpl.data.get_rabbit_stl())
-#    mesh_2.translate(np.array([100, 0, 0]))
-#    vpl.scatter(np.random.uniform(-100, 100, (3, 3)))
+    # plot.name = "rabbit"
+    # mesh_2 = Mesh.from_file(vpl.data.get_rabbit_stl())
+    # mesh_2.translate(np.array([100, 0, 0]))
+    # vpl.scatter(np.random.uniform(-100, 100, (3, 3)))
 
     self.add_all()
     fig, self = self, self.view_buttons
 
-#    M = np.roll(np.eye(3), 1, 0)
-#    self.rotate(M)
-
+    #    M = np.roll(np.eye(3), 1, 0)
+    #    self.rotate(M)
 
     fig.show()
 #

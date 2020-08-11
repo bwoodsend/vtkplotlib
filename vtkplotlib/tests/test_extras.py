@@ -37,22 +37,24 @@ except ImportError:
     Mesh = None
 
 
-
 class TestExtras(BaseTestCase):
-    def test_as_rgb_a(self):
-        rgb, a = (np.array([0.00392157, 1.        , 0.02745098]), .5)
 
-        for i in [(rgb, a),
-                  (tuple(rgb) + (a, ),),
-                  ((rgb * 255).astype(int), int(a * 255)),
-                  ("bright green", a),
-                  ("BRIGHT-GREEN", a),
-                  ("BRIGHT_GrEeN", a),
-                  ("#01FF06", a * 255),
-                  ]:
+    def test_as_rgb_a(self):
+        rgb, a = (np.array([0.00392157, 1., 0.02745098]), .5)
+
+        for i in [
+            (rgb, a),
+            (tuple(rgb) + (a,),),
+            ((rgb * 255).astype(int), int(a * 255)),
+            ("bright green", a),
+            ("BRIGHT-GREEN", a),
+            ("BRIGHT_GrEeN", a),
+            ("#01FF06", a * 255),
+        ]:
             _rgb, _a = vpl.colors.as_rgb_a(*i)
-#            print(_rgb, _a)
-            self.assertTrue(np.allclose(rgb, _rgb, atol=1/255), msg="{} != {}".format(rgb, _rgb))
+            #            print(_rgb, _a)
+            self.assertTrue(np.allclose(rgb, _rgb, atol=1 / 255),
+                            msg="{} != {}".format(rgb, _rgb))
             self.assertLess(abs(a - _a), 1 / 255)
 
         self.assertEqual(vpl.colors.as_rgb_a("not a color"), (None, None))
@@ -72,7 +74,3 @@ class TestExtras(BaseTestCase):
     def test_figure_contents_check(self):
         from vtkplotlib.tests._figure_contents_check import test
         test()
-
-
-
-

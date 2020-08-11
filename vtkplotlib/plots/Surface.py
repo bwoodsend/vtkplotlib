@@ -22,9 +22,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
 
-
 from builtins import super
-
 
 import numpy as np
 import sys
@@ -33,8 +31,6 @@ from pathlib2 import Path
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot
 from vtkplotlib import nuts_and_bolts
-
-
 
 
 class Surface(ConstructedPlot):
@@ -117,24 +113,26 @@ class Surface(ConstructedPlot):
     .. seealso:: A parametrically constructed object plays well with a :class:`vtkplotlib.colors.TextureMap`.
 
     """
-    def __init__(self, x, y, z, scalars=None, color=None, opacity=None, texture_map=None, cmap=None, fig="gcf", label=None):
+
+    def __init__(self, x, y, z, scalars=None, color=None, opacity=None,
+                 texture_map=None, cmap=None, fig="gcf", label=None):
         super().__init__(fig)
 
         points = nuts_and_bolts.zip_axes(x, y, z)
         flat_points = points.reshape((-1, 3))
 
         shape = points.shape[:-1]
-        unflatten_map = np.arange(np.prod(shape), dtype=self.polydata.ID_ARRAY_DTYPE).reshape(shape)
+        unflatten_map = np.arange(
+            np.prod(shape), dtype=self.polydata.ID_ARRAY_DTYPE).reshape(shape)
 
-
-        corners = (unflatten_map[:-1, :-1],
-                   unflatten_map[1:, :-1],
-                   unflatten_map[1:, 1:],
-                   unflatten_map[:-1, 1:],)
-
+        corners = (
+            unflatten_map[:-1, :-1],
+            unflatten_map[1:, :-1],
+            unflatten_map[1:, 1:],
+            unflatten_map[:-1, 1:],
+        )
 
         args = np.concatenate([i[..., np.newaxis] for i in corners], axis=-1)
-
 
         self.polydata.points = flat_points
         self.polydata.polygons = args
@@ -147,10 +145,10 @@ class Surface(ConstructedPlot):
         self.label = label
         self.scalar_range = Ellipsis
 
-
     @property
     def colors(self):
         return self.polydata.point_colors
+
     @colors.setter
     def colors(self, s):
         if s is not None and s.ndim > 2:
@@ -159,15 +157,15 @@ class Surface(ConstructedPlot):
         self.polydata.point_colors = s
 
 
-
 from vtkplotlib.tests._figure_contents_check import checker
+
+
 @checker()
 def test():
     import vtkplotlib as vpl
 
     phi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 1024),
                              np.linspace(0, np.pi, 1024))
-
 
     x = np.cos(phi) * np.sin(theta)
     y = np.sin(phi) * np.sin(theta)

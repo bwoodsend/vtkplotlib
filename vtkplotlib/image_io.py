@@ -21,7 +21,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
-
 """
 ========
 Images
@@ -143,11 +142,13 @@ trim_image
 
 """
 
-from ._image_io import (read, write,
-                        vtkimagedata_to_array,
-                        vtkimagedata_from_array,
-                        as_vtkimagedata,
-                        trim_image,
-                        test_bufferable_formats,
-                        BUFFERABLE_FORMAT_MODES,
-                        )
+from ._image_io import (
+    read,
+    write,
+    vtkimagedata_to_array,
+    vtkimagedata_from_array,
+    as_vtkimagedata,
+    trim_image,
+    test_bufferable_formats,
+    BUFFERABLE_FORMAT_MODES,
+)

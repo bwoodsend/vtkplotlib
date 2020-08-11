@@ -26,10 +26,7 @@ from builtins import super
 
 import numpy as np
 
-
 from vtkplotlib.plots.BasePlot import ConstructedPlot
-
-
 
 
 class Polygon(ConstructedPlot):
@@ -61,7 +58,9 @@ class Polygon(ConstructedPlot):
     many sides, the fragmentation doesn't look too great.
 
     """
-    def __init__(self, vertices, scalars=None, color=None, opacity=None, fig="gcf", label=None):
+
+    def __init__(self, vertices, scalars=None, color=None, opacity=None,
+                 fig="gcf", label=None):
         super().__init__(fig)
 
         # The implementation of this is actually exactly the same as Lines plot
@@ -81,6 +80,8 @@ class Polygon(ConstructedPlot):
 
 
 from vtkplotlib.tests._figure_contents_check import checker
+
+
 @checker()
 def test():
 

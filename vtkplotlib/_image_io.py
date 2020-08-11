@@ -21,10 +21,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
-
 """This module defines everything that goes in vtkplotlib.image_io.
 """
-
 
 import sys
 import os
@@ -32,7 +30,6 @@ import io
 
 import numpy as np
 from pathlib2 import Path
-
 
 from vtkplotlib._get_vtk import vtk, vtk_to_numpy, numpy_to_vtk, numpy_support
 
@@ -106,10 +103,13 @@ def read(path, raw_bytes=None, format=None, convert_to_array=True):
 
     """
     if isinstance(raw_bytes, bool):
-        raise TypeError("The arguments for this method have changed. If you meant to set the `convert_to_array` argument, please treat it as keyword only. i.e ``convert_to_array={}``".format(raw_bytes))
+        raise TypeError(
+            "The arguments for this method have changed. If you meant to set the `convert_to_array` argument, please treat it as keyword only. i.e ``convert_to_array={}``"
+            .format(raw_bytes))
 
     if (path is None) == (raw_bytes is None):
-        raise TypeError("Exactly one of `path` and `raw_bytes` should be specified.")
+        raise TypeError(
+            "Exactly one of `path` and `raw_bytes` should be specified.")
 
     if isinstance(path, io.IOBase):
         raw_bytes = path.read()
@@ -161,7 +161,9 @@ def _normalise_format(path, format, header=None):
         try:
             format = Path(path).suffix
         except TypeError:
-            raise ValueError("No `format` argument was given and couldn't guess the format from `path`.")
+            raise ValueError(
+                "No `format` argument was given and couldn't guess the format from `path`."
+            )
 
     format = format.upper()
     if format[0] == ".":
@@ -279,7 +281,8 @@ def vtkimagedata_from_array(arr, image_data=None):
         arr = arr[..., np.newaxis]
 
     image_data.SetDimensions(arr.shape[1], arr.shape[0], 1)
-    image_data.SetNumberOfScalarComponents(arr.shape[2], image_data.GetInformation())
+    image_data.SetNumberOfScalarComponents(arr.shape[2],
+                                           image_data.GetInformation())
 
     pd = image_data.GetPointData()
     new_arr = arr[::-1].reshape((-1, arr.shape[2]))
@@ -287,7 +290,6 @@ def vtkimagedata_from_array(arr, image_data=None):
     pd._numpy_reference = new_arr.data
 
     return image_data
-
 
 
 def trim_image(arr, background_color, crop_padding):
@@ -323,7 +325,6 @@ def trim_image(arr, background_color, crop_padding):
     if isinstance(crop_padding, float):
         crop_padding = int(crop_padding * min(mask.shape))
 
-
     masks_1d = [mask.all(i) for i in range(2)]
 
     bounds = [[], []]
@@ -332,7 +333,6 @@ def trim_image(arr, background_color, crop_padding):
         for (mask_1d_, bounds_) in zip((mask_1d, mask_1d[::-1]), bounds):
             arg = np.argmin(mask_1d_)
             if mask_1d_[arg]:
-#                print("Figure is empty - not cropping")
                 return arr
             bounds_.append(arg)
 
@@ -343,18 +343,7 @@ def trim_image(arr, background_color, crop_padding):
     bounds[1] += mask.shape[::-1]
     bounds.clip(0, mask.shape[::-1], out=bounds)
 
-#    plt.axvline(bounds[0][0])
-#    plt.axhline(bounds[0][1])
-#    plt.imshow(mask)
-#    plt.axvline(bounds[1][0])
-#    plt.axhline(bounds[1][1])
-#    plt.show()
-
     slices = tuple(slice(*i) for i in bounds.T[::-1])
-
-#    plt.imshow(mask[slices])
-#    plt.show()
-
     return arr[slices]
 
 
@@ -403,13 +392,13 @@ def as_vtkimagedata(x, ndim=None):
     raise TypeError("Unable to convert type {} to vtkImageData".format(type(x)))
 
 
-
 from vtkplotlib.tests._figure_contents_check import checker, VTKPLOTLIB_WINDOWLESS_TEST
+
+
 @checker()
 def test_trim_image():
     import vtkplotlib as vpl
     import matplotlib.pylab as plt
-
 
     vpl.quick_test_plot()
     fig = vpl.gcf()
@@ -420,7 +409,8 @@ def test_trim_image():
     background_color = np.asarray(fig.background_color) * 255
 
     # Check that no non-background coloured pixels have been lost.
-    assert (arr != background_color).any(-1).sum() == (trimmed != background_color).any(-1).sum()
+    assert (arr != background_color).any(-1).sum() \
+           == (trimmed != background_color).any(-1).sum()
 
     if not VTKPLOTLIB_WINDOWLESS_TEST:
         try:
@@ -433,13 +423,12 @@ def test_trim_image():
     return trimmed
 
 
-
-
 def test_conversions():
     import vtkplotlib as vpl
 
     # Shouldn't do anything if the figure is empty.
-    assert vpl.screenshot_fig(trim_pad_width=.05).shape[:2] == vpl.gcf().render_size
+    assert vpl.screenshot_fig(
+        trim_pad_width=.05).shape[:2] == vpl.gcf().render_size
 
     vpl.quick_test_plot()
     arr = vpl.screenshot_fig()
@@ -449,6 +438,7 @@ def test_conversions():
     arr2 = vtkimagedata_to_array(image_data)
 
     assert np.array_equal(arr, arr2)
+
 
 def test_bufferable_formats(*fmts):
     import vtkplotlib as vpl
@@ -466,12 +456,15 @@ def test_bufferable_formats(*fmts):
                 if mode == "r":
                     arr2 = read(None, binary)
                 else:
-                    arr2 = np.array(pillow_open(io.BytesIO(write(arr, None, fmt))))
+                    arr2 = np.array(
+                        pillow_open(io.BytesIO(write(arr, None, fmt))))
+
                 error_msg = "with_fmt={}, mode={}".format(fmt, mode)
                 assert arr.shape == arr2.shape, error_msg
                 error = np.abs(arr - arr2.astype(np.float)).mean()
-        #            print(error, len(binary))
+                #print(error, len(binary))
                 assert error < 1, error_msg
+
             except BaseException as ex:
                 errors.append((ex, fmt, mode))
                 print(mode, fmt)
@@ -481,11 +474,12 @@ def test_bufferable_formats(*fmts):
 
 
 BUFFERABLE_FORMAT_MODES = [
-        ("JPEG", "rw"),
-        ("PNG", "w"),
-        ("TIFF", ""),
-        ("BMP", "w"),
-        ]
+    ("JPEG", "rw"),
+    ("PNG", "w"),
+    ("TIFF", ""),
+    ("BMP", "w"),
+]
+
 
 def test():
     test_trim_image()
@@ -497,37 +491,49 @@ def test():
     else:
         test_bufferable_formats((".jpg", "r"), *BUFFERABLE_FORMAT_MODES)
 
+
 import re
 
 # https://en.wikipedia.org/wiki/List_of_file_signatures
 
 FORMAT_CODES = {
-    "JPEG": """
+    "JPEG":
+        """
         FF D8 FF ??
         FF D8 FF E0 00 10 4A 46 49 46 00 01
         FF D8 FF EE
         FF D8 FF E1 ?? ?? 45 78 69 66 00 00
         """,
-    "PNG": """
+    "PNG":
+        """
         89 50 4E 47 0D 0A 1A 0A
         """,
-    "BMP": """
+    "BMP":
+        """
         42 4D
         """,
-    "TIFF": """
+    "TIFF":
+        """
         49 49 2A 00
         4D 4D 00 2A
         """
 }
 
+
 def _code_to_regex(code):
-    return re.compile(b"".join(b"." if i == "??" else re.escape(bytes([int(i, 16)]))\
-                               for i in code.strip(" \n").split()), re.DOTALL)
+    parts = (b"." if i == "??" else re.escape(bytes([int(i, 16)]))
+             for i in code.strip(" \n").split())
+    return re.compile(b"".join(parts), re.DOTALL)
+
 
 def _codes_to_regexes(codes_block):
     return [_code_to_regex(i) for i in codes_block.strip(" \n").split("\n")]
 
-FORMAT_REGEXS = [(key, _codes_to_regexes(val)) for (key, val) in FORMAT_CODES.items()]
+
+FORMAT_REGEXS = [
+    (key, _codes_to_regexes(val)) for (key, val) in FORMAT_CODES.items()
+]
+
 
 def format_from_header(header):
     """Guess image type based on the first few bytes. This is a bit useless
@@ -539,15 +545,5 @@ def format_from_header(header):
     raise ValueError("Unrecognised header " + repr(header[:16]))
 
 
-
 if __name__ == "__main__":
-#    import vtkplotlib as vpl
-#    from vtkplotlib import image_io
-#    import matplotlib.pylab as plt
-#
-#    path = vpl.data.ICONS["Right"]
-#
-#    plt.imshow(image_io.read(path))
-#    plt.show()
     test()
-

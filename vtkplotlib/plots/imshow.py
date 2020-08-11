@@ -24,7 +24,6 @@
 """
 """
 
-
 import numpy as np
 import matplotlib.pylab as plt
 import sys
@@ -33,18 +32,15 @@ from pathlib2 import Path
 
 from vtkplotlib._get_vtk import vtk, numpy_to_vtk
 
-
 #points = vtk_to_numpy(image_data.GetPointData().GetArray(0))
 #shape = image_data.GetDimensions()[:-1]
 #shape = shape[::-1] + (points.shape[-1], )
 
 
-
-
 def main(colorImage):
 
-#    colorImage = vtk.vtkImageData()
-#    CreateColorImage(colorImage)
+    # colorImage = vtk.vtkImageData()
+    # CreateColorImage(colorImage)
 
     imageMapper = vtk.vtkImageMapper()
     if vtk.VTK_MAJOR_VERSION <= 5:
@@ -83,46 +79,13 @@ def main(colorImage):
     renderWindow.Render()
     renderWindowInteractor.Start()
 
-#
-#def CreateColorImage(image):
-#
-#    dim = 20
-#
-#    image.SetDimensions(dim, dim, 1)
-#
-#    if vtk.VTK_MAJOR_VERSION <= 5:
-#        image.SetNumberOfScalarComponents(3)
-#        image.SetScalarTypeToUnsignedChar()
-#        image.AllocateScalars()
-#    else:
-#        image.AllocateScalars(VTK_UNSIGNED_CHAR,3)
-#
-#    for x in range(dim):
-#        for y in range(dim)
-#            unsigned char* pixel = static_cast<unsigned char*>(image.GetScalarPointer(x,y,0))
-#            if(x < dim/2)
-#	{
-#	pixel[0] = 255
-#	pixel[1] = 0
-#	}
-#            else
-#	{
-#	pixel[0] = 0
-#	pixel[1] = 255
-#	}
-#
-#            pixel[2] = 0
-#            }
-#        }
-#
-#    image.Modified()
-#}
-
 
 from vtkplotlib import image_io
 from vtkplotlib.plots.BasePlot import Base2DPlot
 
+
 class Imshow(Base2DPlot):
+
     def __init__(self, arr, fig="gcf"):
         super().__init__(fig)
 
@@ -152,13 +115,10 @@ class Imshow(Base2DPlot):
         self.fig.renderer.AddActor2D(imageActor)
 
 
-
-
 if __name__ == "__main__":
     pass
 
     import vtkplotlib as vpl
-
 
     arr = plt.imread(vpl.data.ICONS["Right"])
     arr = image_io.trim_image(arr, arr[0, 0], 10)
@@ -169,7 +129,6 @@ if __name__ == "__main__":
     #
     #pd = image_data.GetPointData()
     #pd.SetScalars(numpy_to_vtk(np.transpose(arr[::-1], (2, 0, 1)).ravel()))
-
 
     self = Imshow(arr)
     vpl.show()

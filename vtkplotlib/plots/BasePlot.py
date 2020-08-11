@@ -35,7 +35,6 @@ from vtkplotlib.plots.polydata import PolyData
 from vtkplotlib.nuts_and_bolts import init_when_called
 
 
-
 class BasePlot(object):
     """A base class for all plots in vtkplotlib. This tries to handle all the
     common steps involved in constructing and linking the vtk pipeline. Also
@@ -43,12 +42,8 @@ class BasePlot(object):
     """
 
     def __init__(self, fig="gcf"):
-#        self.temp = []
-
         self.fig = fig
         self.label = None
-
-#        self.mapper =
 
         self.actor = vtk.vtkActor()
 
@@ -59,11 +54,12 @@ class BasePlot(object):
     @fig.setter
     def fig(self, fig):
         if fig == "gcf":
-          fig = gcf()
+            fig = gcf()
         self._fig = fig
 
     def __setstate__(self, state):
-        [setattr(self, key, val) for (key, val) in state.items() if key != "self" and val is not None]
+        [setattr(self, key, val) for (key, val) in state.items()
+         if key != "self" and val is not None] # yapf: disable
 
     @init_when_called
     def mapper(self):
@@ -76,7 +72,6 @@ class BasePlot(object):
         if self.fig is not None:
             self.fig.add_plot(self)
 
-
     def color_opacity(self, color=None, opacity=None):
         prop = self.property
 
@@ -88,10 +83,8 @@ class BasePlot(object):
         if color is not None:
             prop.SetColor(color)
 
-
     def __hash__(self):
         return hash(id(self))
-
 
     @property
     def color(self):
@@ -129,10 +122,10 @@ class BasePlot(object):
         fig.show()
         scf(old_gcf)
 
+
 #    @property
 #    def polydata(self):
 #        raise TypeError("{} type objects can't produce a polydata object.".format(type(self)))
-
 
 
 class SourcedPlot(BasePlot):
@@ -141,6 +134,7 @@ class SourcedPlot(BasePlot):
     further down the pipeline. E.g a sphere or an arrow. The source provides
     it's own conversion to triangles with source.GetOutputPort(). This class
     is just to handle the slightly different way of connecting the pipeline."""
+
     def connect(self):
         super().connect()
         self.mapper.SetInputConnection(self.source.GetOutputPort())
@@ -156,11 +150,11 @@ class ConstructedPlot(BasePlot):
     manually into a vtk.vtkPolyData object (generic bucket class for storing
     points/lines/surfaces ...).
     """
+
     def __init__(self, fig="gcf"):
         super().__init__(fig)
         self.polydata = PolyData()
         self._freeze_scalar_range = False
-
 
     def connect(self):
         super().connect()
@@ -188,11 +182,13 @@ class ConstructedPlot(BasePlot):
 
 
 class Base2DPlot(BasePlot):
+
     def __actor2d_init__(self):
 
-        self.actor.GetPositionCoordinate().SetCoordinateSystemToNormalizedDisplay()
-        self.actor.GetPosition2Coordinate().SetCoordinateSystemToNormalizedDisplay()
-
+        self.actor.GetPositionCoordinate(
+        ).SetCoordinateSystemToNormalizedDisplay()
+        self.actor.GetPosition2Coordinate(
+        ).SetCoordinateSystemToNormalizedDisplay()
 
     @property
     def position(self):
@@ -213,8 +209,6 @@ class Base2DPlot(BasePlot):
         self.actor.GetPosition2Coordinate().SetValue(*size)
 
 
-
-
 def _iter_points(points):
     """Fixes the array shape to (n, 3)."""
     points = np.asarray(points)
@@ -229,7 +223,7 @@ def _iter_colors(colors, shape):
     if colors is None:
         return (None for i in range(size))
 
-    if isinstance(colors, (tuple, list,) + utils.string_types):
+    if isinstance(colors, (tuple, list) + utils.string_types):
         return (colors for i in range(size))
 
     colors = np.asarray(colors)
@@ -252,8 +246,6 @@ def _iter_scalar(s, shape):
         return (s for i in range(size))
     else:
         return arr.flat
-
-
 
 
 if __name__ == "__main__":

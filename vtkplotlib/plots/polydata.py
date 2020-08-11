@@ -31,25 +31,19 @@ from pathlib2 import Path
 import operator
 
 from matplotlib.cm import get_cmap
-from vtkplotlib._get_vtk import (
-    vtk,
-    numpy_to_vtk,
-    numpy_to_vtkIdTypeArray,
-    vtk_to_numpy,
-    get_vtk_to_numpy_typemap
-)
+from vtkplotlib._get_vtk import (vtk, numpy_to_vtk, numpy_to_vtkIdTypeArray,
+                                 vtk_to_numpy, get_vtk_to_numpy_typemap)
 import itertools
 
 ID_ARRAY_DTYPE = get_vtk_to_numpy_typemap()[vtk.VTK_ID_TYPE]
 
-# def unpack_id_array(arr, max_size):
-#
 from vtkplotlib import colors as vpl_colors
 
 _numpy_to_vtk = numpy_to_vtk
 
 import sys
 PYTHON_2 = sys.version[0] == '2'
+
 
 def numpy_to_vtk(num_array, deep=0, array_type=None):
     assert deep or num_array.flags.contiguous
@@ -100,7 +94,8 @@ def colors_property(vtk_name, vpl_name, doc=""):
     Single colors for the entire plot is not included. That should be handled
     after the polydata has been turned into a ConstructedPlot.
     """
-    getter_getter = operator.attrgetter("vtk_polydata.Get{}Data".format(vtk_name))
+    getter_getter = operator.attrgetter(
+        "vtk_polydata.Get{}Data".format(vtk_name))
 
     def getter(self):
         colors = getter_getter(self)().GetScalars()
@@ -108,11 +103,9 @@ def colors_property(vtk_name, vpl_name, doc=""):
             return
         return vtk_to_numpy(colors)
 
-
     def setter(self, colors):
 
         if colors is not None:
-
 
             if colors.ndim == 1:
                 colors = colors[:, np.newaxis]
@@ -120,7 +113,6 @@ def colors_property(vtk_name, vpl_name, doc=""):
             if colors.ndim != 2:
                 raise ValueError("`colors` must be either 1-D or 2-D")
             colors = np.ascontiguousarray(colors)
-
 
             if colors.shape[1] == 1:
                 # treat colors as scalars to be passed through a colormap
@@ -131,9 +123,11 @@ def colors_property(vtk_name, vpl_name, doc=""):
                 # currently texture maps haven't been properly implemented. The
                 # colors are evaluated immediately here.
                 if self.texture_map is None:
-                    raise ValueError("A texture map must be provided in polydata.texture_map to use uv scalars.")
+                    raise ValueError(
+                        "A texture map must be provided in polydata.texture_map to use uv scalars."
+                    )
                 colors = self.texture_map(colors)
-#                self.color_mode = vtk.VTK_COLOR_MODE_MAP_SCALARS
+                # self.color_mode = vtk.VTK_COLOR_MODE_MAP_SCALARS
                 self.color_mode = vtk.VTK_COLOR_MODE_DIRECT_SCALARS
 
             elif colors.shape[1] == 3:
@@ -150,7 +144,6 @@ def colors_property(vtk_name, vpl_name, doc=""):
 
         getter_getter(self)().SetScalars(colors)
         setattr(self, "color_source", vpl_name)
-
 
     def deleter(self):
         setattr(self, vpl_name, None)
@@ -210,7 +203,8 @@ def unpack_lengths(arr):
     assert len(arr.shape) == 1
 
     def error_msg():
-        print("Warning - checksum failed. This input array will cause VTK to crash if plotted.")
+        print("Warning - checksum failed. This input array will cause VTK to"
+              " crash if plotted.")
 
     if len(arr) == 0:
         return []
@@ -230,7 +224,7 @@ def unpack_lengths(arr):
                 error_msg()
                 break
             else:
-                out.append(arr[i: j])
+                out.append(arr[i:j])
                 if j == len(arr):
                     break
                 else:
@@ -240,10 +234,14 @@ def unpack_lengths(arr):
         return out
 
 
-SCALAR_MODES_TO_STRINGS = {vtk.VTK_SCALAR_MODE_DEFAULT: None,
-                           vtk.VTK_SCALAR_MODE_USE_CELL_DATA: "polygon_colors",
-                           vtk.VTK_SCALAR_MODE_USE_POINT_DATA: "point_colors"}
-SCALAR_MODES_FROM_STRINGS = {val:key for (key, val) in SCALAR_MODES_TO_STRINGS.items()}
+SCALAR_MODES_TO_STRINGS = {
+    vtk.VTK_SCALAR_MODE_DEFAULT: None,
+    vtk.VTK_SCALAR_MODE_USE_CELL_DATA: "polygon_colors",
+    vtk.VTK_SCALAR_MODE_USE_POINT_DATA: "point_colors"
+}
+SCALAR_MODES_FROM_STRINGS = {
+    val: key for (key, val) in SCALAR_MODES_TO_STRINGS.items()
+}
 
 #COLOR_MODES_TO_STRINGS = {vtk.VTK_COLOR_MODE_DEFAULT:  }
 
@@ -327,14 +325,13 @@ class PolyData(object):
 
 
     """
+
     def __init__(self, vtk_polydata=None, mapper=None):
         self.vtk_polydata = vtk_polydata or vtk.vtkPolyData()
         self.mapper = mapper or vtk.vtkPolyDataMapper()
 
-#        self.cmap = get_cmap()
         self.texture_map = None
         self._temp = []
-
 
     @property
     def points(self):
@@ -355,12 +352,10 @@ class PolyData(object):
         if vertices is None:
             self.vtk_polydata.SetPoints(None)
         else:
-#            points = vtk.vtkPoints()
             points = self.vtk_polydata.GetPoints() or vtk.vtkPoints()
             points.SetData(numpy_to_vtk(vertices))
             points._numpy_reference = vertices
             self.vtk_polydata.SetPoints(points)
-
 
     lines = cell_array_handler_property("Lines")
 
@@ -386,14 +381,11 @@ class PolyData(object):
         plot.connect()
         return plot
 
-
     point_colors = colors_property("Point", "point_colors")
     polygon_colors = colors_property("Cell", "polygon_colors")
 
-
     def __getstate__(self):
         state = {key: getattr(self, key) for key in self._keys}
-#        del state["vtk_polydata"]
         return state
 
     def __setstate__(self, state):
@@ -457,7 +449,6 @@ class PolyData(object):
             mode = SCALAR_MODES_FROM_STRINGS[mode]
         self.mapper.SetScalarMode(mode)
 
-
     @property
     def color_mode(self):
         """Use to select the interpretation of `self.[]_colors`.
@@ -478,7 +469,6 @@ class PolyData(object):
     @color_mode.setter
     def color_mode(self, mode):
         self.mapper.SetColorMode(mode)
-
 
     @property
     def scalar_range(self):
@@ -515,7 +505,9 @@ class PolyData(object):
     _keys = [key for (key, val) in vars().items() if isinstance(val, property)]
     _keys.remove("cmap")
 
+
 from vtkplotlib.tests._figure_contents_check import checker, VTKPLOTLIB_WINDOWLESS_TEST
+
 
 @checker()
 def test(*spam):
@@ -526,14 +518,12 @@ def test(*spam):
 
     vectors = vpl.mesh_plot(vpl.data.get_rabbit_stl(), fig=None).vectors
 
-
     points = vectors.reshape((-1, 3))
     self.points = points
     polygons = np.arange(len(points)).reshape((-1, 3))
     self.polygons = polygons
 
-
-    point_colors = vpl.colors.normalise(points, axis=0)#[:, 0]
+    point_colors = vpl.colors.normalise(points, axis=0)  #[:, 0]
 
     self.point_colors = point_colors
 
@@ -541,7 +531,6 @@ def test(*spam):
         self.quick_show()
     else:
         self.to_plot(fig=None)
-
 
     self.polygons, self.lines = self.lines, self.polygons
     if not VTKPLOTLIB_WINDOWLESS_TEST:
@@ -553,7 +542,6 @@ def test(*spam):
     del self.polygons
     self.lines = self.polygons = polygons
 
-#    print("copy")
     copy = self.copy()
     assert np.array_equal(self.points, copy.points)
     assert np.array_equal(self.polygons, copy.polygons)
@@ -561,30 +549,24 @@ def test(*spam):
     assert np.array_equal(self.point_colors, copy.point_colors)
     assert np.array_equal(self.polygon_colors, copy.polygon_colors)
 
-#    print("modify points")
     copy.points += [100, 0, 0]
-#    print(copy)
-#    print(copy.vtk_polydata.GetPoints)
-#    print(copy.points)
 
     (self + copy).to_plot()
     repr(self)
 
     globals().update(locals())
 
+
 def test_packing():
     randint = np.random.randint
 
-    x  = [randint(0, 10, i) for i in randint(0, 10, 10)]
+    x = [randint(0, 10, i) for i in randint(0, 10, 10)]
 
     packed = pack_lengths(x)
     unpacked = unpack_lengths(packed)
 
     assert len(x) == len(unpacked)
     assert all(map(np.array_equal, x, unpacked))
-
-
-
 
 
 if __name__ == "__main__":

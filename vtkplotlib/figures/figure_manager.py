@@ -89,8 +89,6 @@ def gcf(create_new=True):
     """
     global _figure
 
-#    print(_auto_fig)
-#    print(_figure)
     if not _auto_fig:
         return
     if _figure is None and create_new:
@@ -104,16 +102,17 @@ class NoFigureError(Exception):
     fmt = """{} requires a figure and auto_fig is disabled. Create one using
     `vpl.figure()` and pass it as `fig` argument. Or call `vpl.auto_figure(True)`
     and leave the `fig` argument as the default.""".format
+
     def __init__(self, name):
         super().__init__(self.fmt(name))
 
+
 def gcf_check(fig, function_name):
     if fig == "gcf":
-      fig = gcf()
+        fig = gcf()
     if fig is None:
         raise NoFigureError(function_name)
     return fig
-
 
 
 def show(block=True, fig="gcf"):
@@ -153,8 +152,8 @@ def show(block=True, fig="gcf"):
     gcf_check(fig, "show").show(block)
 
 
-
-def view(focal_point=None, camera_position=None, camera_direction=None, up_view=None, fig="gcf"):
+def view(focal_point=None, camera_position=None, camera_direction=None,
+         up_view=None, fig="gcf"):
     """Set/get the camera position/orientation.
 
     :param focal_point: A point the camera should point directly to, defaults to None.
@@ -207,8 +206,8 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
 
     if (camera_direction is not None or camera_position is not None) and \
         (focal_point is None):
-            focal_point = np.zeros(3)
-            reset_at_end = True
+        focal_point = np.zeros(3)
+        reset_at_end = True
     else:
         reset_at_end = False
 
@@ -237,7 +236,6 @@ def view(focal_point=None, camera_position=None, camera_direction=None, up_view=
                 up_view=camera.GetViewUp())
 
 
-
 def reset_camera(fig="gcf"):
     """Reset the position and zoom of the camera so that all plots are visible.
 
@@ -254,7 +252,8 @@ def reset_camera(fig="gcf"):
     fig.renderer.ResetCamera()
 
 
-def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, off_screen=False, fig="gcf"):
+def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None,
+                   off_screen=False, fig="gcf"):
     """Take a screenshot of a figure. The image is returned as an array. To
     save a screenshot directly to a file, see vpl.save_fig.
 
@@ -316,7 +315,6 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, off_screen
     win_to_image_filter = vtk.vtkWindowToImageFilter()
     win_to_image_filter.SetInput(fig.renWin)
 
-
     # Normalise and set user inputs for magnification.
 
     if isinstance(pixels, int):
@@ -333,7 +331,8 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, off_screen
         win_to_image_filter.SetScale(*magnification)
     else:
         if magnification[0] != magnification[1]:
-            print("This version of VTK doesn't support seperate magnifications for height and width")
+            print("This version of VTK doesn't support separate magnifications "
+                  "for height and width")
             magnification = (magnification[0], magnification[0])
         win_to_image_filter.SetMagnification(magnification[0])
 
@@ -346,21 +345,11 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None, off_screen
     arr = image_io.vtkimagedata_to_array(win_to_image_filter.GetOutput())
     arr = image_io.trim_image(arr, fig.background_color, trim_pad_width)
 
-    # Rendering in Off screen mode seemingly makes it impossible to ever show
-    # that renWin again without either crashing or hanging indefinitely - even
-    # if you turn off screen rendering back off. `fig.finalise()` deletes the
-    # renWin and a new one will be created if it is needed.
-#    if off_screen:
-#        fig.close()
-#        fig.finalise()
-#        if hasattr(fig, "_clean_up"):
-#            fig._clean_up()
-
     return arr
 
 
-
-def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, off_screen=False, fig="gcf", **imsave_plotargs):
+def save_fig(path, magnification=1, pixels=None, trim_pad_width=None,
+             off_screen=False, fig="gcf", **imsave_plotargs):
     """Take a screenshot and saves it to a file.
 
     :param path: The path, including extension, to save to.
@@ -371,6 +360,9 @@ def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, off_screen
 
     :param pixels: Image dimensions in pixels, defaults to None.
     :type pixels: int or a (width, height) tuple of ints, optional
+
+    :param trim_pad_width: Padding to leave when cropping to contents, see :meth:`screenshot_fig`, defaults to None.
+    :type trim_pad_width: int, float, optional
 
     :param off_screen: If true, attempt to take the screenshot without opening the figure's window, defaults to False.
     :type off_screen: bool, optional
@@ -387,11 +379,8 @@ def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, off_screen
     considerably better file size than PNG.
 
     """
-    array = screenshot_fig(magnification=magnification,
-                           pixels=pixels,
-                           fig=fig,
-                           trim_pad_width=trim_pad_width,
-                           off_screen=off_screen)
+    array = screenshot_fig(magnification=magnification, pixels=pixels, fig=fig,
+                           trim_pad_width=trim_pad_width, off_screen=off_screen)
 
     try:
         from matplotlib.pylab import imsave
@@ -407,9 +396,9 @@ def save_fig(path, magnification=1, pixels=None, trim_pad_width=None, off_screen
         pass
     from vtkplotlib.image_io import write
     if write(array, path) is NotImplemented:
-        raise ValueError("No writer for format '{}' could be found. Try installing PIL for more formats."\
-                         .format(Path(path).ext))
-
+        raise ValueError("No writer for format '{}' could be found. Try "
+                         "installing PIL for more formats.".format(
+                             Path(path).ext))
 
 
 def close(fig="gcf"):
@@ -429,7 +418,6 @@ def close(fig="gcf"):
     if fig is not None:
         # Closing is provided by the figure classes.
         fig.close()
-
 
 
 def zoom_to_contents(plots_to_exclude=(), padding=.05, fig="gcf"):
@@ -459,13 +447,17 @@ def zoom_to_contents(plots_to_exclude=(), padding=.05, fig="gcf"):
 
     # Temporarily hide any 2D plots such as legends or scalarbars.
     from vtkplotlib.plots.BasePlot import Base2DPlot
-    plots_2d_states = {plot: plot.visible for plot in fig.plots if isinstance(plot, Base2DPlot)}
+    plots_2d_states = {
+        plot: plot.visible for plot in fig.plots
+        if isinstance(plot, Base2DPlot)
+    }
     plots_2d_states.update((plot, plot.visible) for plot in plots_to_exclude)
     for plot in plots_2d_states:
         plot.visible = False
 
     for i in range(10):
-        actual_shape = np.array(screenshot_fig(fig=fig, trim_pad_width=padding).shape[:2][::-1])
+        actual_shape = np.array(
+            screenshot_fig(fig=fig, trim_pad_width=padding).shape[:2][::-1])
         target_shape = np.array(fig.render_size)
 
         zoom = (target_shape / actual_shape).min()

@@ -21,7 +21,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # =============================================================================
-
 """Dumping ground for random bits and bobs. I use this for several projects so
 there will be a lot of irrelevant functions."""
 
@@ -29,12 +28,15 @@ import numpy as np
 import os, sys, io
 from future.utils import native_str
 
+
 def set_to_array(s, dtype=float):
     return np.fromiter(iter(s), count=len(s), dtype=dtype)
+
 
 def sep_last_ax(points):
     points = np.asarray(points)
     return tuple(points[..., i] for i in range(points.shape[-1]))
+
 
 def zip_axes(*axes):
     """Convert vertex data from seperate arrays for x, y, z to a single
@@ -70,7 +72,9 @@ def zip_axes(*axes):
 
     """
 
-    return np.concatenate([i[..., np.newaxis] for i in np.broadcast_arrays(*axes)], axis=-1)
+    return np.concatenate(
+        [i[..., np.newaxis] for i in np.broadcast_arrays(*axes)], axis=-1)
+
 
 def unzip_axes(points):
     """Seperate each component from an array of points.
@@ -85,9 +89,7 @@ def unzip_axes(points):
 
     """
 
-
     return sep_last_ax(points)
-
 
 
 def init_when_called(func):
@@ -104,6 +106,7 @@ def init_when_called(func):
             delattr(self, priv_attr)
 
     return property(getter, None, deleter, func.__doc__)
+
 
 def isinstance_no_import(x, module_name, type_name):
     """Test if ``isinstance(x, a_type)`` without importing **a_type** from
@@ -122,4 +125,3 @@ def isinstance_PathLike(x, allow_buffers=False):
         or isinstance_no_import(x, "pathlib", "Path") \
         or isinstance_no_import(x, "pathlib2", "Path") \
         or (allow_buffers and isinstance(x, io.IOBase))
-

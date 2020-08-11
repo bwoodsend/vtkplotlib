@@ -174,8 +174,10 @@ class Legend(Base2DPlot):
     notably, ``legend.text_options.SetFontSize(size)`` has no effect.
 
     """
-    def __init__(self, plots_source="fig", fig="gcf", position=(.7, .7), size=(.3, .3),
-                 color="grey", opacity=None, allow_non_polydata_plots=False, allow_no_label=False):
+
+    def __init__(self, plots_source="fig", fig="gcf", position=(.7, .7),
+                 size=(.3, .3), color="grey", opacity=None,
+                 allow_non_polydata_plots=False, allow_no_label=False):
 
         super().__init__(fig)
         self.actor = self.legend = vtk.vtkLegendBoxActor()
@@ -183,7 +185,6 @@ class Legend(Base2DPlot):
         self.__actor2d_init__()
 
         self.__setstate__(locals())
-
 
         self.legend.UseBackgroundOn()
         self.text_options = self.legend.GetEntryTextProperty()
@@ -195,12 +196,11 @@ class Legend(Base2DPlot):
                 plots_source = self.fig.plots
 
         if plots_source is not None and plots_source != "fig":
-            self.add_plots(plots_source,
-                           allow_no_label=allow_no_label,
+            self.add_plots(plots_source, allow_no_label=allow_no_label,
                            allow_non_polydata_plots=allow_non_polydata_plots)
 
-
-    def add_plots(self, plots, allow_non_polydata_plots=False, allow_no_label=False):
+    def add_plots(self, plots, allow_non_polydata_plots=False,
+                  allow_no_label=False):
         by_label = {}
         for plot in plots:
             label = plot.label
@@ -224,7 +224,6 @@ class Legend(Base2DPlot):
             else:
                 self.set_entry(label=label, color=plot.color)
 
-
     @property
     def color(self):
         return self.legend.GetBackgroundColor()
@@ -236,10 +235,8 @@ class Legend(Base2DPlot):
         if opacity is not None:
             self.legend.SetBackgroundOpacity(opacity)
 
-    opacity = property(lambda self: self.legend.GetBackgroundOpacity()
-                      ,lambda self, o: self.legend.SetBackgroundOpacity(o)
-                        )
-
+    opacity = property(lambda self: self.legend.GetBackgroundOpacity(),
+                       lambda self, o: self.legend.SetBackgroundOpacity(o))
 
     @property
     def length(self):
@@ -251,8 +248,8 @@ class Legend(Base2DPlot):
 
     __len__ = length.fget
 
-
-    def set_entry(self, symbol="box", label="from plot", color=None, icon=None, index="append"):
+    def set_entry(self, symbol="box", label="from plot", color=None, icon=None,
+                  index="append"):
         if index == "append":
             index = self.length
             self.length += 1
@@ -275,7 +272,6 @@ class Legend(Base2DPlot):
                     # PolyData based plot, ignore color.
                     color = None
 
-
         if color is not None:
             self.set_entry_color(index, color)
 
@@ -288,7 +284,6 @@ class Legend(Base2DPlot):
         if icon is not None:
             self.set_entry_icon(index, icon)
 
-
     def set_entry_icon(self, index, icon):
         self._check_length(index)
         from vtkplotlib import image_io
@@ -296,12 +291,12 @@ class Legend(Base2DPlot):
         icon = image_io.as_vtkimagedata(icon, ndim=2)
         self.legend.SetEntryIcon(index, icon)
 
-
     def set_entry_symbol(self, index, symbol):
         self._check_length(index)
 
         if isinstance(symbol, np.ndarray) and symbol.dtype == object:
-            print("Warning - Legend.set_entry_symbol received an array of plots rather than a single plot.")
+            print("Warning - Legend.set_entry_symbol received an array of plots"
+                  " rather than a single plot.")
             symbol = symbol.item(0)
 
         polydata = symbol
@@ -312,7 +307,9 @@ class Legend(Base2DPlot):
             polydata = polydata.vtk_polydata
 
         if not isinstance(polydata, vtk.vtkPolyData):
-            raise TypeError("symbol must be a vpl.PolyData, vtk.vtkPolyData or the output of a vpl method such as vpl.plot. Received type {}".format(type(symbol)))
+            raise TypeError(
+                "symbol must be a vpl.PolyData, vtk.vtkPolyData or the output of a vpl method such as vpl.plot. Received type {}"
+                .format(type(symbol)))
 
         # If the polydata is not already positioned at the origin then the
         # generated icon moves with it. This finds the polydata's position
@@ -336,12 +333,10 @@ class Legend(Base2DPlot):
 
         self.legend.SetEntrySymbol(index, polydata)
 
-
     def set_entry_color(self, index, color):
         self._check_length(index)
         color = as_rgb_a(color)[0]
         self.legend.SetEntryColor(index, color)
-
 
     def set_entry_text(self, index, text):
         self._check_length(index)
@@ -352,24 +347,26 @@ class Legend(Base2DPlot):
             self.length = index + 1
 
 
-
-
 from vtkplotlib.tests._figure_contents_check import checker
+
+
 @checker()
 def test():
     import vtkplotlib as vpl
 
     self = vpl.legend(None)
 
-
     self.set_entry(label="Blue Square", color="blue")
 
     sphere = vpl.scatter([0, 5, 10], color="g", fig=None, label="Ball")
     self.set_entry(sphere, color="b")
-    self.set_entry(sphere, "Green ball", )
+    self.set_entry(
+        sphere,
+        "Green ball",
+    )
 
     self.set_entry(vpl.mesh_plot(vpl.data.get_rabbit_stl()), "rabbit")
-#    self.set_entry(vpl.quiver(np.zeros(3), np.array([-1, 0, 1])), "right")
+    # self.set_entry(vpl.quiver(np.zeros(3), np.array([-1, 0, 1])), "right")
     self.set_entry(None, label="shark", icon=vpl.data.ICONS["Right"])
     self.size = (.3, .3)
     self.position = np.array(1) - self.size
@@ -377,7 +374,5 @@ def test():
     globals().update(locals())
 
 
-
 if __name__ == "__main__":
     self = test()
-
