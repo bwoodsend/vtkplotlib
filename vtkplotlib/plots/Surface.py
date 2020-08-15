@@ -81,13 +81,13 @@ class Surface(ConstructedPlot):
     :rtype: :class:`vtkplotlib.surface`
 
 
-    .. seealso:: 
-    
-        :meth:`vtkplotlib.mesh_plot` for a surface made out of triangles or 
+    .. seealso::
+
+        :meth:`vtkplotlib.mesh_plot` for a surface made out of triangles or
         :meth:`vtkplotlib.polygon` for a surface made out of polygons.
 
     This is the only function in `vtkplotlib` that takes it's (x, y, z)
-    components as seperate arguments. **x**, **y** and **z** should be 2D
+    components as separate arguments. **x**, **y** and **z** should be 2D
     arrays with matching shapes. This is typically achieved by using
     ``phi, theta = np.meshgrid(phis, thetas)`` then calculating x, y and z
     from ``phi`` and ``theta``. Here is a rather unexciting example.
@@ -155,30 +155,3 @@ class Surface(ConstructedPlot):
             s = np.asarray(s)
             s = s.reshape((-1, s.shape[-1]))
         self.polydata.point_colors = s
-
-
-from vtkplotlib.tests._figure_contents_check import checker
-
-
-@checker()
-def test():
-    import vtkplotlib as vpl
-
-    phi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 1024),
-                             np.linspace(0, np.pi, 1024))
-
-    x = np.cos(phi) * np.sin(theta)
-    y = np.sin(phi) * np.sin(theta)
-    z = np.cos(theta)
-
-    self = vpl.surface(x, y, z, fig=None)
-    path = vpl.data.ICONS["Right"]
-    self.polydata.texture_map = vpl.TextureMap(path, interpolate=True)
-    self.colors = (vpl.zip_axes(phi * 3, theta * 5) / np.pi) % 1.
-
-    self.connect()
-    vpl.gcf().add_plot(self)
-
-
-if __name__ == "__main__":
-    test()

@@ -156,26 +156,3 @@ def scatter(points, color=None, opacity=None, radius=1., use_cursors=False,
         return out
     else:
         return out_flat[0]
-
-
-from vtkplotlib.tests._figure_contents_check import checker
-
-
-@checker()
-def test():
-    import vtkplotlib as vpl
-
-    points = np.random.uniform(-10, 10, (30, 3))
-
-    colors = vpl.colors.normalise(points)
-    radii = np.abs(points[:, 0])**.5
-
-    vpl.scatter(points, color=colors, radius=radii, use_cursors=False)[0]
-    self = vpl.scatter(points, color=colors, radius=radii, use_cursors=True)[0]
-    self.point += np.array([10, 0, 0])
-
-    globals().update(locals())
-
-
-if __name__ == "__main__":
-    test()

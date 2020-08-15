@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+#encoding: utf-8
 # =============================================================================
-# Created on Mon Aug  5 11:14:43 2019
+# Created on Tue Sep 24 08:34:56 2019
 #
 # @author: Brénainn Woodsend
 #
 #
-# tests.__init__.py
+# test_extras.py tests everything that isn't tested in the other test modules.
 # Copyright (C) 2019  Brénainn Woodsend
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,3 +21,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # =============================================================================
+
+from __future__ import division
+
+import vtkplotlib as vpl
+
+from tests._common import requires_interaction
+
+
+def test_data():
+    vpl.data.assert_ok()
+
+
+@requires_interaction
+def test_figure_contents_check():
+    from tests._common import test_checker
+    test_checker()

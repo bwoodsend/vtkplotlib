@@ -39,10 +39,10 @@ def sep_last_ax(points):
 
 
 def zip_axes(*axes):
-    """Convert vertex data from seperate arrays for x, y, z to a single
+    """Convert vertex data from separate arrays for x, y, z to a single
     combined points array like most vpl functions require.
 
-    :param axes: Each seperate axis to combine.
+    :param axes: Each separate axis to combine.
     :type axes: array_like or scalar
 
     All `axes` must have the matching or broadcastable shapes. The number of
@@ -77,7 +77,7 @@ def zip_axes(*axes):
 
 
 def unzip_axes(points):
-    """Seperate each component from an array of points.
+    """Separate each component from an array of points.
 
     :param points: Some points.
     :type points: np.ndarray
@@ -97,7 +97,7 @@ def init_when_called(func):
     priv_attr = "_" + attr
 
     def getter(self):
-        if (not hasattr(self, priv_attr)):
+        if not hasattr(self, priv_attr):
             setattr(self, priv_attr, func(self))
         return getattr(self, priv_attr)
 

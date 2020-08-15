@@ -215,24 +215,4 @@ def annotate(points, text, direction, text_color="w", arrow_color="k",
     text = Text3D(text, point + distance * direction, color=text_color,
                   scale=text_size, fig=fig)
 
-    return (arrow, text)
-
-
-from vtkplotlib.tests._figure_contents_check import checker
-
-
-@checker()
-def test():
-    import vtkplotlib as vpl
-
-    point = np.array([1, 2, 3])
-    vpl.scatter(point)
-
-    arrow, self = vpl.annotate(point, point, np.array([0, 0, 1]),
-                               text_color="green", arrow_color="purple")
-
-    globals().update(locals())
-
-
-if __name__ == "__main__":
-    test()
+    return arrow, text

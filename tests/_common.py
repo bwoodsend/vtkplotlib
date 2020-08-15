@@ -5,7 +5,8 @@
 # @author: Brénainn Woodsend
 #
 #
-# Checks consistency of test outputs across different platforms.
+# _common.py
+# Shared variables/markers for testing.
 # Copyright (C) 2019-2020  Brénainn Woodsend
 #
 # This program is free software: you can redistribute it and/or modify
@@ -27,9 +28,11 @@
 from builtins import super
 import future.utils
 
-from vtkplotlib.data import DATA_FOLDER
 import os
 import numpy as np
+from pathlib2 import Path
+
+import pytest
 
 try:
     import inspect
@@ -46,11 +49,24 @@ else:
     else:
         DEFAULT_MODE = "w"
 
+TEST_DIR = Path(__file__).parent.absolute().resolve() / "temp"
+TEST_DIR.mkdir(exist_ok=True)
+
 
 class AutoChecker(object):
+    """Attempts to assess reproducibility of visualisations between runs so I
+    don't have to manually click through each test to verify that it looks OK.
+
+    Wraps around any test function which plots something but doesn't call
+    ``vpl.show()`` at the end. The wrapped function, if called in **write** mode
+    (determined by the **mode** argument to that newly wrapped function) it will
+    call the original function, screenshot and store the image, then call
+    ``vpl.show()`` so you can verify it. If called in **read** mode, then it
+    will call the original function, screenshot the result and verify it matches
+    the stored one, then closes so that you don't have to interact with it."""
 
     def __init__(self):
-        self.path = DATA_FOLDER / "test-data.json"
+        self.path = TEST_DIR / "test-data.json"
         self.load()
 
     def auto_check_contents(self, test_func):
@@ -96,6 +112,13 @@ class AutoChecker(object):
 
     @staticmethod
     def reduce_image_array(arr):
+        """Serialise an image array into something that can go into a json file
+        i.e plain text."""
+        # Ideally I'd just use 'shape' and 'crc32_checksum' but there are
+        # subtle, visually invisible differences between snapshots from
+        # different OSs and VTK versions. So image matching must be fuzzy
+        # meaning we have to store the whole image.
+        # Interestingly bz2 gives better compression than PNG.
         import zlib, bz2, base64
         return {
             "shape": list(arr.shape),
@@ -191,7 +214,7 @@ def test_quick_test_plot():
     vpl.quick_test_plot()
 
 
-def test():
+def test_checker():
 
     test_quick_test_plot(mode=DEFAULT_MODE and "w")
 
@@ -201,5 +224,13 @@ def test():
     test_quick_test_plot(mode=DEFAULT_MODE and "r")
 
 
+requires_interaction = pytest.mark.skipif(VTKPLOTLIB_WINDOWLESS_TEST,
+                                          reason="Requires manual interaction.")
+
+
+def numpy_stl():
+    return pytest.importorskip("stl.mesh", reason="Requires numpy-stl")
+
+
 if __name__ == "__main__":
-    test()
+    test_checker()

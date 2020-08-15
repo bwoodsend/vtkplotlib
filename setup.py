@@ -35,7 +35,7 @@ setup(name='vtkplotlib',
       author='Brénainn Woodsend',
       author_email='bwoodsend@gmail.com',
       license='GNU version 3.0',
-      packages=find_packages(),
+      packages=find_packages(exclude=("tests",)),
       include_package_data=True,
       install_requires=[
              "vtk",
@@ -45,7 +45,9 @@ setup(name='vtkplotlib',
              "future",
               ],
       zip_safe=False,
-      test_suite='nose.collector',
-      tests_require=['nose'],
+      extras_require={
+          "test_minimal": ["pytest"],
+          "test_full": ["pytest", "PyQt5", "numpy-stl", "namegenerator", "PILLOW"],
+      },
       cmdclass={"build": Build}
       ) # yapf:disable

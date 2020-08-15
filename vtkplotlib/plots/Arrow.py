@@ -39,7 +39,7 @@ class Arrow(SourcedPlot):
         super().__init__(fig)
 
         diff = end - start
-        if length == None:
+        if length is None:
             length = geom.distance(diff)
 
         # vtk needs a full set of axes to build about.

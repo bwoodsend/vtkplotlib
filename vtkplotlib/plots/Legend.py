@@ -345,34 +345,3 @@ class Legend(Base2DPlot):
     def _check_length(self, index):
         if index >= self.length:
             self.length = index + 1
-
-
-from vtkplotlib.tests._figure_contents_check import checker
-
-
-@checker()
-def test():
-    import vtkplotlib as vpl
-
-    self = vpl.legend(None)
-
-    self.set_entry(label="Blue Square", color="blue")
-
-    sphere = vpl.scatter([0, 5, 10], color="g", fig=None, label="Ball")
-    self.set_entry(sphere, color="b")
-    self.set_entry(
-        sphere,
-        "Green ball",
-    )
-
-    self.set_entry(vpl.mesh_plot(vpl.data.get_rabbit_stl()), "rabbit")
-    # self.set_entry(vpl.quiver(np.zeros(3), np.array([-1, 0, 1])), "right")
-    self.set_entry(None, label="shark", icon=vpl.data.ICONS["Right"])
-    self.size = (.3, .3)
-    self.position = np.array(1) - self.size
-
-    globals().update(locals())
-
-
-if __name__ == "__main__":
-    self = test()

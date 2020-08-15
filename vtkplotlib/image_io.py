@@ -149,6 +149,5 @@ from ._image_io import (
     vtkimagedata_from_array,
     as_vtkimagedata,
     trim_image,
-    test_bufferable_formats,
     BUFFERABLE_FORMAT_MODES,
 )

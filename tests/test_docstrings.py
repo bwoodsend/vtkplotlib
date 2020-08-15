@@ -28,15 +28,14 @@ from unittest import TestCase, skipUnless
 
 from vtkplotlib import PyQt5_AVAILABLE, NUMPY_STL_AVAILABLE
 
-from vtkplotlib.tests._figure_contents_check import checker, VTKPLOTLIB_WINDOWLESS_TEST
-from vtkplotlib.tests.base import BaseTestCase
-
 if PyQt5_AVAILABLE:
     from PyQt5 import QtWidgets, QtCore, QtGui
 import vtkplotlib as vpl
 
+from tests._common import checker, VTKPLOTLIB_WINDOWLESS_TEST
 
-class TestDocs(BaseTestCase):
+
+class TestDocs(TestCase):
     """These are automatically extracted from the docstrings."""
 
     @checker()

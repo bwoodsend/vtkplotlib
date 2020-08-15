@@ -60,7 +60,7 @@ class Lines(ConstructedPlot):
     :return: A lines object. Always a single object - even when plotting multiple lines.
     :rtype: :class:`vtkplotlib.plots.Lines.Lines`
 
-    If **vertices** is 3D then multiple seperate lines are plotted. This can be
+    If **vertices** is 3D then multiple separate lines are plotted. This can be
     used to plot meshes as wireframes.
 
     .. code-block:: python
@@ -176,36 +176,3 @@ class Lines(ConstructedPlot):
             # can't use `super().color = color` sadly
             ConstructedPlot.color.fset(self, c)
             self.polydata.point_colors = None
-
-
-from vtkplotlib.tests._figure_contents_check import checker
-
-
-@checker()
-def test():
-    import vtkplotlib as vpl
-
-    t = np.arange(0, 1, .001) * 2 * np.pi
-    vertices = np.array(
-        [np.cos(2 * t),
-         np.sin(3 * t),
-         np.cos(5 * t) * np.sin(7 * t)]).T
-    vertices = np.array([vertices, vertices + 2])
-
-    t = np.arange(0, 1, .125) * 2 * np.pi
-    vertices = vpl.zip_axes(np.cos(t), np.sin(t), 0)
-
-    # vertices = np.random.uniform(-30, 30, (3, 3))
-    # color = np.broadcast_to(t, vertices.shape[:-1])
-
-    self = vpl.plot(vertices, line_width=6, join_ends=True, color=t)
-    # self.polydata.point_scalars = vpl.geometry.distance(vertices)
-    # self.polydata.point_colors = t
-    fig = vpl.gcf()
-    fig.background_color = "grey"
-
-    globals().update(locals())
-
-
-if __name__ == "__main__":
-    test()

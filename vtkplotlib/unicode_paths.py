@@ -59,6 +59,7 @@ if __name__ == "__main__":
 else:
     _print = lambda *x: None
 
+
 class PathHandler(object):
     """Context manager to handle unicode filenames (which VTK does poorly).
     This class will choose any combination of:
@@ -69,6 +70,7 @@ class PathHandler(object):
     * Direct VTK to write to an ascii name then rename it afterwards.
 
     """
+
     def __init__(self, path, mode="r", ALLOWED_ENCODING=ALLOWED_ENCODING):
         self.path = Path(path).absolute()
         del path
@@ -142,8 +144,6 @@ class PathHandler(object):
         return self
 
     def __exit__(self, *spam):
-        #        self.access_path = Path(self.access_path)
-
         if not self.name_ok and os.path.exists(self.py_access_path):
             _print("Reverting name changes")
             if self.path.exists():
@@ -157,70 +157,3 @@ class PathHandler(object):
         if not self.folder_ok:
             _print("reverting to old working dir")
             os.chdir(str(self.old_folder))
-
-
-def test_path(path):
-    import vtkplotlib as vpl
-    from vtkplotlib._get_vtk import vtk
-
-    path.parent.mkdir(parents=True, exist_ok=True)
-    polydata = vpl.scatter([0, 0, 0]).polydata.vtk_polydata
-
-    self = PathHandler(path, "w")
-    with self:
-        _print(path, "->", self.py_access_path)
-
-        writer = vtk.vtkPolyDataWriter()
-        writer.SetFileName(self.access_path)
-        writer.SetInputData(polydata)
-        assert writer.Write()
-
-        assert os.path.exists(self.py_access_path)
-
-    with PathHandler(path, "r") as self:
-        reader = vtk.vtkPolyDataReader()
-        reader.SetFileName(self.access_path)
-        reader.Update()
-        read_polydata = reader.GetOutput()
-        reader.CloseVTKFile()
-
-    dicts = [
-        vpl.PolyData(pd).__getstate__() for pd in (polydata, read_polydata)
-    ]
-
-    for key in dicts[0]:
-        # bit weird that allclose is needed here
-        assert np.all(dicts[0][key] == dicts[1][key]) or np.allclose(
-            dicts[0][key], dicts[1][key])
-
-    os.remove(str(path))
-    os.removedirs(str(path.parent))
-
-    return self
-
-
-def test():
-    from vtkplotlib.data import DATA_FOLDER
-
-    NAMES = [u"name"]
-
-    # Proper Python unicode support came in version 3.6 I think (determined
-    # empirically).
-    version = (sys.version_info.major, sys.version_info.minor)
-    if version >= (3, 6):
-        NAMES.append(u"Ñ mé")
-    if version >= (3, 6):
-        NAMES.append(
-            np.arange(0x100, 0xd800, 0x500,
-                      np.int32).tobytes().decode("utf-32"))
-
-    import itertools
-    for path in itertools.combinations_with_replacement(NAMES, 2):
-        self = test_path(DATA_FOLDER / Path(*path))
-
-    return self
-
-
-if __name__ == "__main__":
-    print(ALLOWED_ENCODING)
-    self = test()

@@ -31,7 +31,7 @@ from vtkplotlib.plots.BasePlot import ConstructedPlot
 
 class Polygon(ConstructedPlot):
     """Creates a filled polygon(s) with **vertices** as it's corners. For a 3
-    dimensional **vertices** array, each 2d array within **vertices** is a seperate
+    dimensional **vertices** array, each 2d array within **vertices** is a separate
     polygon.
 
     :param vertices: Each corner of each polygon.
@@ -77,23 +77,3 @@ class Polygon(ConstructedPlot):
         self.connect()
 
         self.color_opacity(color, opacity)
-
-
-from vtkplotlib.tests._figure_contents_check import checker
-
-
-@checker()
-def test():
-
-    import vtkplotlib as vpl
-
-    t = np.arange(0, 1, .1) * 2 * np.pi
-    points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
-
-    self = vpl.polygon(points, color="r")
-
-    globals().update(locals())
-
-
-if __name__ == "__main__":
-    test()

@@ -392,105 +392,12 @@ def as_vtkimagedata(x, ndim=None):
     raise TypeError("Unable to convert type {} to vtkImageData".format(type(x)))
 
 
-from vtkplotlib.tests._figure_contents_check import checker, VTKPLOTLIB_WINDOWLESS_TEST
-
-
-@checker()
-def test_trim_image():
-    import vtkplotlib as vpl
-    import matplotlib.pylab as plt
-
-    vpl.quick_test_plot()
-    fig = vpl.gcf()
-    arr = vpl.screenshot_fig()
-    vpl.close()
-
-    trimmed = trim_image(arr, fig.background_color, 10)
-    background_color = np.asarray(fig.background_color) * 255
-
-    # Check that no non-background coloured pixels have been lost.
-    assert (arr != background_color).any(-1).sum() \
-           == (trimmed != background_color).any(-1).sum()
-
-    if not VTKPLOTLIB_WINDOWLESS_TEST:
-        try:
-            plt.imshow(trimmed)
-            plt.show()
-        except UnicodeDecodeError:
-            # There's an issue with the tk backend in python 2.
-            pass
-
-    return trimmed
-
-
-def test_conversions():
-    import vtkplotlib as vpl
-
-    # Shouldn't do anything if the figure is empty.
-    assert vpl.screenshot_fig(
-        trim_pad_width=.05).shape[:2] == vpl.gcf().render_size
-
-    vpl.quick_test_plot()
-    arr = vpl.screenshot_fig()
-    vpl.close()
-
-    image_data = vtkimagedata_from_array(arr)
-    arr2 = vtkimagedata_to_array(image_data)
-
-    assert np.array_equal(arr, arr2)
-
-
-def test_bufferable_formats(*fmts):
-    import vtkplotlib as vpl
-    from PIL.Image import open as pillow_open
-
-    path = vpl.data.ICONS["Right"]
-    arr = np.array(pillow_open(path))
-    with open(path, "rb") as f:
-        binary = f.read()
-
-    errors = []
-    for (fmt, modes) in fmts:
-        for mode in modes:
-            try:
-                if mode == "r":
-                    arr2 = read(None, binary)
-                else:
-                    arr2 = np.array(
-                        pillow_open(io.BytesIO(write(arr, None, fmt))))
-
-                error_msg = "with_fmt={}, mode={}".format(fmt, mode)
-                assert arr.shape == arr2.shape, error_msg
-                error = np.abs(arr - arr2.astype(np.float)).mean()
-                #print(error, len(binary))
-                assert error < 1, error_msg
-
-            except BaseException as ex:
-                errors.append((ex, fmt, mode))
-                print(mode, fmt)
-                raise
-
-    return errors
-
-
 BUFFERABLE_FORMAT_MODES = [
     ("JPEG", "rw"),
     ("PNG", "w"),
     ("TIFF", ""),
     ("BMP", "w"),
 ]
-
-
-def test():
-    test_trim_image()
-    test_conversions()
-    try:
-        __import__("PIL")
-    except ImportError:
-        pass
-    else:
-        test_bufferable_formats((".jpg", "r"), *BUFFERABLE_FORMAT_MODES)
-
 
 import re
 
@@ -543,7 +450,3 @@ def format_from_header(header):
             if pattern.match(header):
                 return fmt
     raise ValueError("Unrecognised header " + repr(header[:16]))
-
-
-if __name__ == "__main__":
-    test()

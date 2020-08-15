@@ -340,37 +340,3 @@ class QtFigure(BaseFigure, QWidget):
         # closeEvent seems to be called anyway but call this just to be sure.
         self.on_close()
         BaseFigure.close(self)
-
-from vtkplotlib.tests._figure_contents_check import checker, VTKPLOTLIB_WINDOWLESS_TEST
-
-
-@checker()
-def test():
-    import vtkplotlib as vpl
-
-    QtFigure._abc_assert_no_abstract_methods()
-
-    self = QtFigure("a Qt widget figure")
-
-    assert self is vpl.gcf()
-
-    direction = np.array([1, 0, 0])
-    vpl.quiver(np.array([0, 0, 0]), direction)
-    vpl.view(camera_direction=direction)
-    vpl.reset_camera()
-
-    # self.show()
-
-    self.show(block=False)
-    self.close()
-
-    self.showMaximized(block=not VTKPLOTLIB_WINDOWLESS_TEST)
-    out = vpl.screenshot_fig(fig=self)
-    vpl.close(fig=self)
-
-    globals().update(locals())
-    return out
-
-
-if __name__ == "__main__":
-    test()

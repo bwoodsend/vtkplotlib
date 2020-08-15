@@ -73,23 +73,3 @@ class ScalarBar(Base2DPlot):
 
         self.set_horizontal = self.actor.SetOrientationToHorizontal
         self.set_vertical = self.actor.SetOrientationToVertical
-
-
-from vtkplotlib.tests._figure_contents_check import checker
-
-
-@checker()
-def test():
-    from stl.mesh import Mesh
-    import vtkplotlib as vpl
-
-    mesh = Mesh.from_file(vpl.data.get_rabbit_stl())
-    plot = vpl.mesh_plot(mesh, scalars=mesh.x)
-
-    self = vpl.scalar_bar(plot, "X Values")
-
-    globals().update(locals())
-
-
-if __name__ == "__main__":
-    test()

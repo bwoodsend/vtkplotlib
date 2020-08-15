@@ -30,7 +30,6 @@ from pathlib2 import Path
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot
 from vtkplotlib.plots.Lines import Lines
-from vtkplotlib.tests._figure_contents_check import checker
 
 try:
     from stl.mesh import Mesh as NumpyMesh
@@ -623,29 +622,3 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean",
     self.cmap = cmap
 
     return self
-
-
-@checker()
-def test():
-    import vtkplotlib as vpl
-    from stl.mesh import Mesh
-
-    fig = vpl.gcf()
-
-    path = vpl.data.get_rabbit_stl()
-    _mesh = Mesh.from_file(path)
-
-    mesh_data = _mesh.vectors
-    mesh_data = path
-
-    edge_scalars = vpl.geometry.distance(_mesh.vectors[:,
-                                                       np.arange(1, 4) % 3] -
-                                         _mesh.vectors)
-
-    self = vpl.mesh_plot_with_edge_scalars(_mesh, edge_scalars, centre_scalar=0)
-    self.cmap = "Reds"
-    globals().update(locals())
-
-
-if __name__ == "__main__":
-    test()
