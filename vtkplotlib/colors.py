@@ -174,7 +174,7 @@ normalise
 """
 
 from __future__ import division
-from future import utils as _future
+from future import utils as _future_utils
 
 import numpy as np
 from matplotlib import colors, cm
@@ -225,8 +225,8 @@ def as_rgb_a(color=None, opacity=None):
     opacity_out = None
 
     if color is not None:
-        if isinstance(color, _future.string_types):
-            if _future.PY2 and isinstance(color, unicode):
+        if isinstance(color, _future_utils.string_types):
+            if _future_utils.PY2 and isinstance(color, unicode):
                 color = color.encode()
 
             if color[0] == "#":
@@ -422,10 +422,11 @@ class TextureMap(object):
                     from matplotlib.pylab import imread
                     array = imread(path)
                 except (ValueError, ImportError) as ex:
-                    raise NotImplementedError(
-                        "Could not find a suitable VTKImageReader for \"{}\" "
-                        "and matplotlib's search failed with the following:") \
-                        from ex
+                    _future_utils.raise_from(
+                        NotImplementedError(
+                            "Could not find a suitable VTKImageReader for \"{}\" "
+                            "and matplotlib's search failed with the following:"
+                        ), ex)
 
             array = np.swapaxes(array, 0, 1)[:, ::-1]
         from vtkplotlib.nuts_and_bolts import isinstance_no_import
@@ -520,7 +521,7 @@ def as_vtk_cmap(cmap, cache=True):
 
     """
 
-    if cache and isinstance(cmap, str):
+    if cache and isinstance(cmap, _future_utils.string_types):
         if cmap in converted_cmaps:
             return converted_cmaps[cmap]
         cmap = cm.get_cmap(cmap)

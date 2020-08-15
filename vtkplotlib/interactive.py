@@ -117,9 +117,11 @@ class pick_point(object):
     @point_2d.setter
     def point_2d(self, point):
         if len(point) == 2:
-            self.picker.Pick(*point, 0, self.style.GetCurrentRenderer())
+            self.picker.Pick(point[0], point[1], 0,
+                             self.style.GetCurrentRenderer())
         else:
-            self.picker.Pick(*point, self.style.GetCurrentRenderer())
+            self.picker.Pick(point[0], point[1],
+                             self.style.GetCurrentRenderer())
 
     @property
     def point(self):

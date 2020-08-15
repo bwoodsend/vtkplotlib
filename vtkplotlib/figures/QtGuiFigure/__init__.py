@@ -28,7 +28,11 @@ import numpy as np
 import sys
 from pathlib2 import Path
 
-from itertools import zip_longest
+if sys.version_info.major >= 3:
+    from itertools import zip_longest
+else:
+    from itertools import izip_longest as zip_longest
+
 from PyQt5 import QtWidgets, QtGui, QtCore
 
 from vtkplotlib.figures import QtFigure, save_fig, view
@@ -219,7 +223,7 @@ class ViewButton(Button):
         self.args = view_params
 
     def set_view(self):
-        view(**self.args, fig=self.parent())
+        view(fig=self.parent(), **self.args)
 
         self.parent().reset_camera()
         self.parent().update()
@@ -290,7 +294,7 @@ class ViewButtons(object):
         for button in self.buttons:
             args = button.args
             for key in args:
-                args[key] = args[key] @ M
+                args[key] = np.matmul(args[key], M)
 
 
 class PlotTable(QtWidgets.QWidget):
@@ -322,10 +326,10 @@ class PlotTable(QtWidgets.QWidget):
         self.rows.pop(plot)
 
     def update(self):
-        for plot in (self.plots - self.rows.keys()):
+        for plot in self.plots - set(self.rows.keys()):
             self.add_plot(plot)
 
-        for plot in (self.rows.keys() - self.plots):
+        for plot in set(self.rows.keys()) - self.plots:
             self.remove_plot(plot)
 
 
@@ -375,7 +379,7 @@ if __name__ == "__main__":
 
     self = vpl.QtFigure2("Rabbits")
 
-    plot = vpl.mesh_plot(Mesh.from_file(vpl.data.get_rabbit_stl()))
+    plot = vpl.mesh_plot(vpl.data.get_rabbit_stl())
     # plot.name = "rabbit"
     # mesh_2 = Mesh.from_file(vpl.data.get_rabbit_stl())
     # mesh_2.translate(np.array([100, 0, 0]))

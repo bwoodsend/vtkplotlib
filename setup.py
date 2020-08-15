@@ -7,6 +7,7 @@ Created on Wed Jun 19 19:00:26 2019
 
 from setuptools import setup, find_packages
 from distutils.command.build import build
+import sys
 from os import path
 
 HERE = path.split(__file__)[0]
@@ -47,7 +48,9 @@ setup(name='vtkplotlib',
       zip_safe=False,
       extras_require={
           "test_minimal": ["pytest"],
-          "test_full": ["pytest", "PyQt5", "numpy-stl", "namegenerator", "PILLOW"],
+          "test_full": ["pytest",
+                        "PyQt5" if sys.version_info.major >= 3 else "python_qt5",
+                        "numpy-stl", "namegenerator", "PILLOW"],
       },
       cmdclass={"build": Build}
       ) # yapf:disable

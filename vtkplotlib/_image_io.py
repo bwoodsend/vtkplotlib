@@ -427,9 +427,18 @@ FORMAT_CODES = {
 }
 
 
+def _hex_to_byte(string):
+    if string == "??":
+        return b"."
+    value = int(string, 16)
+    if sys.version_info.major >= 3:
+        return value.to_bytes(1, "little")
+    else:
+        return chr(value)
+
+
 def _code_to_regex(code):
-    parts = (b"." if i == "??" else re.escape(bytes([int(i, 16)]))
-             for i in code.strip(" \n").split())
+    parts = (_hex_to_byte(i) for i in code.strip(" \n").split())
     return re.compile(b"".join(parts), re.DOTALL)
 
 
