@@ -35,26 +35,49 @@ import vtkplotlib as vpl
 
 from tests._common import checker
 
-rgb, a = (np.array([0.00392157, 1., 0.02745098]), .5)
+# Target output. Everything below should normalise to this.
+RGB, A = (np.array([0.00392157, 1., 0.02745098]), .5)
+
+parameters = [
+    (RGB, A, None),
+    (tuple(RGB) + (A,), None, None),
+    ((RGB * 255).astype(int), int(A * 255), None),
+    ("bright green", A, None),
+    ("BRIGHT-GREEN", A, Warning),
+    ("BRIGHT_GrEeN", A, Warning),
+    ("#01FF06", A * 255, None),
+    ("#01FF0680", None, None),
+    ("#01FF0610", 0x80, None),
+    (u"bright green", A, None),
+]
+
+try:
+    from PyQt5.QtGui import QColor
+    parameters += [
+        (QColor(*(int(i * 255) for i in RGB)), A, None),
+        (QColor("#01FF06"), A, None),
+    ]
+except ImportError:
+    pass
 
 
-@pytest.mark.parametrize("rgb_a", [
-    (rgb, a),
-    (tuple(rgb) + (a,),),
-    ((rgb * 255).astype(int), int(a * 255)),
-    ("bright green", a),
-    ("BRIGHT-GREEN", a),
-    ("BRIGHT_GrEeN", a),
-    ("#01FF06", a * 255),
-])
-def test_as_rgb_a(rgb_a):
-    _rgb, _a = vpl.colors.as_rgb_a(*rgb_a)
-    assert pytest.approx(rgb, abs=1 / 255) == _rgb
-    assert pytest.approx(a, abs=1 / 255) == _a
+@pytest.mark.parametrize(("rgb", "a", "warns"), parameters)
+def test_as_rgb_a(rgb, a, warns):
+    if warns:
+        with pytest.warns(warns):
+            rgb, a = vpl.colors.as_rgb_a(rgb, a)
+    else:
+        rgb, a = vpl.colors.as_rgb_a(rgb, a)
+    assert pytest.approx(RGB, abs=1 / 255) == rgb
+    assert pytest.approx(A, abs=1 / 255) == a
 
 
-def test_as_rgb_a_warns():
-    assert vpl.colors.as_rgb_a("not a color") == (None, None)
+def test_as_rgb_a_misc():
+    with pytest.warns(Warning):
+        assert vpl.colors.as_rgb_a("not a color") == (None, None)
+    with pytest.raises(ValueError):
+        vpl.colors.as_rgb_a("#12312")
+    assert vpl.colors.as_rgb_a() == (None, None)
 
 
 if __name__ == "__main__":
