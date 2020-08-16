@@ -42,7 +42,8 @@ try:
         from vtkmodules.vtkCommonCore import (
             VTK_ID_TYPE, vtkCommand, VTK_COLOR_MODE_DEFAULT, vtkPoints,
             VTK_COLOR_MODE_MAP_SCALARS, VTK_MAJOR_VERSION,
-            VTK_COLOR_MODE_DIRECT_SCALARS, vtkLookupTable, vtkObject)
+            VTK_COLOR_MODE_DIRECT_SCALARS, vtkLookupTable, vtkObject,
+            VTK_MINOR_VERSION, VTK_BUILD_VERSION)
 
         from vtkmodules.vtkCommonDataModel import (vtkImageData, vtkCellArray,
                                                    vtkPolyData)
@@ -139,3 +140,6 @@ def _disable_numpy_complex_warning():
 
 
 _disable_numpy_complex_warning()
+
+VTK_VERSION_INFO = (vtk.VTK_MAJOR_VERSION, vtk.VTK_MINOR_VERSION,
+                    vtk.VTK_BUILD_VERSION)

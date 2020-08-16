@@ -31,7 +31,8 @@ import io
 import numpy as np
 from pathlib2 import Path
 
-from vtkplotlib._get_vtk import vtk, vtk_to_numpy, numpy_to_vtk, numpy_support
+from vtkplotlib._get_vtk import (vtk, vtk_to_numpy, numpy_to_vtk, numpy_support,
+                                 VTK_VERSION_INFO)
 
 from vtkplotlib.unicode_paths import PathHandler
 from vtkplotlib import nuts_and_bolts
@@ -100,6 +101,10 @@ def read(path, raw_bytes=None, format=None, convert_to_array=True):
         Older versions are hardcoded to write to disk and therefore **path**
         must be a filename and not a BytesIO or similar pseudo file object.
 
+    .. note::
+
+        There is a bug in VTK==9.0.0
+
 
     """
     if isinstance(raw_bytes, bool):
@@ -139,8 +144,14 @@ def read(path, raw_bytes=None, format=None, convert_to_array=True):
 
         im_data = reader.GetOutput()
 
+    if format == "TIFF" and VTK_VERSION_INFO >= (9, 0, 0):
+        # There's a bug in VTK 9 that reads TIFFs upside-down.
+        im_data = vtkimagedata_to_array(im_data)[::-1]
+        return im_data if convert_to_array else vtkimagedata_from_array(im_data)
+
     if convert_to_array:
         return vtkimagedata_to_array(im_data)
+
     return im_data
 
 
@@ -394,9 +405,9 @@ def as_vtkimagedata(x, ndim=None):
 
 BUFFERABLE_FORMAT_MODES = [
     ("JPEG", "rw"),
-    ("PNG", "w"),
+    ("PNG", "w" if VTK_VERSION_INFO < (9, 0, 0) else "rw"),
     ("TIFF", ""),
-    ("BMP", "w"),
+    ("BMP", "" if VTK_VERSION_INFO < (8, 1, 0) else "w"),
 ]
 
 import re
