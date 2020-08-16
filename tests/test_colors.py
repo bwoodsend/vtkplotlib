@@ -29,6 +29,7 @@ from builtins import super
 
 import numpy as np
 import os, sys
+import re
 
 import pytest
 import vtkplotlib as vpl
@@ -78,6 +79,15 @@ def test_as_rgb_a_misc():
     with pytest.raises(ValueError):
         vpl.colors.as_rgb_a("#12312")
     assert vpl.colors.as_rgb_a() == (None, None)
+
+
+@pytest.mark.parametrize("name",
+                         re.findall(r"table[.](\w+)\(\)", vpl.colors.__doc__))
+def test_table_in_doc(name):
+    """Check all the functions listed in one of the table under `vtkLookupTable`
+     in the docs actually exist.
+     """
+    assert hasattr(vpl.vtk.vtkLookupTable, name)
 
 
 if __name__ == "__main__":

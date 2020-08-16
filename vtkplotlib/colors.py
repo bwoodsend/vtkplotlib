@@ -136,8 +136,6 @@ following:
 +-----------------------------------+------------------------------------------+
 | | table.GetNanColor()             | | Choose a color to use when given       |
 | | table.SetNanColor()             | | a NaN scalar.                          |
-| | table.GetUseNanColor()          | | This must be enabled explicitly to     |
-| | table.SetUseNanColor()          | | use.                                   |
 +-----------------------------------+------------------------------------------+
 
 
