@@ -576,10 +576,10 @@ def cmap_from_list(colors, opacities=None, scalars=None, resolution=None):
     :param opacities: Translucency or translucencies, defaults to ``None``.
     :type opacities: Scalar from 0 to 1 or array-like of scalars, optional
 
-    :param scalars: Control scalars to correspond exact colors from **color**, defaults to ``None``.
+    :param scalars: Control scalars to correspond exact colors from **color**, defaults to ``np.arange(len(colors))``.
     :type scalars: array-like with same length as **colors**, optional
 
-    :param resolution: Number of colors in output, defaults to ``(len(points) - 1) * 255 + 1``.
+    :param resolution: Number of colors in output, defaults to ``(len(colors) - 1) * 255 + 1``.
     :type resolution: int, optional
 
     :return: An array of RGBA values.
