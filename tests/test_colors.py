@@ -90,5 +90,29 @@ def test_table_in_doc(name):
     assert hasattr(vpl.vtk.vtkLookupTable, name)
 
 
+INPUTS = [
+    ([(1, 0, .5), (0, 1, .5)], .2, None, None),
+    ([(0, 0, 0, 1), (0, 1, 0)], None, None, 123),
+    ([(1, 1, 0, 1)], None, None, 100),
+    ([(0, 0, 0, 1), (0, 1, 0), (.2, .3, .4)], None, None, 123),
+]
+
+
+@pytest.mark.parametrize(("colors", "opacities", "scalars", "resolution"),
+                         INPUTS)
+def test_cmap_from_list(colors, opacities, scalars, resolution):
+    cmap = vpl.colors.cmap_from_list(colors, opacities, scalars, resolution)
+    assert (cmap[0][:len(colors[0])] == colors[0]).all()
+    assert (cmap[-1][:len(colors[-1])] == colors[-1]).all()
+
+    assert resolution is None or cmap.shape == (resolution, 4)
+
+
+def test_cmap_from_list_scalars():
+    colors = vpl.colors.cmap_from_list(["b", "w", "g"])
+    scalars = np.exp(np.linspace(0, np.log(len(colors)), len(colors)))
+    vpl.colors.cmap_from_list(colors, scalars=scalars)
+
+
 if __name__ == "__main__":
     pytest.main([__file__])
