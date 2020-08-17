@@ -89,9 +89,6 @@ class PathHandler(object):
                 raise FileNotFoundError("The folder {} does not exist".format(
                     self.path.parent))
 
-        elif mode == "i":
-            pass
-
         else:
             raise ValueError(
                 "Mode must be either 'r' or 'w'. Not '{}'".format(mode))
