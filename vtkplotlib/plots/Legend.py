@@ -307,8 +307,9 @@ class Legend(Base2DPlot):
 
         if not isinstance(polydata, vtk.vtkPolyData):
             raise TypeError(
-                "symbol must be a vpl.PolyData, vtk.vtkPolyData or the output of a vpl method such as vpl.plot. Received type {}"
-                .format(type(symbol)))
+                "Legend symbols must be a vtkplotlib.PolyData, vtk.vtkPolyData "
+                "or the output of a vtkplotlib plot method. Received type {}.".
+                format(type(symbol)))
 
         # If the polydata is not already positioned at the origin then the
         # generated icon moves with it. This finds the polydata's position
