@@ -295,8 +295,7 @@ class Legend(Base2DPlot):
         self._check_length(index)
 
         if isinstance(symbol, np.ndarray) and symbol.dtype == object:
-            print("Warning - Legend.set_entry_symbol received an array of plots"
-                  " rather than a single plot.")
+            # E.g. output from scatter() - just pick the 1st.
             symbol = symbol.item(0)
 
         polydata = symbol
