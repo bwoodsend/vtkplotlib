@@ -60,16 +60,19 @@ def test_read_write(path):
     path.parent.mkdir(parents=True, exist_ok=True)
     polydata = vpl.scatter([hash(path)] * 3).polydata.vtk_polydata
 
-    self = PathHandler(path, "w")
-    with self:
-        writer = vtk.vtkPolyDataWriter()
-        writer.SetFileName(self.access_path)
-        writer.SetInputData(polydata)
-        assert writer.Write()
+    for i in range(2):
+        # Do write test twice. 1 to check write and 2 to check overwriting.
 
-        assert os.path.exists(self.py_access_path)
+        self = PathHandler(path, "w")
+        with self:
+            writer = vtk.vtkPolyDataWriter()
+            writer.SetFileName(self.access_path)
+            writer.SetInputData(polydata)
+            assert writer.Write()
 
-    assert self.path.exists()
+            assert os.path.exists(self.py_access_path)
+
+        assert self.path.exists()
 
     with PathHandler(path, "r") as self:
         reader = vtk.vtkPolyDataReader()
@@ -90,6 +93,17 @@ def test_read_write(path):
     os.remove(str(path))
 
     return self
+
+
+def test_exceptions():
+    with pytest.raises(FileNotFoundError):
+        vpl.unicode_paths.PathHandler(TEST_DIR / "nonexistent", "r")
+
+    with pytest.raises(FileNotFoundError):
+        vpl.unicode_paths.PathHandler(TEST_DIR / "nonexistent" / "file", "w")
+
+    with pytest.raises(ValueError):
+        vpl.unicode_paths.PathHandler(__file__, mode="invalid mode")
 
 
 if __name__ == "__main__":
