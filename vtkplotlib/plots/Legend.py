@@ -182,6 +182,7 @@ class Legend(Base2DPlot):
 
         super().__init__(fig)
         self.actor = self.legend = vtk.vtkLegendBoxActor()
+        self._plots_by_label = {}
 
         self.__actor2d_init__()
 
@@ -202,15 +203,20 @@ class Legend(Base2DPlot):
 
     def add_plots(self, plots, allow_non_polydata_plots=False,
                   allow_no_label=False):
-        by_label = {}
+        by_label = self._plots_by_label
         for plot in plots:
             label = plot.label
+
             if label is None and not allow_no_label:
+                continue
+
+            if label in by_label:
                 continue
 
             if isinstance(plot, Legend):
                 # ignore the legend as a plot.
                 continue
+
             elif hasattr(plot, "polydata"):
                 # The symbol in the can be automatically generated from the
                 # polydata if the plot has one.
@@ -219,7 +225,6 @@ class Legend(Base2DPlot):
             elif allow_non_polydata_plots and label not in by_label:
                 by_label[label] = plot
 
-        for (label, plot) in by_label.items():
             if hasattr(plot, "polydata"):
                 self.set_entry(plot)
             else:
