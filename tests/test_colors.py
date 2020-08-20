@@ -34,6 +34,8 @@ import re
 import pytest
 import vtkplotlib as vpl
 
+from matplotlib import cm
+
 from tests._common import checker
 
 # Target output. Everything below should normalise to this.
@@ -112,6 +114,35 @@ def test_cmap_from_list_scalars():
     colors = vpl.colors.cmap_from_list(["b", "w", "g"])
     scalars = np.exp(np.linspace(0, np.log(len(colors)), len(colors)))
     vpl.colors.cmap_from_list(colors, scalars=scalars)
+
+
+def test_as_vtk_cmap_from_list():
+    vpl.colors.as_vtk_cmap(["orange", "blue"])
+
+
+cmaps = ["Blues", "Set2"]
+
+
+def test_cmap_types_differ():
+    assert type(cm.get_cmap(cmaps[0])) is not type(cm.get_cmap(cmaps[1]))
+
+
+@pytest.mark.parametrize("cmap", cmaps)
+def test_as_cmap(cmap):
+    as_vtk_cmap = vpl.colors.as_vtk_cmap
+    assert as_vtk_cmap(cmap) is as_vtk_cmap(cmap)
+    assert as_vtk_cmap(cmap) is not as_vtk_cmap(cmap, False)
+
+    assert as_vtk_cmap(cmap) is as_vtk_cmap(as_vtk_cmap(cmap))
+    assert as_vtk_cmap(cmap) is as_vtk_cmap(cm.get_cmap(cmap))
+
+
+def test_cmap_raises():
+    with pytest.raises(ValueError):
+        vpl.colors.as_vtk_cmap(np.arange(10))
+
+    with pytest.raises(ValueError):
+        vpl.colors.as_vtk_cmap(np.arange(10).reshape(5, 2))
 
 
 if __name__ == "__main__":
