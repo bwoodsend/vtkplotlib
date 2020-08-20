@@ -519,8 +519,8 @@ def as_vtk_cmap(cmap, cache=True):
 
     """
 
-    if cache and isinstance(cmap, _future_utils.string_types):
-        if cmap in converted_cmaps:
+    if isinstance(cmap, _future_utils.string_types):
+        if cache and cmap in converted_cmaps:
             return converted_cmaps[cmap]
         cmap = cm.get_cmap(cmap)
 
