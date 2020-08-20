@@ -545,7 +545,7 @@ def as_vtk_cmap(cmap, cache=True):
         cmap = cmap_from_list(cmap)
 
     if not isinstance(cmap, np.ndarray):
-        raise TypeError()
+        raise TypeError("cmap is of an invalid type {}.".format(type(cmap)))
 
     if cmap.ndim == 2 and 3 <= cmap.shape[1] <= 4:
         cmap = np.ascontiguousarray(
