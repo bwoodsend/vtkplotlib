@@ -59,6 +59,8 @@ from .plots.polydata import PolyData
 
 from . import data, image_io, interactive
 
+i = interactive
+
 color_bar = scalar_bar
 
 
