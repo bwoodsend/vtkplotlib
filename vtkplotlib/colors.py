@@ -419,7 +419,7 @@ class TextureMap(object):
                 try:
                     from matplotlib.pylab import imread
                     array = imread(path)
-                except (ValueError, ImportError) as ex:
+                except Exception as ex:
                     _future_utils.raise_from(
                         NotImplementedError(
                             "Could not find a suitable VTKImageReader for \"{}\" "
