@@ -157,7 +157,8 @@ class Lines(ConstructedPlot):
         if colors is not None:
             return colors.reshape(self.shape[:-1] + (-1,))
 
-        return super().color
+        # TODO: fix this for MeshPlot.
+        return ConstructedPlot.color.fget(self)
 
     @color.setter
     def color(self, c):
@@ -173,6 +174,5 @@ class Lines(ConstructedPlot):
                 self.scalar_range = Ellipsis
 
         else:
-            # can't use `super().color = color` sadly
             ConstructedPlot.color.fset(self, c)
             self.polydata.point_colors = None
