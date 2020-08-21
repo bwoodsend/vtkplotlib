@@ -129,8 +129,8 @@ class QtFigure2(QtFigure):
         return self
 
     def add_cursor_tracker(self):
-        from vtkplotlib.interactive import CursorTrackor
-        self.cursor_tracker = CursorTrackor(self)
+        from vtkplotlib.interactive import CursorTracker
+        self.cursor_tracker = CursorTracker(self)
 
     def screenshot(self):
         path = QtWidgets.QFileDialog.getSaveFileName(

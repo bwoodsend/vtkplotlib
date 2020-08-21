@@ -156,7 +156,7 @@ class pick_point(object):
         key for (key, val) in locals().items() if isinstance(val, property))
 
 
-class CursorTrackor(object):
+class CursorTracker(object):
 
     def __init__(self, fig):
         self.fig = fig
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     fig = vpl.QtFigure2()
     style = fig.style
 
-    tracker = CursorTrackor(fig)
+    tracker = CursorTracker(fig)
     balls = vpl.quick_test_plot()
     rabbit = vpl.mesh_plot(vpl.data.get_rabbit_stl())
     rabbit.vertices -= [i.mean() for i in vpl.unzip_axes(rabbit.vertices)]
