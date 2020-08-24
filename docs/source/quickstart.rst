@@ -31,7 +31,7 @@ Key features
 * Takes advantage of VTK's lesser known numpy support so that data can be efficiently copied by reference between numpy and VTK making it much faster than most of the VTK examples you'll find online.
 * Has direct support for STL plotting.
 * Can be embedded seamlessly into `PyQt5`_ applications.
-* Is freezable with `pyinstaller`_.
+* Is freezable with `PyInstaller`_.
 
 
 Requirements for installing:
@@ -79,7 +79,7 @@ Some features require you to install the following:
 .. _PyQt5: https://pypi.org/project/PyQt5/
 .. _numpy-stl: https://pypi.org/project/numpy-stl/
 .. _future: https://pypi.org/project/future/
-.. _pyinstaller: https://www.pyinstaller.org/
+.. _PyInstaller: https://www.pyinstaller.org/
 .. _namegenerator: https://pypi.org/project/namegenerator/
 
 
