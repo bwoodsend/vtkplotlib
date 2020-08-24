@@ -177,6 +177,13 @@ todo_include_todos = True
 
 rst_epilog = "\n"
 
+
+def add_url(name, url):
+    "Convenience way to create URLs."
+    global rst_epilog
+    rst_epilog += ".. _{}: {}\n".format(name, url)
+
+
 for vtk_name in [
         'vtkActor', 'vtkActor2D', 'vtkArrowSource', 'vtkBMPReader',
         'vtkBMPWriter', 'vtkCellArray', 'vtkCommand', 'vtkCubeSource',
@@ -190,8 +197,23 @@ for vtk_name in [
         'vtkTIFFReader', 'vtkTIFFWriter', 'vtkTextActor', 'vtkTransform',
         'vtkVectorText', 'vtkWindowToImageFilter'
 ]:
-    rst_epilog += ".. _{0}: https://vtk.org/doc/nightly/html/class{0}.html#details\n".format(
-        vtk_name)
+    add_url(vtk_name,
+            "https://vtk.org/doc/nightly/html/class%s.html#details" % vtk_name)
+
+
+# Borrowed from quickstart.rst
+rst_epilog += """
+.. _numpy: http://numpy.org/
+.. _matplotlib: http://matplotlib.org/
+.. _pathlib2: https://pypi.org/project/pathlib2/
+.. _vtk: https://pypi.org/project/vtk/
+.. _PyQt5: https://pypi.org/project/PyQt5/
+.. _numpy-stl: https://pypi.org/project/numpy-stl/
+.. _future: https://pypi.org/project/future/
+.. _PyInstaller: https://www.pyinstaller.org/
+.. _namegenerator: https://pypi.org/project/namegenerator/
+"""
+
 
 # -- Add this file for Google search console ----------
 html_extra_path = ["google77eb9775385691af.html"]
