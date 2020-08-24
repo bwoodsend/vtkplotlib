@@ -151,7 +151,9 @@ class Surface(ConstructedPlot):
 
     @colors.setter
     def colors(self, s):
-        if s is not None and s.ndim > 2:
+        if s is not None:
             s = np.asarray(s)
+            if s.ndim < 3:
+                s = s[..., np.newaxis]
             s = s.reshape((-1, s.shape[-1]))
         self.polydata.point_colors = s
