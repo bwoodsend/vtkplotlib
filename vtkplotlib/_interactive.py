@@ -53,6 +53,7 @@ def get_super_callback(invoker=None, event_name=None):
         # Try to guess the arguments that would have been provided.
         # This uses the same frame hack that future uses to mimick super() in
         # Python 2.
+        _invoker, _event_name = invoker, event_name
 
         # Find the frame that called either this method or call_super_callback().
         caller = _sys._getframe(0)
@@ -72,6 +73,9 @@ def get_super_callback(invoker=None, event_name=None):
             invoker = event_name
         else:
             raise SuperError(caller.f_code.co_name)
+
+        # Allow explicitly provided arguments to override those found.
+        invoker, event_name = _invoker or invoker, _event_name or event_name
 
     # VTK has some rather loose naming rules for callbacks and event names.
     name = "On" + _re.match("(.*)Event", event_name).group(1)
