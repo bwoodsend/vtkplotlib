@@ -39,6 +39,13 @@ def null_callback():
     pass
 
 
+class SuperError(RuntimeError):
+    def __str__(self):
+        return ("Couldn't determine the event `invoker and `event_name`. "
+                "Ensure you are calling %s() from a callback which is "
+                "receiving a vtkObject and str as its arguments." % self.args)
+
+
 def get_super_callback(invoker=None, event_name=None):
     if invoker is None or event_name is None:
         # Try to guess the arguments that would have been provided.
@@ -62,9 +69,7 @@ def get_super_callback(invoker=None, event_name=None):
                 break
             invoker = event_name
         else:
-            raise TypeError(
-                "Couldn't determine the event `invoker and `event_name`. Ensure you are calling {}() from a callback which is recieving a vtkObject and str as its arguments."
-                .format(caller.f_code.co_name))
+            raise SuperError(caller.f_code.co_name)
 
     # VTK has some rather loose naming rules for callbacks and event names.
     name = "On" + _re.match("(.*)Event", event_name).group(1)
