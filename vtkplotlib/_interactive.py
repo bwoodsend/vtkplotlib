@@ -221,6 +221,67 @@ def _mini_vtk_repr(obj):
     return repr(obj)
 
 
+def _default_click_event(pick):
+    print(pick)
+
+
+# Get all the supported mouse button types (e.g. Left, Right, Middle, ...) by
+# iterating through `dir(vtkCommands)`. Note that `re.fullmatch()` doesn't
+# exist in python 2 - hence the "\A...\Z" in the regex.
+_mouse_buttons = set(
+    i.group(1) for i in
+    map(_re.compile(r"\A(\w+)ButtonPressEvent\Z").match, vtkCommands)
+    if i is not None
+) # yapf: disable
+
+
+class OnClick(object):
+    VALID_BUTTONS = _mouse_buttons
+
+    def __init__(self, button, style, on_click=None, mouse_shift_tolerance=2):
+        assert button in self.VALID_BUTTONS
+        self.button = button
+        self.style = getattr(style, "style", style)
+        self.mouse_shift_tolerance = mouse_shift_tolerance
+        self._click_location = None
+        self.on_click = on_click or _default_click_event
+
+        style.AddObserver(self.button + "ButtonPressEvent", self._press_cb)
+        style.AddObserver(self.button + "ButtonReleaseEvent", self._release_cb)
+        style.AddObserver("MouseMoveEvent", self._mouse_move_cb)
+
+    def _press_cb(self, invoker, name):
+        vpl.interactive.call_super_callback()
+        self._click_location = invoker.GetInteractor().GetEventPosition()
+
+    def _clicks_are_equal(self, point_0, point_1):
+        shift_sqr = sum((i - j)**2 for (i, j) in zip(point_0, point_1))
+        return shift_sqr <= self.mouse_shift_tolerance**2
+
+    def _release_cb(self, invoker, name):
+        vpl.interactive.call_super_callback()
+        if self._click_location is None:
+            return
+        picker = vpl.interactive.pick(invoker)
+        if picker.actor is None:
+            return
+        if self._clicks_are_equal(self._click_location, picker.point_2D):
+            self.on_click(picker)
+
+    def _mouse_move_cb(self, invoker, name):
+        if self._click_location:
+            point_2D = invoker.GetInteractor().GetEventPosition()
+            if self._clicks_are_equal(self._click_location, point_2D):
+                return
+            self._click_location = None
+        # Only calling the super event with the mouse button down (which rotates
+        # the model for left click) when we are sure that this click is not
+        # meant to place a marker reduces the slight jolt when you click on with
+        # a sensitive mouse. Move this line to the top of this method to see
+        # what I mean.
+        vpl.interactive.call_super_callback()
+
+
 if __name__ == "__main__":
     import vtkplotlib as vpl
 
