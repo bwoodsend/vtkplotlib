@@ -35,7 +35,9 @@ vtkCommands = [
 ]
 
 
-def null_callback():
+def null_super_callback():
+    """A placeholder callback for when an event doesn't have a parent callback
+    which needs calling. Calling this function has no effect."""
     pass
 
 
@@ -80,7 +82,7 @@ def get_super_callback(invoker=None, event_name=None):
         return getattr(invoker, name)
 
     # Not all callbacks have a super event.
-    return null_callback
+    return null_super_callback
 
 
 def call_super_callback(invoker=None, event_name=None):
@@ -95,7 +97,7 @@ def _actor_collection(actors, collection=None):
     return collection
 
 
-class pick_point(object):
+class pick(object):
 
     def __init__(self, style_or_iren):
         if isinstance(style_or_iren, vtk.vtkRenderWindowInteractor):
@@ -141,7 +143,7 @@ class pick_point(object):
         return self.picker.GetActor2D()
 
     @property
-    def prop_3d(self):
+    def prop_3D(self):
         return self.picker.GetProp3D()
 
     @property
@@ -203,7 +205,7 @@ class CursorTracker(object):
             label.setText("  --  ")
 
     def mouse_move_cb(self, style, event_name):
-        picker = pick_point(style)
+        picker = pick(style)
 
         if picker.actor is None:
             self.set_no_cursor()
@@ -214,7 +216,7 @@ class CursorTracker(object):
 
 def _mini_vtk_repr(obj):
     if isinstance(obj, vtk.vtkObject):
-        return type(obj).__name__ + " " + hex(id(obj))
+        return object.__repr__(obj)
     return repr(obj)
 
 
