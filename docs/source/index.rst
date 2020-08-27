@@ -17,6 +17,7 @@ Welcome to vtkplotlib's documentation!
     Figures
     Colors
     Images
+    Interactive
     Extras
     Contributing
 

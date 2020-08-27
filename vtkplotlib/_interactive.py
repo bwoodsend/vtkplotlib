@@ -42,6 +42,7 @@ def null_super_callback():
 
 
 class SuperError(RuntimeError):
+
     def __str__(self):
         return ("Couldn't determine the event `invoker and `event_name`. "
                 "Ensure you are calling %s() from a callback which is "
@@ -49,6 +50,67 @@ class SuperError(RuntimeError):
 
 
 def get_super_callback(invoker=None, event_name=None):
+    """Finds the original VTK callback function for a given event. Like the
+    builtin ``super()`` in Python 3.x, this method should be able to find its
+    own arguments.
+
+    :param invoker: The `vtkObject`_ you used in ``invoker.AddObserver(..)``, defaults to ``None``.
+    :type invoker: `vtkObject`_, optional
+
+    :param event_name: The name of the interaction, defaults to ``None``.
+    :type event_name: str, optional
+
+    :return: A method of **invoker** or a dummy :meth:`null_callback` function.
+    :rtype: callable
+
+    :raises: :class:`SuperError` if called without (an) argument(s) and the argument(s) couldn't be determined automatically.
+
+    The original callback (if there is one) is always a method of the
+    *invoker**. VTK has some rather loose naming rules which make this
+    deceptively fiddly.
+
+    If called inside function which takes a `vtkObject`_ and a ``str`` as its
+    first two arguments, then :meth:`get_super_callback` will use the values of
+    those two arguments as its own arguments. Or, if you provide those
+    arguments explicitly, you can call this function anywhere. e.g.
+
+        >>> vpl.i.get_super_callback(fig.style, "MouseMoveEvent")
+        <built-in method OnMouseMove of vtkmodules.vtkInteractionStyle.vtkInteractorStyleTrackballCamera object at 0x000000C0AB4B1E88>
+
+    Not all events have parent events. In these cases a dummy function is
+    returned. This is also the case for non-existant event types.
+
+        >>> vpl.i.get_super_callback(fig.style, "WindowIsCurrentEvent")
+        <function null_super_callback at 0x000000C0AB4ABA68>
+        >>> vpl.i.get_super_callback(fig.style, "BlueMoonEvent")
+        <function null_super_callback at 0x000000C0AB4ABA68>
+
+    You can also overide the arguments should you wish. The following will swap
+    the left and right mouse-click functionallities.
+
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        fig = vpl.figure()
+        vpl.quick_test_plot()
+
+        def callback(invoker, event_name):
+            # Swap left for right and vice-versa.
+            if "Left" in event_name:
+                swapped = event_name.replace("Left", "Right")
+            else:
+                swapped = event_name.replace("Right", "Left")
+
+            # Call the callback for the switched event_name.
+            vpl.i.call_super_callback(event_name=swapped)
+
+        for event_name in ["LeftButtonPressEvent", "LeftButtonReleaseEvent",
+                           "RightButtonPressEvent", "RightButtonReleaseEvent"]:
+            fig.style.AddObserver(event_name, callback)
+
+        fig.show()
+
+    """
     if invoker is None or event_name is None:
         # Try to guess the arguments that would have been provided.
         # This uses the same frame hack that future uses to mimick super() in
@@ -90,6 +152,10 @@ def get_super_callback(invoker=None, event_name=None):
 
 
 def call_super_callback(invoker=None, event_name=None):
+    """
+    Just runs ``get_super_callback(invoker, event_name)()``. See
+    :meth:`get_super_callback`.
+    """
     get_super_callback(invoker, event_name)()
 
 
@@ -102,7 +168,51 @@ def _actor_collection(actors, collection=None):
 
 
 class pick(object):
+    # language=rst
+    """Pick collects information about user interactions into a handy bucket
+    class.
 
+    .. code-block:: python
+
+        import vtkplotlib as vpl
+        import numpy as np
+
+        # Create a figure.
+        fig = vpl.figure()
+
+        # With something semi-interesting in it.
+        u, v = np.meshgrid(np.linspace(-10, 10), np.linspace(-10, 10))
+        vpl.surface(np.sin(u) * np.sin(v), np.cos(u) * np.sin(v), v, scalars=v)
+
+        def callback(invoker, event_name):
+            vpl.i.call_super_callback()
+
+            # Optional, if you're using Python in interactive mode then you can
+            # play around with the pick afterwards.
+            global pick
+
+            # pick this current event to get a pick object. A pick contains
+            # everything VTK has to tell you about the event.
+            pick = vpl.i.pick(invoker)
+
+            # To see everything pick has to say, just print it.
+            print(pick)
+
+            if pick.actor is None:
+                print("Mouse is hovering over background.")
+            else:
+                print("Mouse is hovering over {} at (x, y, z) = {}."
+                      .format(repr(pick.actor), pick.point))
+
+        fig.style.AddObserver("MouseMoveEvent", callback)
+
+        vpl.show()
+
+    The most important properties of a :meth:`pick` are :attr:`pick.point` which
+    tells you the 3D coordinates of the event and :attr:`pick.actor` which tells
+    you the `vtkActor`_ of the plot under which the event took place.
+
+    """
 
         self.style = style
         self.picker = vtk.vtkPropPicker()

@@ -45,6 +45,7 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx_copybutton',
     'm2r',
+    'sphinx.ext.autosectionlabel',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -195,11 +196,13 @@ for vtk_name in [
         'vtkPolyDataWriter', 'vtkRenderWindow', 'vtkRenderWindowInteractor',
         'vtkRenderer', 'vtkSTLReader', 'vtkScalarBarActor', 'vtkSphereSource',
         'vtkTIFFReader', 'vtkTIFFWriter', 'vtkTextActor', 'vtkTransform',
-        'vtkVectorText', 'vtkWindowToImageFilter'
+        'vtkVectorText', 'vtkWindowToImageFilter', 'vtkObject',
+        'vtkInteractorStyle'
 ]:
     add_url(vtk_name,
             "https://vtk.org/doc/nightly/html/class%s.html#details" % vtk_name)
 
+add_url("wxPython", "https://www.wxpython.org/")
 
 # Borrowed from quickstart.rst
 rst_epilog += """
@@ -214,6 +217,9 @@ rst_epilog += """
 .. _namegenerator: https://pypi.org/project/namegenerator/
 """
 
-
 # -- Add this file for Google search console ----------
 html_extra_path = ["google77eb9775385691af.html"]
+
+# --- Option for autosectionlabel --------
+
+autosectionlabel_prefix_document = True
