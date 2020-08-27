@@ -103,15 +103,22 @@ def _actor_collection(actors, collection=None):
 
 class pick(object):
 
-    def __init__(self, style):
-        style = getattr(style, "style", style)
-        if not isinstance(style, vtk.vtkInteractorStyle):
-            raise TypeError(
-                "pick requires either a figure or a or a vtkInteractorStyle")
 
         self.style = style
         self.picker = vtk.vtkPropPicker()
         self.update()
+
+    @property
+    def style(self):
+        return self._style
+
+    @style.setter
+    def style(self, style):
+        style = getattr(style, "style", style)
+        if not isinstance(style, vtk.vtkInteractorStyle):
+            raise TypeError(
+                "pick requires either a figure or a or a vtkInteractorStyle")
+        self._style = style
 
     def update(self):
         iren = self.style.GetInteractor()
