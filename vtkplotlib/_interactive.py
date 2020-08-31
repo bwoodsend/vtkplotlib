@@ -338,6 +338,7 @@ class pick(object):
             # Be careful not to call GetEventPosition() when VTK's app isn't
             # running. Otherwise this will block indefinitely.
             self.point_2D = iren.GetEventPosition()
+        return self
 
     @property
     def point_2D(self):
