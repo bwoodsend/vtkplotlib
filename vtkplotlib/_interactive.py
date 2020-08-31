@@ -410,9 +410,15 @@ class pick(object):
         return self.picker.GetVolume()
 
     def __repr__(self):
-        return type(self).__name__ + " {\n" +\
-            "\n".join("  {}: {}".format(key, _mini_vtk_repr(getattr(self, key))) for key in self.KEYS) +\
-            "\n}\n"
+        out = type(self).__name__ + " {\n"
+        for key in self.KEYS:
+            if key == "from_":
+                value = ("NULL - pick.from_ is not set" if self.from_ is None
+                         else "%i items" % len(self.from_))
+            else:
+                value = _mini_vtk_repr(getattr(self, key))
+            out += "  %s: %s\n" % (key, value)
+        return out + "}\n"
 
     KEYS = sorted(
         key for (key, val) in locals().items() if isinstance(val, property))
