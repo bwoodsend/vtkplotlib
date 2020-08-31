@@ -461,7 +461,7 @@ class OnClick(object):
     def __init__(self, button, style, on_click=None, mouse_shift_tolerance=2):
         assert button in self.VALID_BUTTONS
         self.button = button
-        self.style = getattr(style, "style", style)
+        style = self.style = getattr(style, "style", style)
         self.mouse_shift_tolerance = mouse_shift_tolerance
         self._click_location = None
         self.on_click = on_click or _default_click_event
