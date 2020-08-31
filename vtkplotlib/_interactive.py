@@ -344,7 +344,9 @@ class pick(object):
     def point_2D(self):
         """The 2D ``(horizontal, vertical)`` coordinates in pixels where the
         event happened. ``(0, 0)`` is the left lower corner of the window. """
-        return self.picker.GetSelectionPoint()
+        # For some strange reason GetSelectionPoint() includes a 3rd dimension
+        # which is always zero. Get rid of it as it's confusing.
+        return self.picker.GetSelectionPoint()[:2]
 
     @point_2D.setter
     def point_2D(self, point):
