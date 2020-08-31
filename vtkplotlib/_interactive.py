@@ -363,6 +363,34 @@ class pick(object):
 
     @property
     def actor(self):
+        """The `vtkActor`_ of the plot where the event took place. This
+        corresponds to ``plot.actor`` where ``plot`` is the output of any
+        vtkplotlib plotting function.
+
+        .. code-block:: python
+
+            import vtkplotlib as vpl
+            import numpy as np
+
+            fig = vpl.figure()
+            spheres = vpl.scatter(np.random.uniform(-10, 10, (30, 3)))
+            vpl.text("Hover the mouse over a sphere")
+
+            def callback(invoker, event_name):
+                actor = vpl.i.pick(invoker).actor
+                for sphere in spheres:
+                    if sphere.actor is actor:
+                        sphere.color = "blue"
+                    else:
+                        sphere.color = "white"
+                vpl.i.call_super_callback()
+                fig.update()
+
+            fig.style.AddObserver("MouseMoveEvent", callback)
+
+            fig.show()
+
+        """
         return self.picker.GetActor()
 
     @property
