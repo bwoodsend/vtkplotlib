@@ -334,7 +334,7 @@ class pick(object):
 
     def update(self):
         iren = self.style.GetInteractor()
-        if iren.GetEnabled():
+        if iren and iren.GetEnabled():
             # Be careful not to call GetEventPosition() when VTK's app isn't
             # running. Otherwise this will block indefinitely.
             self.point_2D = iren.GetEventPosition()
