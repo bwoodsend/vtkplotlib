@@ -1,0 +1,1 @@
+sphinx-autobuild -B -z ../vtkplotlib ./source ./build -i *~
