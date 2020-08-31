@@ -465,6 +465,9 @@ class OnClick(object):
         self.mouse_shift_tolerance = mouse_shift_tolerance
         self._click_location = None
         self.on_click = on_click or _default_click_event
+        # Only call style.OnMouseMove() if another callback isn't already
+        # doing it. This isn't an ideal work around.
+        self._super_on_mouse_move = not style.HasObserver("MouseMoveEvent")
 
         style.AddObserver(self.button + "ButtonPressEvent", self._press_cb)
         style.AddObserver(self.button + "ButtonReleaseEvent", self._release_cb)
@@ -497,9 +500,10 @@ class OnClick(object):
         # Only calling the super event with the mouse button down (which rotates
         # the model for left click) when we are sure that this click is not
         # meant to place a marker reduces the slight jolt when you click on with
-        # a sensitive mouse. Move this line to the top of this method to see
-        # what I mean.
-        vpl.interactive.call_super_callback()
+        # a sensitive mouse. Move the lines below to the top of this method to
+        # see what I mean.
+        if self._super_on_mouse_move:
+            call_super_callback()
 
 
 if __name__ == "__main__":
