@@ -29,7 +29,13 @@ import sys as _sys
 #import numpy as np
 #from pathlib2 import Path
 import re as _re
+if _sys.version_info >= (3, 3, 0):
+    from collections.abc import Mapping
+else:
+    from collections import Mapping
+
 from vtkplotlib._get_vtk import vtk
+
 vtkCommands = [
     i for (i, j) in vars(vtk.vtkCommand).items() if isinstance(j, int)
 ]
@@ -214,9 +220,11 @@ class pick(object):
 
     """
 
+    def __init__(self, style, from_=None):
         self.style = style
         self.picker = vtk.vtkPropPicker()
         self.update()
+        self.from_ = from_
 
     @property
     def style(self):
@@ -229,6 +237,97 @@ class pick(object):
             raise TypeError(
                 "pick requires either a figure or a or a vtkInteractorStyle")
         self._style = style
+
+    @property
+    def from_(self):
+        """Limit the :attr:`actor` results to only a set of actors.
+
+        The (writeable) :attr:`from_` attribute allows you restrict the actors
+        that can be picked. This can be useful, when placing markers on an
+        object, to avoid placing a marker on top of another marker.
+
+        You can set this attribute to an iterable of vtkplotlib plots, an
+        iterable of `vtkActor`_\\ s, or a mapping with either plots or actors as
+        its keys. On setting this attribute is normalised into the mapping form.
+        To disable filtering use either ``del pick.from_`` or ``pick.from_ =
+        None``.
+
+        .. code-block:: python
+
+            import vtkplotlib as vpl
+            import numpy as np
+
+            fig = vpl.figure()
+            ball = vpl.scatter([0, 0, 0], radius=10, color="green")
+            text = vpl.text("Click on the green ball", color="black")
+
+            # Create a restricted pick that will only treat clicks on anything
+            # other than the ball as it would with clicks on the background.
+            pick = vpl.i.pick(fig, from_=[ball])
+
+            def callback(pick):
+                if pick.actor is not None:
+                    vpl.scatter(pick.point, color="r", fig=fig)
+                    text.text = "Now try to click on one of the red balls"
+
+            vpl.i.OnClick("Left", fig, callback, pick=pick)
+
+            fig.show()
+
+        If its not immediately clear what the difference is then remove the
+        ``from_=[ball]`` try clicking on a red ball a few times, then rotate the
+        camera slightly. You should see that each click creates a new red ball
+        on top of the last, creating a tower of balls.
+
+         """
+        return self._from_map
+
+    @from_.setter
+    def from_(self, from_):
+        if from_ is None:
+            del self.from_
+        else:
+            if not isinstance(from_, Mapping):
+                from_ = {getattr(i, "actor", i): i for i in from_}
+            self.picker.GetPickList().RemoveAllItems()
+            _actor_collection(from_, self.picker.GetPickList())
+            self._from_map = from_
+            self.picker.PickFromListOn()
+
+    @from_.deleter
+    def from_(self):
+        self._from_map = None
+        self.picker.GetPickList().RemoveAllItems()
+        self.picker.PickFromListOff()
+
+    @property
+    def picked(self):
+        """Contains the plot where the event happened. This can be thought of as
+         equivalent to ``pick.from_[pick.actor]``. If the :attr:`from_` has not
+         been set or the event happened over empty space or over an actor which
+         isn't in ``pick.from_`` then the output is None.
+
+         .. code-block:: python
+
+            import vtkplotlib as vpl
+            import numpy as np
+
+            fig = vpl.figure()
+            spheres = vpl.scatter(np.random.uniform(-30, 30, (50, 3)))
+            vpl.text("Click on the spheres")
+
+            def callback(pick):
+                sphere = pick.picked
+                if sphere is not None:
+                    sphere.color = np.random.random(3)
+
+            vpl.i.OnClick("Left", fig, callback, pick=vpl.i.pick(fig, from_=spheres))
+
+            fig.show()
+
+        """
+        if (self.actor is not None) and (self._from_map is not None):
+            return self._from_map[self.actor]
 
     def update(self):
         iren = self.style.GetInteractor()
