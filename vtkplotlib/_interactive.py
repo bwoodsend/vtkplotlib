@@ -466,13 +466,16 @@ _mouse_buttons = set(
 class OnClick(object):
     VALID_BUTTONS = _mouse_buttons
 
-    def __init__(self, button, style, on_click=None, mouse_shift_tolerance=2):
+    def __init__(self, button, style, on_click=None, mouse_shift_tolerance=2,
+                 pick=None):
         assert button in self.VALID_BUTTONS
         self.button = button
         style = self.style = getattr(style, "style", style)
         self.mouse_shift_tolerance = mouse_shift_tolerance
         self._click_location = None
         self.on_click = on_click or _default_click_event
+        self.pick = pick or globals()["pick"](self.style)
+
         # Only call style.OnMouseMove() if another callback isn't already
         # doing it. This isn't an ideal work around.
         self._super_on_mouse_move = not style.HasObserver("MouseMoveEvent")
@@ -482,27 +485,25 @@ class OnClick(object):
         style.AddObserver("MouseMoveEvent", self._mouse_move_cb)
 
     def _press_cb(self, invoker, name):
-        vpl.interactive.call_super_callback()
-        self._click_location = invoker.GetInteractor().GetEventPosition()
+        call_super_callback()
+        self.pick.update()
+        self._click_location = self.pick.point_2D
 
     def _clicks_are_equal(self, point_0, point_1):
         shift_sqr = sum((i - j)**2 for (i, j) in zip(point_0, point_1))
         return shift_sqr <= self.mouse_shift_tolerance**2
 
     def _release_cb(self, invoker, name):
-        vpl.interactive.call_super_callback()
-        if self._click_location is None:
-            return
-        picker = vpl.interactive.pick(invoker)
-        if picker.actor is None:
-            return
-        if self._clicks_are_equal(self._click_location, picker.point_2D):
-            self.on_click(picker)
+        if (self._click_location is not None
+                and self.pick.update().actor is not None and
+                self._clicks_are_equal(self._click_location, self.pick.point_2D)
+                and self.on_click(self.pick)):
+            call_super_callback()
 
     def _mouse_move_cb(self, invoker, name):
         if self._click_location:
-            point_2D = invoker.GetInteractor().GetEventPosition()
-            if self._clicks_are_equal(self._click_location, point_2D):
+            self.pick.update()
+            if self._clicks_are_equal(self._click_location, self.pick.point_2D):
                 return
             self._click_location = None
         # Only calling the super event with the mouse button down (which rotates
