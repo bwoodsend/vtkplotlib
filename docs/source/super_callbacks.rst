@@ -2,10 +2,10 @@
 Super Callbacks
 ***************
 
-This is a reference for :meth:`get_super_callback` and
-:meth:`call_super_callback` which get and call VTK's original responses to user
-interactions which may have been overwritten. See :ref:`Interactive:Super
-Callbacks?` for why you need them and where to use them.
+The methods :meth:`get_super_callback` and :meth:`call_super_callback` get and
+call VTK's original responses to user interactions which may have been
+overwritten. See :ref:`Interactive:Super Callbacks?` for why you need them and
+where to use them.
 
 .. autofunction:: vtkplotlib.interactive.get_super_callback()
 

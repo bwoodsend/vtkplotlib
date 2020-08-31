@@ -89,8 +89,8 @@ def get_super_callback(invoker=None, event_name=None):
         >>> vpl.i.get_super_callback(fig.style, "BlueMoonEvent")
         <function null_super_callback at 0x000000C0AB4ABA68>
 
-    You can also overide the arguments should you wish. The following will swap
-    the left and right mouse-click functionallities.
+    Should you want to, you can also overide the one or both arguments. The
+    following will swap the left and right mouse-click functionallities.
 
     .. code-block:: python
 

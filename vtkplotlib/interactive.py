@@ -36,15 +36,20 @@ VTK interaction works, then progressively moving towards quicker, more
 integrated vtkplotlib methods. If you're feeling lazy, you may want to read this
 backwards.
 
+.. versionadded:: 1.4.0
+
+=========
+Reference
+=========
+
 Some of the classes and methods in this submodule have their own reference pages
-which can be accessed below.
+which can be accessed below. You are recommended, however, to read through this
+page before consulting them.
 
 .. toctree::
 
     pick
     super_callbacks
-
-.. versionadded:: 1.4.0
 
 =============
 Events in VTK
@@ -173,7 +178,7 @@ Getting Information About an Event
 
 We know if a user clicked on something. Now you want to know where they clicked.
 And what they clicked on. This is all done using :meth:`pick` (see
-:ref:`pick`).
+:ref:`pick:Pick`).
 
 ================
 Super Callbacks?
