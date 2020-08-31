@@ -222,4 +222,4 @@ arguments.
 from ._interactive import (
     CursorTracker, pick, get_super_callback, call_super_callback,
     null_super_callback, SuperError, vtkCommands, OnClick
-)
+) # yapf:disable

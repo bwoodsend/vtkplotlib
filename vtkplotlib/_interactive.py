@@ -24,11 +24,9 @@
 """
 """
 
-#import os, sys
 import sys as _sys
-#import numpy as np
-#from pathlib2 import Path
 import re as _re
+
 if _sys.version_info >= (3, 3, 0):
     from collections.abc import Mapping
 else:
@@ -119,14 +117,18 @@ def get_super_callback(invoker=None, event_name=None):
     """
     if invoker is None or event_name is None:
         # Try to guess the arguments that would have been provided.
-        # This uses the same frame hack that future uses to mimick super() in
+        # This uses the same frame hack that future uses to mimic super() in
         # Python 2.
         _invoker, _event_name = invoker, event_name
 
         # Find the frame that called either this method or call_super_callback().
+        # noinspection PyUnresolvedReferences
         caller = _sys._getframe(0)
         cb_frame = caller.f_back
+
+        # If this function has been called by call_super_callback():
         if cb_frame.f_code.co_name == "call_super_callback":
+            # Go up another frame to skip the get_super_callback() frame.
             caller = cb_frame
             cb_frame = cb_frame.f_back
 
@@ -136,6 +138,7 @@ def get_super_callback(invoker=None, event_name=None):
         invoker = None
         for event_name in f_args:
             # This loop is just to bypass any `self` or `cls` 1st arguments.
+            # It should break on its 1st or 2nd iteration.
             if hasattr(invoker, "AddObserver") and isinstance(event_name, str):
                 break
             invoker = event_name
@@ -234,8 +237,8 @@ class pick(object):
     def style(self, style):
         style = getattr(style, "style", style)
         if not isinstance(style, vtk.vtkInteractorStyle):
-            raise TypeError(
-                "pick requires either a figure or a or a vtkInteractorStyle")
+            raise TypeError("pick.style should be either a figure or a or a "
+                            "vtkInteractorStyle. Got a {}.".format(type(style)))
         self._style = style
 
     @property
@@ -436,6 +439,10 @@ class CursorTracker(object):
 
 
 def _mini_vtk_repr(obj):
+    """The ``__str__`` method of `vtkObject`_ and its descendants tells you
+    everything about it, often recursing to child objects, making it very long.
+    This is helpful sometimes but not always. Use Python's default ``__str__``
+    in cases where every detail is not desired."""
     if isinstance(obj, vtk.vtkObject):
         return object.__repr__(obj)
     return repr(obj)

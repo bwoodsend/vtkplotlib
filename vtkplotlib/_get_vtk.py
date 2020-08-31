@@ -36,7 +36,7 @@ try:
     class vtk(object):
         """This dummy vtk class mimics the default vtk module structure
         whilst only loading the libraries and corresponding dlls that
-        vtkplotlib uses. This makes import quicker and pyinstaller builds
+        vtkplotlib uses. This makes import quicker and PyInstaller builds
         smaller.
         """
         from vtkmodules.vtkCommonCore import (
