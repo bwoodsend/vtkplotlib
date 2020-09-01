@@ -424,57 +424,6 @@ class pick(object):
         key for (key, val) in locals().items() if isinstance(val, property))
 
 
-class CursorTracker(object):
-
-    def __init__(self, fig):
-        self.fig = fig
-        self.init_labels()
-
-        self.fig.style.AddObserver("MouseMoveEvent", self.mouse_move_cb)
-
-        self.set_no_cursor()
-
-    def init_labels(self):
-        from PyQt5 import QtWidgets
-        self.text_labels = [QtWidgets.QLabel(i) for i in "Cursor X Y Z".split()]
-        self.coord_labels = [QtWidgets.QLabel() for i in range(3)]
-
-        self.labels = [self.text_labels[0]]
-        [
-            self.labels.extend(i)
-            for i in zip(self.text_labels[1:], self.coord_labels)
-        ]
-
-        [
-            label.setFrameStyle(QtWidgets.QFrame.Panel
-                                | QtWidgets.QFrame.Sunken)
-            for label in self.coord_labels
-        ]
-
-        layout = QtWidgets.QHBoxLayout()
-        layout.addStretch()
-        [layout.addWidget(i) for i in self.labels]
-
-        self.fig.vl.addLayout(layout)
-
-    def set_cursor_position(self, position):
-        for (label, axis) in zip(self.coord_labels, position):
-            label.setText(format(axis, "6.2f"))
-
-    def set_no_cursor(self):
-        for label in self.coord_labels:
-            label.setText("  --  ")
-
-    def mouse_move_cb(self, style, event_name):
-        picker = pick(style)
-
-        if picker.actor is None:
-            self.set_no_cursor()
-        else:
-            self.set_cursor_position(picker.point)
-        call_super_callback()
-
-
 def _mini_vtk_repr(obj):
     """The ``__str__`` method of `vtkObject`_ and its descendants tells you
     everything about it, often recursing to child objects, making it very long.
@@ -557,13 +506,10 @@ if __name__ == "__main__":
     fig = vpl.QtFigure2()
     style = fig.style
 
-    tracker = CursorTracker(fig)
     balls = vpl.quick_test_plot()
     rabbit = vpl.mesh_plot(vpl.data.get_rabbit_stl())
     rabbit.vertices -= [i.mean() for i in vpl.unzip_axes(rabbit.vertices)]
     rabbit.vertices /= 5
     text = vpl.text("text")
-    collection = _actor_collection(balls)
-    _actor_collection(balls, fig.iren.GetPicker().GetPickList())
 
     vpl.show()

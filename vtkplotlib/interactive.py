@@ -217,14 +217,9 @@ find and call the original callbacks for you. Like Python's builtin
 called inside of a function taking a `vtkObject`_ and a string event name as its
 arguments.
 
-
-.. autoclass:: vtkplotlib.interactive.CursorTracker
-    :members:
-
-
 """
 
 from ._interactive import (
-    CursorTracker, pick, get_super_callback, call_super_callback,
+    pick, get_super_callback, call_super_callback,
     null_super_callback, SuperError, vtkCommands, OnClick
 ) # yapf:disable

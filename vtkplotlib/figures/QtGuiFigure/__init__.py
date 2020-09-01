@@ -129,7 +129,7 @@ class QtFigure2(QtFigure):
         return self
 
     def add_cursor_tracker(self):
-        from vtkplotlib.interactive import CursorTracker
+        from vtkplotlib.figures.QtGuiFigure.cursor_tracker import CursorTracker
         self.cursor_tracker = CursorTracker(self)
 
     def screenshot(self):
