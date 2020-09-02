@@ -26,6 +26,7 @@
 
 import sys as _sys
 import re as _re
+import numpy as np
 
 if _sys.version_info >= (3, 3, 0):
     from collections.abc import Mapping
@@ -362,7 +363,10 @@ class pick(object):
 
     @property
     def point(self):
-        return self.picker.GetPickPosition()
+        if self.prop_3D is not None:
+            return self.picker.GetPickPosition()
+        else:
+            return (np.nan, np.nan, np.nan)
 
     @property
     def actor(self):
@@ -454,14 +458,14 @@ _mouse_buttons = set(
 class OnClick(object):
     VALID_BUTTONS = _mouse_buttons
 
-    def __init__(self, button, style, on_click=None, mouse_shift_tolerance=2,
-                 pick=None):
+    def __init__(self, button, style, on_click=_default_click_event,
+                 mouse_shift_tolerance=2, pick=None):
         assert button in self.VALID_BUTTONS
         self.button = button
         style = self.style = getattr(style, "style", style)
         self.mouse_shift_tolerance = mouse_shift_tolerance
         self._click_location = None
-        self.on_click = on_click or _default_click_event
+        self.on_click = on_click
         self.pick = pick or globals()["pick"](self.style)
 
         # Only call style.OnMouseMove() if another callback isn't already
@@ -485,8 +489,9 @@ class OnClick(object):
         if (self._click_location is not None
                 and self.pick.update().actor is not None and
                 self._clicks_are_equal(self._click_location, self.pick.point_2D)
-                and self.on_click(self.pick)):
-            call_super_callback()
+                and self.on_click is not None):
+            self.on_click(self.pick)
+        call_super_callback()
 
     def _mouse_move_cb(self, invoker, name):
         if self._click_location:
