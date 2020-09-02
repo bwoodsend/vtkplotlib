@@ -458,6 +458,7 @@ class OnClick(object):
 
     def __init__(self, button, style, on_click=print, mouse_shift_tolerance=2,
                  pick=None):
+        button = button.capitalize()
         assert button in self.VALID_BUTTONS
         self.button = button
         style = self.style = getattr(style, "style", style)
