@@ -24,6 +24,8 @@
 """
 """
 
+from __future__ import print_function
+
 import sys as _sys
 import re as _re
 import numpy as np
@@ -441,10 +443,6 @@ def _mini_vtk_repr(obj):
     return repr(obj)
 
 
-def _default_click_event(pick):
-    print(pick)
-
-
 # Get all the supported mouse button types (e.g. Left, Right, Middle, ...) by
 # iterating through `dir(vtkCommands)`. Note that `re.fullmatch()` doesn't
 # exist in python 2 - hence the "\A...\Z" in the regex.
@@ -458,8 +456,8 @@ _mouse_buttons = set(
 class OnClick(object):
     VALID_BUTTONS = _mouse_buttons
 
-    def __init__(self, button, style, on_click=_default_click_event,
-                 mouse_shift_tolerance=2, pick=None):
+    def __init__(self, button, style, on_click=print, mouse_shift_tolerance=2,
+                 pick=None):
         assert button in self.VALID_BUTTONS
         self.button = button
         style = self.style = getattr(style, "style", style)
