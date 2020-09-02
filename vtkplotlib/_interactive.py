@@ -46,6 +46,9 @@ def null_super_callback():
 
 
 class SuperError(RuntimeError):
+    """Raised if :meth:`get_super_callback` or :meth:`call_super_callback` are
+    called in an inappropriate context. i.e. Outside of a callback.
+    """
 
     def __str__(self):
         return ("Couldn't determine the event `invoker and `event_name`. "
