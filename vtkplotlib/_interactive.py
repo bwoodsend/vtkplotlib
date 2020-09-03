@@ -370,7 +370,7 @@ class pick(object):
 
     @property
     def point(self):
-        if self.prop_3D is not None:
+        if self.actor_3D is not None:
             return self.picker.GetPickPosition()
         else:
             return (np.nan, np.nan, np.nan)
@@ -412,7 +412,7 @@ class pick(object):
         return self.picker.GetActor2D()
 
     @property
-    def prop_3D(self):
+    def actor_3D(self):
         return self.picker.GetProp3D()
 
     @property
