@@ -167,6 +167,9 @@ class Lines(ConstructedPlot):
                 c = c[..., np.newaxis]
             # TODO: put a proper failsafe in here
 
+            if c.ndim == 1:
+                c = c[:, np.newaxis]
+
             # assert self.shape[:-1] == c.shape[:-1]
             self.polydata.point_colors = c.reshape((-1, c.shape[-1]))
 
