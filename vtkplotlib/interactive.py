@@ -50,6 +50,7 @@ page before consulting them.
 
     pick
     super_callbacks
+    OnClick
 
 =============
 Events in VTK

@@ -275,10 +275,15 @@ class pick(object):
             pick = vpl.i.pick(fig, from_=[ball])
 
             def callback(pick):
+                # We're going to use OnClick() instead of fig.style.AddObserver()
+                # so this callback should only take a `pick` argument.
                 if pick.actor is not None:
                     vpl.scatter(pick.point, color="r", fig=fig)
                     text.text = "Now try to click on one of the red balls"
 
+            # OnClick is more suitable for capturing mouse clicks because it can
+            # differentiate between a click and a click-and-drag. See the reference
+            # for OnClick().
             vpl.i.OnClick("Left", fig, callback, pick=pick)
 
             fig.show()
@@ -455,6 +460,49 @@ _mouse_buttons = set(
 
 class OnClick(object):
     VALID_BUTTONS = _mouse_buttons
+
+    __doc__ = \
+    """:class:`OnClick` provides a higher-level means to attach callbacks to
+    mouse click events without unintentionally also catching mouse
+    click-and-drag events.
+
+    :param button: Any of *{}* (case-insensitive).
+    :type button: str
+
+    :param style: The figure or `vtkInteractorStyle`_ to attach to, writeable.
+    :type style: :class:`vtkplotlib.figures.BaseFigure`, `vtkInteractorStyle`_
+
+    :param on_click: Method to call when a click happens, writeable, set to None
+        to disable, defaults to :meth:`print`.
+    :type on_click: callable taking a :class:`pick` as an argument, None, optional
+
+    :param mouse_shift_tolerance: The maximum mouse movement in pixels between
+        mouse-down and mouse-up allowed for a click to not be counted as a
+        click-and-drag, writeable, defaults to ``2``.
+    :type mouse_shift_tolerance: int, optional
+
+    :param pick: Set a custom :meth:`pick`, writeable, defaults to creating its
+        own on initialisation.
+    :type pick: :class:`pick`, optional
+
+    All parameters are available as attributes with the same name. Of these,
+    parameters labelled *writeable* can be set or altered later.
+
+    .. note:: *Forth* and *Fifth* **button** names require ``VTK>=8.0``.
+
+    Usage of :meth:`OnClick` differs from that of
+    ``fig.style.AddObserver(event_name, callback)`` in the following ways.
+
+    * Callbacks take a single argument **pick**.
+    * The calling of :meth:`call_super_callback` is automatic.
+    * If using a user-supplied **pick**, then ``pick.update()`` is called
+      automatically before passing it to the callback.
+
+    See the example from
+    `pick.from\\_ <pick.html#vtkplotlib.interactive.pick.from\\_>`_ for a
+    usage demonstration.
+
+    """.format("*, *".join(VALID_BUTTONS))
 
     def __init__(self, button, style, on_click=print, mouse_shift_tolerance=2,
                  pick=None):
