@@ -51,6 +51,7 @@ page before consulting them.
     pick
     super_callbacks
     OnClick
+    lookup_example
 
 =============
 Events in VTK
@@ -217,6 +218,7 @@ find and call the original callbacks for you. Like Python's builtin
 :meth:`super` function, these methods can't be called anywhere. They must be
 called inside of a function taking a `vtkObject`_ and a string event name as its
 arguments.
+
 
 """
 

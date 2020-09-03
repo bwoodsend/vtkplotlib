@@ -370,6 +370,16 @@ class pick(object):
 
     @property
     def point(self):
+        """A 3D coordinates tuple of where the event took place. If the event
+        happened over empty background or a 2D plot such as a
+        :meth:`vtkplotlib.scalar_bar` then outputs a 3-tuple of nans. To check
+        for this use ``pick.actor_3D is None``.
+
+        The coordinates interpolate between vertices you have provided. If you
+        require the nearest user-provided coordinate then you must implement
+        this yourself. See :ref:`lookup_example:Looking up original data`.
+
+        """
         if self.actor_3D is not None:
             return self.picker.GetPickPosition()
         else:
