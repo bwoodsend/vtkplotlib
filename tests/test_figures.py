@@ -41,6 +41,12 @@ from tests._common import checker, requires_interaction, TEST_DIR
 from tests._common import VTKPLOTLIB_WINDOWLESS_TEST
 
 
+def test_abstract():
+    with pytest.raises(Exception):
+        vpl.figures.BaseFigure.BaseFigure._abc_assert_no_abstract_methods()
+    vpl.figure._abc_assert_no_abstract_methods()
+
+
 def test_figure_io():
     vpl.close()
     assert vpl.gcf(False) is None
