@@ -182,6 +182,22 @@ def _actor_collection(actors, collection=None):
     return collection
 
 
+def _requires_active_iren(default=None):
+    """We must be careful when calling any method from a :class:`pick`'s iren
+    in case the iren isn't initialised or when VTK's app isn't running.
+    Otherwise this will block indefinitely.
+    """
+    def _requires_active_iren_or_default(func):
+        def wrapped(self):
+            iren = self.style.GetInteractor()
+            if iren and iren.GetEnabled():
+                return func(self, iren)
+            return default
+        wrapped.__doc__ = func.__doc__
+        return wrapped
+    return _requires_active_iren_or_default
+
+
 class pick(object):
     # language=rst
     """Pick collects information about user interactions into a handy bucket
@@ -343,12 +359,9 @@ class pick(object):
         if (self.actor is not None) and (self._from_map is not None):
             return self._from_map[self.actor]
 
-    def update(self):
-        iren = self.style.GetInteractor()
-        if iren and iren.GetEnabled():
-            # Be careful not to call GetEventPosition() when VTK's app isn't
-            # running. Otherwise this will block indefinitely.
-            self.point_2D = iren.GetEventPosition()
+    @_requires_active_iren()
+    def update(self, iren):
+        self.point_2D = iren.GetEventPosition()
         return self
 
     @property
