@@ -117,3 +117,7 @@ def test_annotate():
 
     arrow, self = vpl.annotate(point, point, np.array([0, 0, 1]),
                                text_color="green", arrow_color="purple")
+    assert np.all(self.color == vpl.colors.as_rgb_a("green")[0])
+    assert self.text == str(point)
+    assert (self.position - point == (0, 0, 3)).all()
+    assert np.all(arrow.color == vpl.colors.as_rgb_a("purple")[0])
