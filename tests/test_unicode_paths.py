@@ -38,6 +38,9 @@ from tests._common import TEST_DIR
 
 NAMES = ["name"]
 
+if sys.version_info[0] <= 2:
+    FileNotFoundError = IOError
+
 # Proper Python unicode support came in version 3.6.
 if sys.version_info >= (3, 6):
     NAMES.append("Ñ mé")

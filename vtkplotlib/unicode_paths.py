@@ -59,6 +59,9 @@ if __name__ == "__main__":
 else:
     _print = lambda *x: None
 
+if sys.version_info[0] <= 2:
+    FileNotFoundError = IOError
+
 
 class PathHandler(object):
     """Context manager to handle unicode filenames (which VTK does poorly).
