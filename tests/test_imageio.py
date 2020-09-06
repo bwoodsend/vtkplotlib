@@ -132,10 +132,16 @@ def test_write(fmt, pseudo_file):
     if pseudo_file:
         file = io.BytesIO()
     else:
+        if dest.exists():
+            os.remove(str(dest))
         file = dest
 
     vpl.image_io.write(original, file, dest.suffix)
-    written = pillow_open(str(dest))
+
+    if not pseudo_file:
+        assert dest.exists()
+
+    written = pillow_open(file)
 
     assert written.shape == original.shape
     error = np.abs(written - original.astype(np.float)).mean()
