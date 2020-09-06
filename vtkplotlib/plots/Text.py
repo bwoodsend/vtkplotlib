@@ -105,7 +105,7 @@ class Text(Base2DPlot):
 
     @property
     def text(self):
-        self.actor.GetInput()
+        return self.actor.GetInput()
 
     @text.setter
     def text(self, text_str):

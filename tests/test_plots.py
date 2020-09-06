@@ -78,7 +78,12 @@ def test_mesh():
 
 @checker()
 def test_text():
-    vpl.text("text", (100, 100), color="g")
+    text = vpl.text("spaghetti", (100, 150), color="g")
+    assert text.text == "spaghetti"
+    assert np.all(text.position[:2] == (100, 150))
+    assert np.all(text.color == vpl.colors.as_rgb_a("g")[0])
+    text.text = "not spaghetti"
+    assert text.actor.GetInput() == text.text == "not spaghetti"
 
 
 @checker()
