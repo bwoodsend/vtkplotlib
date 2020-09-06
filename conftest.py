@@ -1,0 +1,1 @@
+# -*- coding: utf-8 -*-import vtkplotlib as vplimport pytest@pytest.fixture(autouse=True)def add_vpl(doctest_namespace):    doctest_namespace["vpl"] = vpl@pytest.fixture(autouse=True)def add_fig(doctest_namespace):    doctest_namespace["fig"] = vpl.figure()

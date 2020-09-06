@@ -85,15 +85,15 @@ def get_super_callback(invoker=None, event_name=None):
     arguments explicitly, you can call this function anywhere. e.g.
 
         >>> vpl.i.get_super_callback(fig.style, "MouseMoveEvent")
-        <built-in method OnMouseMove of vtkmodules.vtkInteractionStyle.vtkInteractorStyleTrackballCamera object at 0x000000C0AB4B1E88>
+        <built-in method OnMouseMove of vtkmodules.vtkInteractionStyle.vtkInteractorStyleTrackballCamera object at ...>
 
     Not all events have parent events. In these cases a dummy function is
     returned. This is also the case for non-existant event types.
 
         >>> vpl.i.get_super_callback(fig.style, "WindowIsCurrentEvent")
-        <function null_super_callback at 0x000000C0AB4ABA68>
+        <function null_super_callback at ...>
         >>> vpl.i.get_super_callback(fig.style, "BlueMoonEvent")
-        <function null_super_callback at 0x000000C0AB4ABA68>
+        <function null_super_callback at ...>
 
     Should you want to, you can also overide the one or both arguments. The
     following will swap the left and right mouse-click functionallities.

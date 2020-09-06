@@ -172,10 +172,11 @@ def pack_lengths(itr_of_arrays):
     [no of points in cell, cell_id1, cell_id2, ..., no of points in next cell, id1, id2, ...]
 `
     ..doctest::
+
         >>> pack_lengths([[20, 21, 22],
-                          [23, 24],
-                          [25, 26, 27, 28]])
-        np.array([3, 20, 21, 22, 2, 23, 24, 4, 25, 26, 27, 28])
+        ...               [23, 24],
+        ...               [25, 26, 27, 28]])
+        array([ 3, 20, 21, 22,  2, 23, 24,  4, 25, 26, 27, 28])
 
     .. seealso:
 
