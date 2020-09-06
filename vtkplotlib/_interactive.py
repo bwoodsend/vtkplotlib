@@ -187,14 +187,18 @@ def _requires_active_iren(default=None):
     in case the iren isn't initialised or when VTK's app isn't running.
     Otherwise this will block indefinitely.
     """
+
     def _requires_active_iren_or_default(func):
+
         def wrapped(self):
             iren = self.style.GetInteractor()
             if iren and iren.GetEnabled():
                 return func(self, iren)
             return default
+
         wrapped.__doc__ = func.__doc__
         return wrapped
+
     return _requires_active_iren_or_default
 
 
@@ -445,6 +449,81 @@ class pick(object):
     @property
     def volume(self):
         return self.picker.GetVolume()
+
+    @property
+    @_requires_active_iren("")
+    def key_text(self, iren):
+        """:attr:`key_name` is used to capture keyboard interaction. See
+        :attr:`key_name`.
+        """
+        try:
+            return iren.GetKeyCode()
+        except UnicodeError:
+            return ""
+
+    @property
+    @_requires_active_iren("")
+    def key_name(self, iren):
+        """:attr:`key_name` is used to capture keyboard interaction.
+
+        .. code-block:: python
+
+            import vtkplotlib as vpl
+
+            fig = vpl.figure()
+            vpl.quick_test_plot()
+
+            # The repr tells you everything there is to know...
+            callback = lambda *spam: print(vpl.i.pick(fig))
+
+            # Attach to either 'KeyPressEvent' or 'KeyReleaseEvent'.
+            fig.style.AddObserver("KeyPressEvent", callback)
+            fig.show()
+
+        See also the similar :attr:`key_text`. The following shows the
+        differences between the two.
+
+        ================   ==============   ========
+        Action             key_name         key_text
+        ================   ==============   ========
+        Press 'a' key      `'a'`            `'a'`
+        Press Shift a      `'A'`            `'A'`
+        Press Shift key    `'Shift_L'`      `''`
+        Press Return key   `'return'`       `'\\r'`
+        Press F5 key       `'F5'`           `''`
+        Press `#` key      `'numbersign'`   `'#'`
+        Press '?' key      `'question'`     `'?'`
+        Type unicode Á     `'a'`            `''`
+        ================   ==============   ========
+
+        .. note::
+
+            Unlike with every other event, there is no need to use
+            :meth:`call_super_callback`. It is called for you.
+
+        """
+        return iren.GetKeySym()
+
+    _KEY_MODIFIERS = [(i, "Get%sKey" % i) for i in ("Shift", "Control", "Alt")]
+    _KEY_MODIFIERS = [(i, getattr(vtk.vtkRenderWindowInteractor, j))
+                      for (i, j) in _KEY_MODIFIERS
+                      if hasattr(vtk.vtkRenderWindowInteractor, j)]
+
+    @property
+    @_requires_active_iren(())
+    def key_modifiers(self, iren):
+        """:attr:`key_modifiers` lists currently held down modifiers keys.
+
+        The result can be any combination of ``("Shift", "Control", "Alt")``.
+        The order is consistent, meaning that it is safe to use something like
+        the following:
+
+        .. code-block:: python
+
+            if pick.key_modifiers == ("Shift", "Alt"):
+
+        """
+        return tuple(key for (key, get) in self._KEY_MODIFIERS if get(iren))
 
     def __repr__(self):
         out = type(self).__name__ + " {\n"
