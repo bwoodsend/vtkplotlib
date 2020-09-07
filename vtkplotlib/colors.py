@@ -61,8 +61,6 @@ called lookup tables and are of type ``vtk.vtkLookupTable``.
 
 Any vtkplotlib method that takes  **cmap** argument can utilise a colormap.
 
-
-
 .. code-block:: python
 
     import vtkplotlib as vpl
@@ -228,44 +226,9 @@ def as_rgb_a(color=None, opacity=None):
                 color = color.encode()
 
             if color[0] == "#":
-                if len(color) not in (7, 9):
-                    raise ValueError(
-                        "HTML Hex string color \"{}\" is not a valid length.".
-                        format(color))
-                # allow #RRGGBB hex colors
-                # mpl's hex2rgb doesn't allow opacity. Otherwise I'd just use that
-                return as_rgb_a(tuple(int(color[i:2 + i], 16)
-                                      for i in range(1, len(color), 2)),
-                                opacity) # yapf: disable
-            else:
-                # use matplotlib's color library
-                if color in mpl_colors:
-                    color = mpl_colors[color]
-                else:
-                    # If not in mpl's library try to correct user input and try again
-                    corrected = color.lower().replace("_", " ").replace(
-                        "-", " ")
-                    import warnings
+                return as_rgb_a(_hex_to_rgba(color), opacity)
 
-                    if corrected in mpl_colors:
-                        warnings.warn(
-                            "Auto-correcting color {!r} to {!r}.\nMatplotlib "
-                            "colors are all lowercase and use spaces instead of"
-                            " underscores.".format(color, corrected),
-                            UserWarning
-                        ) # yapf: disable
-                        color = mpl_colors[corrected]
-
-                    else:
-                        # If still not found then cancel the whole operation
-                        # (including opacity)
-                        warnings.warn(
-                            "Color {!r} not found. Skipping color assignment. "
-                            "See vtkplotlib.colors.mpl_colors.keys() for a list"
-                            " of available colors.".format(color),
-                            UserWarning
-                        ) # yapf: disable
-                        return None, None
+            return as_rgb_a(_named_matplotlib_color(color), opacity)
 
         # QColors
         from vtkplotlib.nuts_and_bolts import isinstance_no_import
@@ -289,6 +252,48 @@ def as_rgb_a(color=None, opacity=None):
         opacity_out = opacity
 
     return color_out, opacity_out
+
+
+def _hex_to_rgba(color):
+    """
+    Convert #RRGGBB hex colors to (R, G, B) tuple of ints.
+    Or #RRGGBBAA to (R, G, B, A).
+
+    matplotlib's hex2rgb doesn't allow opacity. Otherwise I'd just use that.
+    """
+    if len(color) not in (7, 9):
+        raise ValueError("Invalid length HTML Hex string color \"%s\"." % color)
+    try:
+        return tuple(int(color[i:i + 2], 16) for i in range(1, len(color), 2))
+    except ValueError:
+        raise ValueError("Invalid HTML Hex string color \"%s\"." % color)
+
+
+def _named_matplotlib_color(color):
+    if color in mpl_colors:
+        return mpl_colors[color]
+
+    # If not in mpl's library try to correct user input and try again
+    corrected = color.lower().replace("_", " ").replace("-", " ")
+    import warnings
+
+    if corrected in mpl_colors:
+        warnings.warn(
+            "Auto-correcting color {!r} to {!r}.\nMatplotlib "
+            "colors are all lowercase and use spaces instead of"
+            " underscores.".format(color, corrected),
+            UserWarning
+        )  # yapf: disable
+        return mpl_colors[corrected]
+
+    # If still not found then skip color assignment.
+    warnings.warn(
+        "Color {!r} not found. Skipping color assignment. "
+        "See vtkplotlib.colors.mpl_colors.keys() for a list"
+        " of available colors.".format(color),
+        UserWarning
+    )  # yapf: disable
+    return None
 
 
 def normalise(colors, axis=None):
