@@ -176,11 +176,8 @@ import numpy as np
 from matplotlib import colors, cm
 from vtkplotlib._get_vtk import vtk, numpy_to_vtk, vtk_to_numpy
 
-mpl_colors = {}
-mpl_colors.update(colors.BASE_COLORS)
-for _dic in (colors.CSS4_COLORS, colors.TABLEAU_COLORS, colors.XKCD_COLORS):
-    for (_key, _val) in _dic.items():
-        mpl_colors[_key.split(":")[-1]] = colors.hex2color(_val)
+
+from vtkplotlib._matplotlib_colors import matplotlib_colors as mpl_colors
 
 
 def as_rgb_a(color=None, opacity=None):
