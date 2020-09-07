@@ -108,6 +108,10 @@ def pillow_open(path):
 
 @pytest.mark.parametrize("fmt, pseudo_file", pseudos["r"] + non_pseudos)
 def test_read(fmt, pseudo_file):
+    if fmt == "JPEG" and sys.version_info[:2] == (3, 6)\
+            and sys.platform == "linux":
+        pytest.xfail("PIL gives a different array with this platform/"
+                     "Python-version pair.")
 
     path = _setup_test_image(fmt)
     pillow_array = pillow_open(path)
