@@ -8,7 +8,7 @@
 # unicode_paths.py
 # VTK can't handle non ascii file paths. This lets python handle all the unicode
 # so that vtk is never exposed to it.
-# Copyright (C) 2019  Brénainn Woodsend
+# Copyright (C) 2019-2020  Brénainn Woodsend
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -6,7 +6,7 @@
 #
 #
 # BaseFigure.py provides a base class for vpl figures.
-# Copyright (C) 2019  Brénainn Woodsend
+# Copyright (C) 2019-2020  Brénainn Woodsend
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

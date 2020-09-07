@@ -5,7 +5,7 @@
 # @author: Brénainn Woodsend
 #
 # nuts_and_bolts.py is a dumping ground for various misc functions.
-# Copyright (C) 2019  Brénainn Woodsend
+# Copyright (C) 2019-2020  Brénainn Woodsend
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

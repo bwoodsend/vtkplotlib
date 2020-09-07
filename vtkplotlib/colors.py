@@ -7,7 +7,7 @@
 #
 # colors.py "borrows" matplotlib's color library and contains functions for handling different
 # color types.
-# Copyright (C) 2019  Brénainn Woodsend
+# Copyright (C) 2019-2020  Brénainn Woodsend
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -175,7 +175,6 @@ from future import utils as _future_utils
 import numpy as np
 from matplotlib import colors, cm
 from vtkplotlib._get_vtk import vtk, numpy_to_vtk, vtk_to_numpy
-
 
 from vtkplotlib._matplotlib_colors import matplotlib_colors as mpl_colors
 

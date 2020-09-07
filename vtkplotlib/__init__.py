@@ -6,7 +6,7 @@
 #
 #
 # __init__.py collects all the relevant parts and renames the classes to look like functions.
-# Copyright (C) 2019  Brénainn Woodsend
+# Copyright (C) 2019-2020  Brénainn Woodsend
 #
 #
 # This program is free software: you can redistribute it and/or modify
