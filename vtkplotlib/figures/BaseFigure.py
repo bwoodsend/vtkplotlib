@@ -34,6 +34,24 @@ from vtkplotlib._get_vtk import vtk
 from vtkplotlib import _vtk_errors, nuts_and_bolts
 
 
+def abstract_property(func):
+    if sys.version_info > (3, 3):
+        return property(abc.abstractmethod(func))
+    else:
+        return abc.abstractproperty(func)
+
+
+def _abc_assert_not_abstract_method(name, method):
+    if isinstance(method, property):
+        _abc_assert_not_abstract_method(name + " getter", method.fget)
+        _abc_assert_not_abstract_method(name + " setter", method.fset)
+        _abc_assert_not_abstract_method(name + " deleter", method.fdel)
+        return
+
+    if getattr(method, "__isabstractmethod__", False):
+        raise Exception(name + " is abstract and has not been re-implemented.")
+
+
 class BaseFigure(object):
 
     def __init__(self, name=""):
@@ -64,11 +82,11 @@ class BaseFigure(object):
     def camera(self, camera):
         self.renderer.SetActiveCamera(camera)
 
-    @abc.abstractmethod
+    @abstract_property
     def iren(self):
         pass
 
-    @abc.abstractmethod
+    @abstract_property
     def renWin(self):
         pass
 
@@ -205,10 +223,7 @@ class BaseFigure(object):
         # Don't use `vars(cls)` here as inherited methods are only in the
         # parent class dict. i.e this test would be useless.
         for name in dir(cls):
-            meth = getattr(cls, name)
-            if getattr(meth, "__isabstractmethod__", False):
-                raise Exception(name +
-                                " is abstract and has not been re-implemented.")
+            _abc_assert_not_abstract_method(name, getattr(cls, name))
 
     @staticmethod
     def _flush_stdout():
