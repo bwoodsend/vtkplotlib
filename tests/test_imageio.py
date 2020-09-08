@@ -40,7 +40,6 @@ import io
 
 
 def test_trim_image():
-    import matplotlib.pylab as plt
 
     fig = vpl.figure()
 
