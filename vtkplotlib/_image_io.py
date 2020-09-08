@@ -253,7 +253,7 @@ def vtkimagedata_to_array(image_data):
     points = vtk_to_numpy(image_data.GetPointData().GetScalars())
     shape = image_data.GetDimensions()
     # Be careful here. shape[2] isn't the number of values per pixel as you'd
-    # expect. Rather it is a 3rd dimension as vtkImagedata is
+    # expect. Rather it is a 3rd dimension as vtkImageData is
     # supposed to hold volumes. `image_data.GetNumberOfScalarComponents()` gets
     # the right value (usually 3 for RGB).
     # Additionally vtk uses cartesian coordinates in images which isn't the

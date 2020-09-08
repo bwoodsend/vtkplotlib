@@ -85,7 +85,7 @@ def unzip_axes(points):
     :return: Each axis separately as a tuple.
     :rtype: tuple of arrays
 
-    See :meth:`vpl.zip_axes` more information and the reverse.
+    See :meth:`zip_axes` more information and the reverse.
 
     """
 

@@ -5,7 +5,8 @@
 #@author: Brénainn Woodsend
 #
 #
-# image_io.py performs image read/write operations and conversions to vtkimage types.
+# image_io.py
+# Performs image read/write operations and conversions to vtkImage types.
 # Copyright (C) 2019  Brénainn Woodsend
 #
 # This program is free software: you can redistribute it and/or modify
@@ -87,7 +88,7 @@ Read and Write
 
 VTK provides classes for reading and writing images to disk. These are somewhat
 superseded by `Pillow`_ (Python image library) which does the same thing. But
-these methods are included anyway just incase you don't want to use Pillow.
+these methods are included anyway just in case you don't want to use Pillow.
 
 -------------------------
 
@@ -109,7 +110,7 @@ Formats allowing pseudo files
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Some formats allow reading and writing from RAM whereas others must use the disk.
-The following table summarises which are allowed. This table is accessable via
+The following table summarises which are allowed. This table is accessible via
 ``vtkplotlib.image_io.BUFFERABLE_FORMAT_MODES``.
 
 ====  ==============

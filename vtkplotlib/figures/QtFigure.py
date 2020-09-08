@@ -187,7 +187,7 @@ class QtFigure(BaseFigure, QWidget):
         qapp.exec_()
 
 
-    .. note::  QtFigures are not reshowable if the figure has a parent.
+    .. note::  QtFigures are not reshow-able if the figure has a parent.
 
     .. seealso:: :class:`vtkplotlib.QtFigure2` is an extension of this to provide some standard GUI elements, ready-made.
 
@@ -238,7 +238,7 @@ class QtFigure(BaseFigure, QWidget):
 
     def _base_show_wrap(QWidget_show_name):
         """Wrap all the ``QWidget.show()``, ``QWidget.showMaximized()`` etc
-        methods so they can all be used as expected. Just incase Qt has changed
+        methods so they can all be used as expected. Just in case Qt has changed
         and some ``show...()`` methods aren't present, this defaults to just
         ``show()``.
         """

@@ -31,7 +31,7 @@ from pathlib2 import Path
 from vtkplotlib._get_vtk import vtk
 
 try:
-    # Doing this allows the current figure to be remembered if vtkplotlib get's
+    # Doing this allows the current figure to be remembered if vtkplotlib gets
     # re-imported.
     _figure
 except NameError:
@@ -64,7 +64,7 @@ def scf(figure):
     """Sets the current working figure.
 
     :param figure: A figure or None.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`
+    :type figure: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`
 
     """
     global _figure
@@ -255,10 +255,7 @@ def reset_camera(fig="gcf"):
 def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None,
                    off_screen=False, fig="gcf"):
     """Take a screenshot of a figure. The image is returned as an array. To
-    save a screenshot directly to a file, see vpl.save_fig.
-
-    :param path: The path, including extension, to save to.
-    :type path: str or Pathlike
+    save a screenshot directly to a file, use :meth:`save_fig`.
 
     :param magnification: Image dimensions relative to the size of the render (window), defaults to 1.
     :type magnification: int or a (width, height) tuple of ints, optional
