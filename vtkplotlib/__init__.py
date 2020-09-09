@@ -57,7 +57,7 @@ from .plots.Legend import Legend as legend
 from .plots import BasePlot
 from .plots.polydata import PolyData
 
-from . import data, image_io, interactive
+from . import data, image_io, interactive, colors, geometry, nuts_and_bolts
 
 i = interactive
 
@@ -88,3 +88,6 @@ from .colors import TextureMap
 from ._get_vtk import vtk
 
 from .__version__ import __version__
+
+# Explicitly importing these can improve IDE autocompletion.
+from . import _interactive, _image_io
