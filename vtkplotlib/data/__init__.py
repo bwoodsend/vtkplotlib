@@ -30,12 +30,7 @@ from pathlib2 import Path
 
 from vtkplotlib import __file__ as _init_path
 
-if getattr(sys, 'frozen', False):
-    # running in a PyInstaller bundle
-    DATA_FOLDER = Path(_init_path).parent.with_name("vpl-data")
-else:
-    # running normally
-    DATA_FOLDER = Path(_init_path).with_name("data")
+DATA_FOLDER = Path(_init_path).with_name("data")
 
 MODELS_FOLDER = DATA_FOLDER / "models"
 
@@ -45,7 +40,6 @@ def get_rabbit_stl():
 
 
 ICONS_FOLDER = DATA_FOLDER / "icons"
-
 ICONS = {i.stem: str(i) for i in ICONS_FOLDER.glob("*.jpg")}
 
 
