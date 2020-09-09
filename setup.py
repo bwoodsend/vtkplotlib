@@ -52,5 +52,8 @@ setup(name='vtkplotlib',
                         "PyQt5" if sys.version_info.major >= 3 else "python_qt5",
                         "numpy-stl", "namegenerator", "PILLOW"],
       },
-      cmdclass={"build": Build}
+      cmdclass={"build": Build},
+      entry_points={
+          "pyinstaller40": ["hook-dirs = vtkplotlib.data:_get_hooks_dir"]
+      },
       ) # yapf:disable
