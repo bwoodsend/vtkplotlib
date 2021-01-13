@@ -329,9 +329,14 @@ def trim_image(arr, background_color, crop_padding):
 
     background_color = np.asarray(background_color)
     if background_color.dtype.kind == "f" and arr.dtype.kind == "u":
-        background_color = (background_color * 255).astype(arr.dtype)
+        background_color = background_color * np.iinfo(arr.dtype).max
 
-    mask = (arr == background_color).all(-1)
+    if arr.dtype.kind == "u":
+        # Allow up to 1 LSB of deviation to account for rounding/integer
+        # truncation error.
+        mask = (np.abs(arr - background_color) <= 1).all(-1)
+    else:
+        mask = (arr == background_color).all(-1)
 
     if isinstance(crop_padding, float):
         crop_padding = int(crop_padding * min(mask.shape))
