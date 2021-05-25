@@ -38,3 +38,11 @@ datas += collect_data_files("vtkplotlib", includes=["**/*.jpg"])
 
 # The rabbit STL. Only used for demonstrating.
 # datas += collect_data_files("vtkplotlib", includes=["**/rabbit/"])
+
+excludes = [
+    "matplotlib.backends",
+    "vtkmodules.all",
+    "matplotlib.pylab",
+    "matplotlib.pyplot",
+    "scipy",
+]
