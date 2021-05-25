@@ -165,7 +165,7 @@ def join_line_ends(lines):
         return lines[:, np.arange(max(-1, -m), m)]
 
 
-def pack_lengths(itr_of_arrays):
+def pack_lengths(arrays):
     """Packs into VTK's compound cell array format which is designed to allow
     cells of different lengths in the same array of cells. The output format is
     a 1D array of the form
@@ -183,21 +183,24 @@ def pack_lengths(itr_of_arrays):
         unpack_lengths for the reverse.
     """
 
-    if not isinstance(itr_of_arrays, (list, np.ndarray)):
-        itr_of_arrays = list(itr_of_arrays)
-    itr_of_arrays = np.asarray(itr_of_arrays)
+    if isinstance(arrays, np.ndarray) and arrays.dtype != object:
+        # This is just a regular numpy array with equal-lengthed rows.
+        # Prepend an extra column containing the row length.
 
-    if itr_of_arrays.dtype == object:
-        parts = itertools.chain(*[([len(i)], i) for i in itr_of_arrays.flat])
-        return np.concatenate(list(parts))
+        arrays = arrays.reshape((-1, arrays.shape[-1]))
 
-    else:
+        out = np.empty((arrays.shape[0], arrays.shape[1] + 1), ID_ARRAY_DTYPE)
+        out[:, 0] = arrays.shape[1]
+        out[:, 1:] = arrays
 
-        itr_of_arrays = itr_of_arrays.reshape((-1, itr_of_arrays.shape[-1]))
-        n, m = itr_of_arrays.shape
-        lengths = np.empty((n, 1), int)
-        lengths[:] = m
-        return np.concatenate([lengths, itr_of_arrays], axis=1)
+        return out
+
+    # Otherwise do it the slow way.
+    flat = []
+    for array in arrays:
+        flat.append(len(array))
+        flat.extend(array)
+    return np.array(flat, dtype=ID_ARRAY_DTYPE)
 
 
 def unpack_lengths(arr):
