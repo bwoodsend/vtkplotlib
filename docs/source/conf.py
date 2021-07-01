@@ -44,7 +44,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.githubpages',
     'sphinx_copybutton',
-    'm2r',
+    'm2r2',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.doctest',
 ]
