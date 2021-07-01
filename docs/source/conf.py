@@ -45,6 +45,7 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx_copybutton',
     'm2r2',
+    'sphinx_rtd_theme_configuration',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.doctest',
 ]
