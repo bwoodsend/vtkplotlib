@@ -46,6 +46,7 @@ polygon
 scalar_bar
 ---------------------
 
+.. py:function:: vtkplotlib.color_bar
 .. autofunction:: vtkplotlib.scalar_bar
 
 
@@ -110,6 +111,6 @@ legend
 custom plots using PolyData
 ---------------------------
 
-.. autofunction:: vtkplotlib.PolyData
+.. autoclass:: vtkplotlib.PolyData
 
 

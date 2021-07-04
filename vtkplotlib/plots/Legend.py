@@ -36,29 +36,25 @@ from vtkplotlib.plots.BasePlot import Base2DPlot, BasePlot, as_rgb_a, PolyData
 class Legend(Base2DPlot):
     """Creates a legend to label plots.
 
-    :param plots_source: Plots to use in the legend, can be None, defaults to `fig.plots`.
-    :type plots_source: iterable of plots or None, optional
+    :param plots_source: Plots to use in the legend. Use `None` to include nothing. Defaults to ``fig.plots``.
 
-    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+    :param fig: The figure to plot into, use `None` for no figure, defaults to the output of `vtkplotlib.gcf()`.
+    :type fig: :class:`~vtkplotlib.figure` or :class:`~vtkplotlib.QtFigure`
 
-    :param position: Position (relative to the size of the figure) of the bottom left corner, defaults to (0.7, 0.7).
-    :type position: tuple pair of floats, optional
+    :param position: Position (relative to the size of the figure) of the bottom left corner.
+    :type position: tuple
 
-    :param size: Size (relative to the size of the figure) of the legend, defaults to (0.3, 0.3).
-    :type size: tuple pair of floats, optional
+    :param size: Size (relative to the size of the figure) of the legend.
+    :type size: tuple
 
-    :param color: The background color of the legend, defaults to 'grey'.
-    :type color: str, 3-tuple, 4-tuple, optional
+    :param color: The background color of the legend.
+    :type color: str or tuple or numpy.ndarray
 
-    :param allow_no_label: Allow plots that have no label to have label None, only applicable if entries are added automatically, defaults to False.
-    :type allow_no_label: bool, optional
+    :param allow_no_label: Allow plots that have no label to have label `None`, only applicable if entries are added automatically.
+    :type allow_no_label: bool
 
-    :param allow_non_polydata_plots: Allow plots that have no polydata to represented with a box, only applicable if entries are added automatically, defaults to False.
-    :type allow_non_polydata_plots: bool, optional
-
-    :return: The legend created.
-    :rtype: vtkplotlib.plots.Legend.Legend
+    :param allow_non_polydata_plots: Allow plots that have no polydata to represented with a box, only applicable if entries are added automatically.
+    :type allow_non_polydata_plots: bool
 
 
     Elements can be added to the legend automatically or explicitly. Most plot
@@ -156,14 +152,14 @@ class Legend(Base2DPlot):
 
     Some caveats / potential sources of confusion:
 
-    - Long and thin plots such as :meth:`arrow` tend to mess up the spacing
+    - Long and thin plots such as `arrow()` tend to mess up the spacing
       which is seemingly non configurable.
 
-    - Be careful when using :meth:`scatter` and :meth:`quiver` which return an
+    - Be careful when using `scatter()` and `quiver()` which return an
       array of plots rather than a single plot.
 
-    - Plots based on lines such as the output of vpl.plot tend not to show
-      well as the lines are less than one pixel wide.
+    - Plots based on lines such as the output of `vtkplotlib.plot()` tend not to
+      show well as the lines are less than one pixel wide.
 
     - Automatic setting of color can only work for uniformly colored plots.
       any colors derived from scalars are ignored.

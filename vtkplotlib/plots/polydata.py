@@ -254,45 +254,46 @@ SCALAR_MODES_FROM_STRINGS = {
 
 class PolyData(object):
     """The polydata is a key building block to making customised plot objects.
-    The :class:`mesh_plot`, :class:`plot` and :class:`surface` methods are in
-    fact just a thin wrapping layer around a :class:`PolyData`. This is a wrapper
-    around VTK's `vtkPolyData`_ object, which is functionally equivalent, but
-    difficult and crash-prone to work with directly.
+    The `mesh_plot`, `plot` and `surface` methods are in fact just a thin
+    wrapping layer around a `PolyData`. This class itself is a wrapper
+    around VTK's `vtkPolyData`_ object.
 
-    :param vtk_polydata: An original `vtkPolyData`_ to build on top of, defaults to None.
-    :type vtk_polydata: vtk.vtkPolyData, optional
+    :param vtk_polydata: An original `vtkPolyData`_ to build on top of, defaults to constructing a new one from scratch.
+    :type vtk_polydata: `vtkPolyData`_
 
 
     A polydata consists of the following 2D numpy arrays:
 
-    +----------------+-------+--------+--------------------------------------------+
-    | Attribute name | dtype | shape  | Meaning                                    |
-    +----------------+-------+--------+--------------------------------------------+
-    | points         | float | (a, 3) | | All line start and end points            |
-    |                |       |        | | and all polygon corners.                 |
-    +----------------+-------+--------+--------------------------------------------+
-    | lines          | int   | (b, 3) | | Each row of **lines** corresponds        |
-    |                |       |        | | the point indices a line passes          |
-    |                |       |        | | through.                                 |
-    +----------------+-------+--------+--------------------------------------------+
-    | polygons       | int   | (c, 3) | | Each row of **polygons** corresponds     |
-    |                |       |        | | the point indices a the corners of       |
-    |                |       |        | | a polygon.                               |
-    +----------------+-------+--------+--------------------------------------------+
-    | point_colors   | float | (a,)   |                                            |
-    |                |       | (a, 1) | | Per-point scalars, texture coordinates   |
-    |                |       | (a, 2) | | or RGB values, depending on the shape.   |
-    |                |       | (a, 3) |                                            |
-    +----------------+-------+--------+--------------------------------------------+
-    | polygon_colors | float | (c,)   |                                            |
-    |                |       | (c, 1) | | Per-polygon scalars, texture coordinates |
-    |                |       | (c, 2) | | or RGB values, depending on the shape.   |
-    |                |       | (c, 3) |                                            |
-    +----------------+-------+--------+--------------------------------------------+
+    +--------------------+---------+---------------+-------------------------------+
+    | Attribute name     | dtype   | shape         | Meaning                       |
+    +--------------------+---------+---------------+-------------------------------+
+    | ``points``         | `float` | | ``(a, 3)``  | All line start and end points |
+    |                    |         |               | and all polygon corners.      |
+    +--------------------+---------+---------------+-------------------------------+
+    | ``lines``          | `int`   | | ``(b, 3)``  | Each row of **lines**         |
+    |                    |         |               | corresponds the point indices |
+    |                    |         |               | a line passes through.        |
+    +--------------------+---------+---------------+-------------------------------+
+    | ``polygons``       | `int`   | | ``(c, 3)``  | Each row of **polygons**      |
+    |                    |         |               | corresponds the point indices |
+    |                    |         |               | a the corners of a polygon.   |
+    +--------------------+---------+---------------+-------------------------------+
+    | ``point_colors``   | `float` | | ``(a,)`` or | Per-point scalars, texture    |
+    |                    |         |   ``(a, 1)``  | coordinates or RGB values,    |
+    |                    |         | | ``(a, 2)``  | depending on the shape.       |
+    |                    |         | | ``(a, 3)``  |                               |
+    +--------------------+---------+---------------+-------------------------------+
+    | ``polygon_colors`` | `float` | | ``(c,)`` or | Per-polygon scalars, texture  |
+    |                    |         |   ``(c, 1)``  | coordinates or RGB values,    |
+    |                    |         | | ``(c, 2)``  | depending on the shape.       |
+    |                    |         | | ``(c, 3)``  |                               |
+    +--------------------+---------+---------------+-------------------------------+
 
+    Where ``a``, ``b`` and ``c`` are defined as the numbers of vertices, lines
+    and polygons respectively.
 
     The points aren't visible themselves - to create some kind of points plot
-    use :meth`scatter`.
+    use `vtkplotlib.scatter()`.
 
     Lines and polygons can be interchanged to switch from solid surface to
     wire-frame.
@@ -323,13 +324,11 @@ class PolyData(object):
 
         # When you are happy with it, it can be turned into a proper plot
         # object like those output from other ``vpl.***()`` commands. It will be
-        # automatically added to ``vpl.gcf()`` unless told otherwise.
+        # automatically added to `vtkplotlib.gcf()` unless told otherwise.
         plot = polydata.to_plot()
         vpl.show()
 
-
     """
-
     def __init__(self, vtk_polydata=None, mapper=None):
         self.vtk_polydata = vtk_polydata or vtk.vtkPolyData()
         self.mapper = mapper or vtk.vtkPolyDataMapper()

@@ -67,8 +67,8 @@ color_bar = scalar_bar
 def quick_test_plot(fig="gcf"):
     """A quick laziness function to create 30 random spheres.
 
-    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+    :param fig: The figure to plot into, use `None` for no figure, defaults to the output of `vtkplotlib.gcf()`.
+    :type fig: :class:`~vtkplotlib.figure` or :class:`~vtkplotlib.QtFigure`
 
     .. code-block:: python
 

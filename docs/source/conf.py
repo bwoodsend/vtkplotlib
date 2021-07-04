@@ -15,6 +15,7 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+from sphinx.application import Sphinx
 
 # -- Project information -----------------------------------------------------
 
@@ -43,6 +44,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.githubpages',
+    'sphinx.ext.intersphinx',
     'sphinx_copybutton',
     'm2r2',
     'sphinx_rtd_theme_configuration',
@@ -88,11 +90,6 @@ html_theme = 'sphinx_rtd_theme'
 # documentation.
 #
 # html_theme_options = {}
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -219,9 +216,56 @@ rst_epilog += """
 .. _namegenerator: https://pypi.org/project/namegenerator/
 """
 
+rst_prolog = """
+.. py:currentmodule:: vtkplotlib
+"""
+
 # -- Add this file for Google search console ----------
 html_extra_path = ["google77eb9775385691af.html"]
 
 # --- Option for autosectionlabel --------
 
 autosectionlabel_prefix_document = True
+
+# --- Intersphinx cross refrerneces ---
+
+# Warn if a cross reference is not found.
+nitpicky = True
+
+# Other projects' website roots so that they can be cross referenced.
+intersphinx_mapping = {
+    'python': ('http://docs.python.org/3', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/', None),
+    'PyQt5': ('https://www.riverbankcomputing.com/static/Docs/PyQt5/', None),
+    'wxPython': ('https://docs.wxpython.org/', None),
+    'matplotib': ('https://matplotlib.org', None),
+    'pillow': ('https://pillow.readthedocs.io/en/stable/', None),
+}
+
+
+def setup(app):
+    # type: (Sphinx) -> None
+
+    # PyQt5 has all its cross reference targets in a special :sip: domain which
+    # needs to be registered to be used. Don't ask me how this works. It's
+    # mostly guess work and copy/paste from sphinx.domains.c.CDomain.
+
+    import sphinx.roles
+    from sphinx.domains import Domain, ObjType, _
+
+    class SIPDomain(Domain):
+        name = "sip"
+        label = "sip"
+        object_types = {
+            key: ObjType(_(key), key, 'data', 'identifier', 'type')
+            for key in "attribute class enum member method module signal".split()
+        }
+
+    app.add_domain(SIPDomain)
+    for key in SIPDomain.object_types:
+        app.add_role_to_domain("sip", key, sphinx.roles.XRefRole())
+
+
+# Set the default interpretation of `foo` to :any:`foo`.
+default_role = "any"

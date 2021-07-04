@@ -148,36 +148,34 @@ def normalise_mesh_type(self, mesh_data):
 class MeshPlot(ConstructedPlot):
     """To plot STL files you will need some kind of STL reader library. If you don't
     have one then get `numpy-stl`_. Their Mesh class can be passed
-    directly to :meth:`mesh_plot`.
+    directly to `mesh_plot()`.
 
     .. _numpy-stl: https://pypi.org/project/numpy-stl/
 
-    :param mesh_data: The mesh to plot.
-    :type mesh_data: An STL (like) object (see below)
+    :param mesh_data: A mesh object to plot.
 
     :param tri_scalars: Per-triangle scalar, texture-coordinates or RGB values, defaults to None.
-    :type tri_scalars: np.ndarray, optional
+    :type tri_scalars: numpy.ndarray
 
     :param scalars: Per-vertex scalar, texture-coordinates or RGB values, defaults to None.
-    :type scalars: np.ndarray, optional
+    :type scalars: numpy.ndarray
 
-    :param color: The color of the whole plot, ignored if scalars are used, defaults to white.
-    :type color: str, 3-tuple, 4-tuple, optional
+    :param color: The color (see `colors.as_rgb_a()`) of the whole plot, ignored if scalars are used, defaults to white.
+    :type color: str or tuple or numpy.ndarray
 
-    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
-    :type opacity: float, optional
+    :param opacity: The translucency of the plot. Ranges from ``0.0`` (invisible) to ``1.0`` (solid).
+    :type opacity: float
 
-    :param cmap: Colormap to use for scalars, defaults to `rainbow`.
-    :type cmap: matplotlib cmap, `vtkLookupTable`_, or similar see :meth:`vtkplotlib.colors.as_vtk_cmap`, optional
+    :param cmap: A colormap (see `vtkplotlib.colors.as_vtk_cmap()`) to convert scalars to colors, defaults to ``'rainbow'``.
 
-    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+    :param fig: The figure to plot into, use `None` for no figure, defaults to the output of `vtkplotlib.gcf()`.
+    :type fig: :class:`~vtkplotlib.figure` or :class:`~vtkplotlib.QtFigure`
 
-    :param label: Give the plot a label to use in legends, defaults to None.
-    :type label: str, optional
+    :param label: Give the plot a label to use in a `legend`.
+    :type label: str
 
     :return: A mesh object.
-    :rtype: :class:`vtkplotlib.plots.MeshPlot.MeshPlot`
+    :rtype: `vtkplotlib.mesh_plot`
 
 
     The following example assumes you have installed `numpy-stl`_.
@@ -209,11 +207,11 @@ class MeshPlot(ConstructedPlot):
 
     1.  A filename.
 
-    2.  Some kind of mesh class that has form `3` stored in ``mesh.vectors``.
-        For example numpy-stl's stl.mesh.Mesh or pymesh's pymesh.stl.Stl
+    2.  Some kind of mesh class that has form 3 stored in ``mesh.vectors``.
+        For example numpy-stl's ``stl.mesh.Mesh`` or pymesh's ``pymesh.stl.Stl``.
 
 
-    3.   An np.array with shape (n, 3, 3) in the form:
+    3.   An `numpy.array` with shape ``(n, 3, 3)`` of the form:
 
         .. code-block:: python
 
@@ -234,7 +232,8 @@ class MeshPlot(ConstructedPlot):
         extra entries are ignored.
 
 
-    4.  An np.array with shape (k, 3) of (usually unique) vertices in the form:
+    4.  An `numpy.array` with shape (k, 3) of (usually unique) vertices of the
+        form:
 
         .. code-block:: python
 
@@ -242,11 +241,10 @@ class MeshPlot(ConstructedPlot):
                       [x, y, z],
                       ...
                       [x, y, z],
-                      [x, y, z],
-                      ])
+                      [x, y, z]])
 
-        And a second argument of an np.array of integers with shape (n, 3) of point
-        args in the form
+        And a second argument of an `numpy.array` of integers with shape
+        ``(n, 3)`` of point args in the form:
 
         .. code-block:: python
 
@@ -258,19 +256,18 @@ class MeshPlot(ConstructedPlot):
         where i, j, k are the indices of the points (in the vertices array)
         representing each corner of a triangle.
 
-        Note that this form can be (and is) easily converted to form 2) using
+        Note that this form can be easily converted to form 2) using
 
         .. code-block:: python
 
             vertices = unique_vertices[point_args]
 
 
-
     Hopefully this will cover most of the cases. If you are using or have written
     an STL library (or any other format) that you want supported then let me know.
     If it's numpy based then it's probably only a few extra lines to support. Or
-    you can have a go at writing it yourself, either with :meth:`mesh_plot`  or
-    with the :class:`vtkplotlib.PolyData` class.
+    you can have a go at writing it yourself, either with `mesh_plot()`  or
+    with the `vtkplotlib.PolyData` class.
 
 
     **Mesh plotting with scalars:**
@@ -322,7 +319,7 @@ class MeshPlot(ConstructedPlot):
     .. seealso::
 
         Having per-triangle-edge scalars doesn't fit well with VTK. So it got
-        its own separate function :meth:`mesh_plot_with_edge_scalar`.
+        its own separate function `mesh_plot_with_edge_scalars()`.
 
     """
 
@@ -436,34 +433,32 @@ class MeshPlot(ConstructedPlot):
 
 def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean",
                                 opacity=None, cmap=None, fig="gcf", label=None):
-    """Like :meth:`mesh_plot` but able to add scalars per triangle's edge. By default,
+    r"""Like `mesh_plot` but able to add scalars per triangle's edge. By default,
     the scalar value at centre of each triangle is taken to be the mean of the
     scalars of its edges, but it can be far more visually effective to use
     ``centre_scalar=fixed_value``.
 
-    :param mesh_data: The mesh to plot.
-    :type mesh_data: An STL (like) object (see below)
+    :param mesh_data: The mesh to plot (see `mesh_plot()`).
 
     :param edge_scalars: Per-edge scalar, texture-coordinates or RGB values.
-    :type edge_scalars: np.ndarray
+    :type edge_scalars: numpy.ndarray
 
     :param centre_scalar: Scalar value(s) for the centre of each triangle, defaults to 'mean'.
-    :type centre_scalar: str, optional
+    :type centre_scalar: str
 
-    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
-    :type opacity: float, optional
+    :param opacity: The translucency of the plot. Ranges from ``0.0`` (invisible) to ``1.0`` (solid).
+    :type opacity: float
 
-    :param cmap: Colormap to use for scalars, defaults to `rainbow`.
-    :type cmap: matplotlib cmap, `vtkLookupTable`_, or similar see :meth:`vtkplotlib.colors.as_vtk_cmap`, optional
+    :param cmap: A colormap (see `vtkplotlib.colors.as_vtk_cmap()`) to convert scalars to colors, defaults to ``'rainbow'``.
 
-    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+    :param fig: The figure to plot into, use `None` for no figure, defaults to the output of `vtkplotlib.gcf()`.
+    :type fig: :class:`~vtkplotlib.figure` or :class:`~vtkplotlib.QtFigure`
 
-    :param label: Give the plot a label to use in legends, defaults to None.
-    :type label: str, optional
+    :param label: Give the plot a label to use in a `legend`.
+    :type label: str
 
     :return: A mesh plot object.
-    :rtype: :class:`vtkplotlib.plots.MeshPlot.MeshPlot`
+    :rtype: `vtkplotlib.mesh_plot`
 
 
     Edge scalars are very much not the way VTK likes it. In fact VTK doesn't
@@ -476,12 +471,12 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean",
 
                    p1
 
-                 //|\\\\         Double lines represent the original triangle.
-                // | \\\\        The single lines represent the division lines that
-          l0   //  |  \\\\  l1   split the triangle into three.
-              //  / \\  \\\\      The annotations show the order in which the
-             // /     \\ \\\\     scalar for each edge must be provided.
-            ///~~~~~~~~~\\\\\\
+                 //|\\         Double lines represent the original triangle.
+                // | \\        The single lines represent the division lines that
+          l0   //  |  \\  l1   split the triangle into three.
+              //  / \  \\      The annotations show the order in which the
+             // /     \ \\     scalar for each edge must be provided.
+            ///~~~~~~~~~\\\
         p0  ~~~~~~~~~~~~~~~  p2
                   l2
 
@@ -527,13 +522,13 @@ def mesh_plot_with_edge_scalars(mesh_data, edge_scalars, centre_scalar="mean",
             return np.frombuffer(arr.tobytes(), dtype)
 
         def build_tri2tri_map(mesh):
-            \"""This creates an (n, 3) array that maps each triangle to its 3
+            '''This creates an (n, 3) array that maps each triangle to its 3
             adjacent triangles. It takes advantage of each triangles vertices
             being consistently ordered anti-clockwise. If triangle A shares an
             edge with triangle B then both A and B have the edges ends as
             vertices but in opposite order. Looking for this helps reduce the
             complexity of the problem.
-            \"""
+            '''
 
             # The most efficient way to make a pair of points hashable is to
             # take its binary representation.

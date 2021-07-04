@@ -35,10 +35,10 @@ from vtkplotlib.figures.BaseFigure import BaseFigure, nuts_and_bolts, vtk
 
 class Figure(BaseFigure):
     """Create a new figure. This will automatically be set as the current
-    working figure (returned by ``vpl.gcf()``).
+    working figure (returned by `vtkplotlib.gcf()`).
 
-    :param name: The window title, defaults to 'vtk figure'.
-    :type name: str, optional
+    :param name: The window title, defaults to ``'vtk figure'``.
+    :type name: str
 
     """
 

@@ -37,32 +37,31 @@ class Text3D(SourcedPlot):
     itself to follow the camera (defaults to on) with the **follow_cam**
     argument.
 
-    :param string: The text to be shown.
-    :type string:
+    :param text: The text to be shown.
 
     :param position: The position of the start of the text, defaults to (0, 0, 0).
-    :type position: tuple, optional
+    :type position: tuple
 
     :param follow_cam: Automatically rotates to follow the camera, defaults to True.
-    :type follow_cam: bool, optional
+    :type follow_cam: bool
 
-    :param scale: The height of one line of text, can have 3 values, defaults to 1.0.
-    :type scale: number or 3-tuple of numbers, optional
+    :param scale: The height in world coordinates of one line of text. Use a 3-tuple of values to stretch or squash it.
+    :type scale: float or tuple
 
     :param color: The color of the text, defaults to white.
-    :type color: str, 3-tuple, 4-tuple, optional
+    :type color: str or tuple or numpy.ndarray
 
-    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
-    :type opacity: float, optional
+    :param opacity: The translucency of the plot. Ranges from ``0.0`` (invisible) to ``1.0`` (solid).
+    :type opacity: float
 
-    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+    :param fig: The figure to plot into, use `None` for no figure, defaults to the output of `vtkplotlib.gcf()`.
+    :type fig: :class:`~vtkplotlib.figure` or :class:`~vtkplotlib.QtFigure`
 
-    :param label: Give the plot a label to use in legends, defaults to None.
-    :type label: str, optional
+    :param label: Give the plot a label to use in a `legend`.
+    :type label: str
 
     :return: text3D plot object
-    :rtype: vtkplotlib.plots.Text3D.Text3D
+    :rtype: `vtkplotlib.text3d`
 
 
     .. warning::
@@ -125,39 +124,35 @@ def annotate(points, text, direction, text_color="w", arrow_color="k",
              distance=3., text_size=1., fig="gcf"):
     """Annotate a feature with an arrow pointing at a point and a text label
     on the reverse end of the arrow. This is just a convenience call to
-    :meth:`arrow` and :meth:`text3d`. See there for just one or the other.
+    `arrow()` and `text3d()`. See there for just one or the other.
 
     :param points: The position of the feature where the arrow's tip should be.
-    :type points: np.ndarray
+    :type points: numpy.ndarray
 
     :param text: The text to put in the label.
 
     :param direction: The direction from the feature to the text position as a unit vector.
-    :type direction: np.ndarray with shape (3,)
+    :type direction: numpy.ndarray
 
     :param text_color: The color of the label, defaults to 'w'.
-    :type text_color: optional
 
     :param arrow_color:  The color of the arrow, defaults to 'k'.
-    :type arrow_color: optional
 
-    :param distance: The distance from the feature to the label, defaults to 3.0.
-    :type distance: number, optional
+    :param distance: The distance from the feature to the label.
 
     :param text_size: The height of one line of text, can have 3 values, defaults to 1.0.
-    :type text_size: number or 3-tuple of numbers, optional
+    :type text_size: float or tuple
 
-    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+    :param fig: The figure to plot into, use `None` for no figure, defaults to the output of `vtkplotlib.gcf()`.
+    :type fig: :class:`~vtkplotlib.figure` or :class:`~vtkplotlib.QtFigure`
 
-    :return: (arrow, text) 2-tuple
-    :rtype: (:class:`vtkplotlib.plots.Arrow.Arrow`, :class:`vtkplotlib.plots.Text3D.Text3D`)
+    :return: An (`arrow`, `text3d`)  pair.
 
 
     The arrow points to the highest point and the text is placed at a point
     **distance** above (where above also is determined by direction).
 
-    If **text** is not a str then it is automatically converted to one.
+    If **text** is not a `str` then it is automatically converted to one.
 
 
     .. code-block:: python

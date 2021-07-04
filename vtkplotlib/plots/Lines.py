@@ -34,31 +34,30 @@ class Lines(ConstructedPlot):
     """Plots a line passing through an array of points.
 
     :param vertices: The points to plot through.
-    :type vertices: np.ndarray of shape (n, 3)
+    :type vertices: numpy.ndarray
 
     :param color: The color(s) of the lines, defaults to white.
-    :type color: str, 3-tuple, 4-tuple, np.ndarray optional
+    :type color: str or tuple or numpy.ndarray
 
-    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
-    :type opacity: float, optional
+    :param opacity: The translucency of the plot. Ranges from ``0.0`` (invisible) to ``1.0`` (solid).
+    :type opacity: float
 
     :param line_width: The thickness of the lines, defaults to 1.0.
-    :type line_width: float, optional
+    :type line_width: float
 
     :param join_ends: If true, join the 1st and last points to form a closed loop, defaults to False.
-    :type join_ends: bool, optional
+    :type join_ends: bool
 
-    :param cmap: Colormap to use for scalars, defaults to `rainbow`.
-    :type cmap: matplotlib cmap, `vtkLookupTable`_, or similar see :meth:`vtkplotlib.colors.as_vtk_cmap`, optional
+    :param cmap: A colormap (see `vtkplotlib.colors.as_vtk_cmap()`) to convert scalars to colors, defaults to ``rainbow``.
 
-    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+    :param fig: The figure to plot into, can be `None`, defaults to `vtkplotlib.gcf()`.
+    :type fig: :class:`~vtkplotlib.figure` or :class:`~vtkplotlib.QtFigure`
 
-    :param label: Give the plot a label to use in legends, defaults to None.
-    :type label: str, optional
+    :param label: Give the plot a label to use in a `legend`.
+    :type label: str
 
     :return: A lines object. Always a single object - even when plotting multiple lines.
-    :rtype: :class:`vtkplotlib.plots.Lines.Lines`
+    :rtype: `vtkplotlib.plot`
 
     If **vertices** is 3D then multiple separate lines are plotted. This can be
     used to plot meshes as wireframes.
@@ -74,11 +73,11 @@ class Lines(ConstructedPlot):
         vpl.plot(vertices, join_ends=True, color="dark red")
         vpl.show()
 
-    If **color** is an `np.ndarray` then a color per vertex is implied. The shape
+    If **color** is an `numpy.ndarray` then a color per vertex is implied. The shape
     of **color** relative to the shape of **vertices** determines whether the
     colors should be interpreted as scalars, texture coordinates or RGB values.
-    If **color** is either a list, tuple, or str then it is one color for the
-    whole plot.
+    If **color** is either a `list`, `tuple`, or `str` then it is one color for
+    the whole plot.
 
 
     .. code-block:: python

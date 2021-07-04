@@ -40,14 +40,15 @@ else:
 
 
 class QtFigure(BaseFigure, QWidget):
-    """The VTK render window embedded into a PyQt5 QWidget. This can be
-    embedded into a GUI the same way all other QWidgets are used.
+    """The VTK render window in a `PyQt5.QtWidgets.QWidget`.
+    This can be embedded into a GUI the same way all other
+    `PyQt5.QtWidgets.QWidget`\\ s are used.
 
     :param name: The window title of the figure, only applicable is **parent** is None, defaults to 'qt vtk figure'.
-    :type name: str, optional
+    :type name: str
 
     :param parent: Parent window, defaults to None.
-    :type parent: PyQt5.QtWidgets.QWidget, optional
+    :type parent: :sip:class:`PyQt5.QtWidgets.QWidget`
 
 
     .. note::
@@ -58,13 +59,14 @@ class QtFigure(BaseFigure, QWidget):
         with some basic Qt before coming here.
 
 
-    This class inherits both from :class:`PyQt5.QtWidgets.QWidget` and a
-    vtkplotlib BaseFigure class. Therefore it can be used exactly the same as you
-    would normally use either a `QWidget` or a :class:`vtkplotlib.figure`.
+    This class inherits both from `PyQt5.QtWidgets.QWidget` and a
+    vtkplotlib base figure class. Therefore it can be used exactly the same as
+    you would normally use either a `PyQt5.QtWidgets.QWidget` or a
+    `vtkplotlib.figure`.
 
     Care must be taken when using Qt to ensure you have **exactly one**
-    QApplication. To make this class quicker to use the qapp is created
-    automatically but is wrapped in a
+    `PyQt5.QtWidgets.QApplication`. To make this class quicker to use
+    the qapp is created automatically but is wrapped in a
 
     .. code-block:: python
 
@@ -73,16 +75,19 @@ class QtFigure(BaseFigure, QWidget):
         else:
             self.qapp = QApplication.instance()
 
-    This prevents multiple QApplication instances from being created (which
-    causes an instant crash) whilst also preventing a QWidget from being
-    created without a qapp (which also causes a crash).
+    This prevents multiple `PyQt5.QtWidgets.QApplication` instances
+    from being created (which causes an instant crash) whilst also preventing a
+    `PyQt5.QtWidgets.QWidget` from being created without a qapp
+    (which also causes a crash).
 
 
-    On ``self.show()``, ``self.qapp.exec_()`` is called automatically if
-    ``self.parent() is None`` (unless specified otherwise). If the QFigure is part
-    of a larger window then ``larger_window.show()`` must also explicitly show
-    the figure. It won't begin interactive mode until ``qapp.exec_()`` is
-    called.
+    On :func:`show()`, :sip:method:`qapp.exec_()
+    <PyQt5.QtWidgets.QApplication.exec_>` is called automatically if
+    ``figure.parent() is None`` (unless specified otherwise).
+
+    If the figure is part of a larger window then ``larger_window.show()``
+    must also explicitly show the figure. It won't begin interactive mode until
+    `PyQt5.QtWidgets.QApplication.exec_` is called.
 
 
     If the figure is not to be part of a larger window then it behaves exactly
@@ -187,9 +192,9 @@ class QtFigure(BaseFigure, QWidget):
         qapp.exec_()
 
 
-    .. note::  QtFigures are not reshow-able if the figure has a parent.
+    .. note::  `QtFigure`\\ s are not reshow-able if the figure has a parent.
 
-    .. seealso:: :class:`vtkplotlib.QtFigure2` is an extension of this to provide some standard GUI elements, ready-made.
+    .. seealso:: `vtkplotlib.QtFigure2` is an extension of this to provide some standard GUI elements, ready-made.
 
     """
 

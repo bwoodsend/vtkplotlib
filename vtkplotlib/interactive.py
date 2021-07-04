@@ -27,9 +27,9 @@
 Interactive
 ***********
 
-The ``interactive`` submodule provides methods to handle user-interactivity such
+The `interactive` submodule provides methods to handle user-interactivity such
 as mouse clicking, keyboard pressing, or timer based events. This submodule is
-named ``vtkplotlib.interactive`` but also goes by the alias ``vtkplotlib.i``.
+named `vtkplotlib.interactive` but also goes by the alias `vtkplotlib.i`.
 
 This mini tutorial works from the bottom up. Starting with how raw, low-level
 VTK interaction works, then progressively moving towards quicker, more
@@ -58,7 +58,7 @@ Events in VTK
 =============
 
 Interaction in VTK follows a similar model to those of GUI frameworks such as
-`PyQt5`_ or `wxPython`_, or web frameworks. For the benefit of those who aren't
+`PyQt5`_ or `wx`, or web frameworks. For the benefit of those who aren't
 familiar with either, you define a *callback* function which may take some kind
 of *event* information object as an argument:
 
@@ -74,12 +74,12 @@ you want to capture.
 two arguments:
 
 * The **invoker**, which is whichever `vtkObject`_ triggered the event.
-* And the **event_name** - the type of event, such as `"KeyPressEvent"` as a string.
+* And the **event_name** - the type of event, such as *"KeyPressEvent"* as a string.
 
 | The **invoker** is almost always the `vtkInteractorStyle`_, which can be found
-  in vtkplotlib at :attr:`vtkplotlib.figure.style`.
+  in `vtkplotlib` at ``vtkplotlib.figure.style``.
 | Information about the event is accessed through the
-  `vtkRenderWindowInteractor`_, found at :attr:`vtkplotlib.figure.iren`.
+  `vtkRenderWindowInteractor`_, found at ``vtkplotlib.figure.iren``.
   (The arguments to the callback function aren't particularly helpful.)
 | And the registering of a new event call is done using
   ``invoker.AddObserver(event_name, callback)``.
@@ -128,7 +128,7 @@ a different event name. See `Event Types`_ for all events available.
 .. note::
 
     IPython buffers stdout in a way that doesn't play well with VTK's event
-    loop. This means that there may be a substantial delay between ``print()``
+    loop. This means that there may be a substantial delay between `print`
     being called and the output appearing on the screen. To get around this,
     instead run interactive VTK examples from shell.
 
@@ -186,7 +186,7 @@ And what they clicked on. This is all done using :meth:`pick` (see
 Super Callbacks?
 ================
 
-What is this :meth:`call_super_callback` function that's in all the examples?
+What is this `call_super_callback()` function that's in all the examples?
 The answer is best explained by omitting it. Try the `Minimal Example`_ again
 but remove the ``vpl.i.call_super_callback()``, then left-click-and-drag rotate
 the screen.
@@ -213,9 +213,9 @@ didn't). Instead we have to do it by hand. i.e. Add
 ``fig.style.OnLeftButtonDown()`` to our callbacks for *LeftButtonPressEvent*.
 
 To help map event names to default callbacks, vtkplotlib provides the methods
-:meth:`get_super_callback` and :meth:`call_super_callback` which respectively
-find and call the original callbacks for you. Like Python's builtin
-:meth:`super` function, these methods can't be called anywhere. They must be
+`get_super_callback()` and `call_super_callback()` which respectively
+find and call the original callbacks. Like Python's builtin
+`super` function, these methods can't be called anywhere. They must be
 called inside of a function taking a `vtkObject`_ and a string event name as its
 arguments.
 

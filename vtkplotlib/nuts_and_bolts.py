@@ -43,9 +43,9 @@ def zip_axes(*axes):
     combined points array like most vpl functions require.
 
     :param axes: Each separate axis to combine.
-    :type axes: array_like or scalar
+    :type axes: numpy.ndarray
 
-    All `axes` must have the matching or broadcastable shapes. The number of
+    All **axes** must have the matching or broadcastable shapes. The number of
     axes doesn't have to be 3.
 
     .. code-block:: python
@@ -68,7 +68,7 @@ def zip_axes(*axes):
         #             [ 8,  4,  3],
         #             [ 9,  4,  4]])
 
-    .. seealso:: :meth:`unzip_axes` for the reverse.
+    .. seealso:: `unzip_axes()` for the reverse.
 
     """
 
@@ -80,12 +80,12 @@ def unzip_axes(points):
     """Separate each component from an array of points.
 
     :param points: Some points.
-    :type points: np.ndarray
+    :type points: numpy.ndarray
 
     :return: Each axis separately as a tuple.
-    :rtype: tuple of arrays
+    :rtype: tuple
 
-    See :meth:`zip_axes` more information and the reverse.
+    See `zip_axes()` more information and the reverse.
 
     """
 

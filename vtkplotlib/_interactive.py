@@ -49,7 +49,7 @@ def null_super_callback():
 
 
 class SuperError(RuntimeError):
-    """Raised if :meth:`get_super_callback` or :meth:`call_super_callback` are
+    """Raised if `get_super_callback()` or `call_super_callback()` are
     called in an inappropriate context. i.e. Outside of a callback.
     """
 
@@ -61,26 +61,26 @@ class SuperError(RuntimeError):
 
 def get_super_callback(invoker=None, event_name=None):
     """Finds the original VTK callback function for a given event. Like the
-    builtin ``super()`` in Python 3.x, this method should be able to find its
+    builtin `super` in Python 3.x, this method should be able to find its
     own arguments.
 
-    :param invoker: The `vtkObject`_ you used in ``invoker.AddObserver(..)``, defaults to ``None``.
-    :type invoker: `vtkObject`_, optional
+    :param invoker: The `vtkObject`_ you used in ``invoker.AddObserver(..)``.
+    :type invoker: `vtkObject`_
 
-    :param event_name: The name of the interaction, defaults to ``None``.
-    :type event_name: str, optional
+    :param event_name: The name of the interaction.
+    :type event_name: str
 
-    :return: A method of **invoker** or a dummy :meth:`null_callback` function.
-    :rtype: callable
+    :return: A method of **invoker** or a dummy `null_super_callback` function.
+    :rtype: `types.FunctionType`
 
-    :raises: :class:`SuperError` if called without (an) argument(s) and the argument(s) couldn't be determined automatically.
+    :raises: `SuperError` if called without (an) argument(s) and the argument(s) couldn't be determined automatically.
 
     The original callback (if there is one) is always a method of the
     *invoker**. VTK has some rather loose naming rules which make this
     deceptively fiddly.
 
-    If called inside function which takes a `vtkObject`_ and a ``str`` as its
-    first two arguments, then :meth:`get_super_callback` will use the values of
+    If called inside function which takes a `vtkObject`_ and a `str` as its
+    first two arguments, then `get_super_callback()` will use the values of
     those two arguments as its own arguments. Or, if you provide those
     arguments explicitly, you can call this function anywhere. e.g.
 
@@ -169,7 +169,7 @@ def get_super_callback(invoker=None, event_name=None):
 def call_super_callback(invoker=None, event_name=None):
     """
     Just runs ``get_super_callback(invoker, event_name)()``. See
-    :meth:`get_super_callback`.
+    `get_super_callback()`.
     """
     get_super_callback(invoker, event_name)()
 
@@ -183,7 +183,7 @@ def _actor_collection(actors, collection=None):
 
 
 def _requires_active_iren(default=None):
-    """We must be careful when calling any method from a :class:`pick`'s iren
+    """We must be careful when calling any method from a `pick()`'s iren
     in case the iren isn't initialised or when VTK's app isn't running.
     Otherwise this will block indefinitely.
     """
@@ -243,8 +243,8 @@ class pick(object):
 
         vpl.show()
 
-    The most important properties of a :meth:`pick` are :attr:`pick.point` which
-    tells you the 3D coordinates of the event and :attr:`pick.actor` which tells
+    The most important properties of a :class:`pick` are `pick.point` which
+    tells you the 3D coordinates of the event and `pick.actor` which tells
     you the `vtkActor`_ of the plot under which the event took place.
 
     """
@@ -269,9 +269,9 @@ class pick(object):
 
     @property
     def from_(self):
-        """Limit the :attr:`actor` results to only a set of actors.
+        """Limit the `actor` results to only a set of actors.
 
-        The (writeable) :attr:`from_` attribute allows you restrict the actors
+        The (writeable) `from_` attribute allows you restrict the actors
         that can be picked. This can be useful, when placing markers on an
         object, to avoid placing a marker on top of another marker.
 
@@ -337,9 +337,9 @@ class pick(object):
     @property
     def picked(self):
         """Contains the plot where the event happened. This can be thought of as
-         equivalent to ``pick.from_[pick.actor]``. If the :attr:`from_` has not
+         equivalent to ``pick.from_[pick.actor]``. If the `from_` has not
          been set or the event happened over empty space or over an actor which
-         isn't in ``pick.from_`` then the output is None.
+         isn't in `pick.from_` then the output is `None`.
 
          .. code-block:: python
 
@@ -389,7 +389,7 @@ class pick(object):
     def point(self):
         """A 3D coordinates tuple of where the event took place. If the event
         happened over empty background or a 2D plot such as a
-        :meth:`vtkplotlib.scalar_bar` then outputs a 3-tuple of nans. To check
+        `vtkplotlib.scalar_bar()` then outputs a 3-tuple of nans. To check
         for this use ``pick.actor_3D is None``.
 
         The coordinates interpolate between vertices you have provided. If you
@@ -406,7 +406,7 @@ class pick(object):
     def actor(self):
         """The `vtkActor`_ of the plot where the event took place. This
         corresponds to ``plot.actor`` where ``plot`` is the output of any
-        vtkplotlib plotting function.
+        `vtkplotlib` plotting function.
 
         .. code-block:: python
 
@@ -453,9 +453,8 @@ class pick(object):
     @property
     @_requires_active_iren("")
     def key_text(self, iren):
-        """:attr:`key_name` is used to capture keyboard interaction. See
-        :attr:`key_name`.
-        """
+        """`key_text` is used to capture keyboard interaction. See `key_name`
+        for more information."""
         try:
             return iren.GetKeyCode()
         except UnicodeError:
@@ -464,7 +463,7 @@ class pick(object):
     @property
     @_requires_active_iren("")
     def key_name(self, iren):
-        """:attr:`key_name` is used to capture keyboard interaction.
+        """`key_name` is used to capture keyboard interaction.
 
         .. code-block:: python
 
@@ -480,26 +479,29 @@ class pick(object):
             fig.style.AddObserver("KeyPressEvent", callback)
             fig.show()
 
-        See also the similar :attr:`key_text`. The following shows the
-        differences between the two.
+        There is also a similar `key_text` attribute. The `key_text` is usually
+        the single character typed when a given key is pressed. If pressing that
+        key doesn't normally type anything (e.g. pressing **shift**) then
+        `key_text` is empty. `key_name` is always defined.
+        The following table shows the differences between the two.
 
-        ================   ==============   ========
-        Action             key_name         key_text
-        ================   ==============   ========
-        Press 'a' key      `'a'`            `'a'`
-        Press Shift a      `'A'`            `'A'`
-        Press Shift key    `'Shift_L'`      `''`
-        Press Return key   `'return'`       `'\\r'`
-        Press F5 key       `'F5'`           `''`
-        Press `#` key      `'numbersign'`   `'#'`
-        Press '?' key      `'question'`     `'?'`
-        Type unicode Á     `'a'`            `''`
-        ================   ==============   ========
+        ================   ================   ==========
+        Action             `key_name`         `key_text`
+        ================   ================   ==========
+        Press 'a' key      ``'a'``            ``'a'``
+        Press Shift a      ``'A'``            ``'A'``
+        Press Shift key    ``'Shift_L'``      ``''``
+        Press Return key   ``'return'``       ``'\\r'``
+        Press F5 key       ``'F5'``           ``''``
+        Press '#' key      ``'numbersign'``   ``'#'``
+        Press '?' key      ``'question'``     ``'?'``
+        Type unicode Á     ``'a'``            ``''``
+        ================   ================   ==========
 
         .. note::
 
             Unlike with every other event, there is no need to use
-            :meth:`call_super_callback`. It is called for you.
+            :func:`call_super_callback()`. It is called implicitly.
 
         """
         return iren.GetKeySym()
@@ -512,7 +514,7 @@ class pick(object):
     @property
     @_requires_active_iren(())
     def key_modifiers(self, iren):
-        """:attr:`key_modifiers` lists currently held down modifiers keys.
+        """`key_modifiers` lists currently held down modifiers keys.
 
         The result can be any combination of ``("Shift", "Control", "Alt")``.
         The order is consistent, meaning that it is safe to use something like
@@ -521,6 +523,8 @@ class pick(object):
         .. code-block:: python
 
             if pick.key_modifiers == ("Shift", "Alt"):
+
+        There is not *Super* key in VTK.
 
         """
         return tuple(key for (key, get) in self._KEY_MODIFIERS if get(iren))
@@ -563,6 +567,7 @@ _mouse_buttons = set(
 class OnClick(object):
     VALID_BUTTONS = _mouse_buttons
 
+    # language=rst
     __doc__ = \
     """:class:`OnClick` provides a higher-level means to attach callbacks to
     mouse click events without unintentionally also catching mouse
@@ -572,20 +577,20 @@ class OnClick(object):
     :type button: str
 
     :param style: The figure or `vtkInteractorStyle`_ to attach to, writeable.
-    :type style: :class:`vtkplotlib.figures.BaseFigure`, `vtkInteractorStyle`_
+    :type style: `vtkplotlib.figure`, `vtkInteractorStyle`_
 
     :param on_click: Method to call when a click happens, writeable, set to None
-        to disable, defaults to :meth:`print`.
-    :type on_click: callable taking a :class:`pick` as an argument, None, optional
+        to disable, defaults to :func:`print`.
+    :type on_click: callable taking a :class:`pick` as an argument, None
 
     :param mouse_shift_tolerance: The maximum mouse movement in pixels between
         mouse-down and mouse-up allowed for a click to not be counted as a
         click-and-drag, writeable, defaults to ``2``.
-    :type mouse_shift_tolerance: int, optional
+    :type mouse_shift_tolerance: int
 
     :param pick: Set a custom :meth:`pick`, writeable, defaults to creating its
         own on initialisation.
-    :type pick: :class:`pick`, optional
+    :type pick: pick
 
     All parameters are available as attributes with the same name. Of these,
     parameters labelled *writeable* can be set or altered later.
@@ -596,7 +601,7 @@ class OnClick(object):
     ``fig.style.AddObserver(event_name, callback)`` in the following ways.
 
     * Callbacks take a single argument **pick**.
-    * The calling of :meth:`call_super_callback` is automatic.
+    * The calling of `call_super_callback` is automatic.
     * If using a user-supplied **pick**, then ``pick.update()`` is called
       automatically before passing it to the callback.
 

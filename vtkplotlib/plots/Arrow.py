@@ -80,31 +80,30 @@ def arrow(start, end, length=None, width_scale=1., color=None, opacity=None,
     """Draw (an) arrow(s) from **start** to **end**.
 
     :param start: The starting point(s) of the arrow(s).
-    :type start: np.ndarray
+    :type start: numpy.ndarray
 
     :param end: The end point(s) of the arrow(s).
-    :type end:  np.ndarray
+    :type end:  numpy.ndarray
 
     :param length: The length of the arrow(s), defaults to None.
-    :type length: number, np.ndarray, optional
+    :type length: float or numpy.ndarray
 
-    :param width_scale: How fat to make each arrow, is relative to its length, defaults to 1.0.
-    :type width_scale: number, np.ndarray, optional
+    :param width_scale: How fat to make each arrow, is relative to its length.
+    :type width_scale: float or numpy.ndarray
 
     :param color: The color of each arrow, defaults to white.
-    :type color: str, 3-tuple, 4-tuple, np.ndarray of shape (n, 3)
+    :type color: str or tuple or numpy.ndarray
 
-    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
+    :param opacity: The translucency of the plot. Ranges from ``0.0`` (invisible) to ``1.0`` (solid).
     :type opacity: float
 
-    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+    :param fig: The figure to plot into, use `None` for no figure, defaults to the output of `vtkplotlib.gcf()`.
+    :type fig: :class:`~vtkplotlib.figure` or :class:`~vtkplotlib.QtFigure`
 
-    :param label: Give the plot a label to use in legends, defaults to None.
-    :type label: str, optional
+    :param label: Give the plot a label to use in a `legend`.
+    :type label: str
 
     :return: arrow or array of arrows
-    :rtype: vtkplotlib.plots.Arrow.Arrow, np.array of Arrows
 
 
     The shapes of **start** and **end** should match. Arrow lengths are
@@ -119,7 +118,7 @@ def arrow(start, end, length=None, width_scale=1., color=None, opacity=None,
         loop. There is no speed bonus to using numpy or trying to plot in bulk
         here.
 
-    .. seealso:: :meth:`vtkplotlib.quiver` for field plots.
+    .. seealso:: `vtkplotlib.quiver()` for field plots.
 
     """
 
@@ -153,36 +152,35 @@ def quiver(point, gradient, length=None, length_scale=1., width_scale=1.,
     See arrow's docs for more detail.
 
     :param point: The starting point of the arrow(s).
-    :type point: np.ndarray
+    :type point: numpy.ndarray
 
     :param gradient: The displacement / gradient vector.
-    :type gradient: np.ndarray
+    :type gradient: numpy.ndarray
 
-    :param length: A frozen length for each arrow, defaults to None.
-    :type length: NoneType, optional
+    :param length: A frozen length for each arrow, defaults to unfrozen. Overrides the magnitudes of **gradient**.
+    :type length: float
 
-    :param length_scale: A scaling factor for the length of each arrow, defaults to 1.0.
-    :type length_scale: int, optional
+    :param length_scale: A scaling factor for the length of each arrow.
+    :type length_scale: float
 
-    :param width_scale: How fat to make each arrow, is relative to its length, defaults to 1.0.
-    :type width_scale: int, optional
+    :param width_scale: How fat to make each arrow, is relative to its length.
+    :type width_scale: float
 
     :param color: The color of each arrow, defaults to white.
-    :type color: str, 3-tuple, 4-tuple, np.ndarray of shape (n, 3)
+    :type color: str or tuple or numpy.ndarray
 
-    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
+    :param opacity: The translucency of the plot. Ranges from ``0.0`` (invisible) to ``1.0`` (solid).
     :type opacity: float
 
-    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+    :param fig: The figure to plot into, use `None` for no figure, defaults to the output of `vtkplotlib.gcf()`.
+    :type fig: :class:`~vtkplotlib.figure` or :class:`~vtkplotlib.QtFigure`
 
-    :param label: Give the plot a label to use in legends, defaults to None.
-    :type label: str, optional
+    :param label: Give the plot a label to use in a `legend`.
+    :type label: str
 
     :return: arrow or array of arrows
-    :rtype: vtkplotlib.plots.Arrow.Arrow, np.array of Arrows
 
-    .. seealso:: ``vpl.arrow`` to draw arrows from a start point to an end point.
+    .. seealso:: `arrow` to draw arrows from a start point to an end point.
 
     """
 

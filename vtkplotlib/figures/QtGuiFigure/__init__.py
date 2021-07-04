@@ -59,7 +59,7 @@ class QtFigure2(QtFigure):
 
     1. Suggestions welcome here...
 
-    Use this class the same way you would use ``vpl.QtFigure`` (see there first.)
+    Use this class the same way you would use `QtFigure` (see there first.)
     Each feature is added with a ``fig.add_***()`` method.
 
     .. code-block:: python

@@ -27,13 +27,13 @@
 Images
 ========
 
-The :mod:`image_io` subpackage provides tools for working 2D images. It includes
+The `image_io` subpackage provides tools for working 2D images. It includes
 methods for:
 
 - Converting to and from VTK's `vtkImageData`_ class.
 - Image reading and writing via VTK's image reader/writer classes.
-- The image trimming utilised by :meth:`vtkplotlib.screenshot_fig` and
-  :meth:`vtkplotlib.save_fig`.
+- The image trimming utilised by `vtkplotlib.screenshot_fig()` and
+  `vtkplotlib.save_fig()`.
 
 For the most part, vtkplotlib converts implicitly to/from its preferred format,
 which is just a numpy array of RGB values, using methods from here. But if you
@@ -42,7 +42,7 @@ be useful.
 
 vtkplotlib's default image format is the same as matplotlib's. i.e an ``(m, n,
 3)`` numpy array with dtype ``np.uint8``. The most convenient way to visualise
-is using matplotlib's `imshow`_ method.
+is using `matplotlib.pyplot.imshow` method.
 
 .. code-block::
 
@@ -50,7 +50,8 @@ is using matplotlib's `imshow`_ method.
     plt.imshow(image_array)
     plt.show()
 
-.. note:: This submodule was introduced in `v1.3.0`.
+.. versionadded:: v1.3.0
+
 
 -------------------------
 
@@ -87,8 +88,8 @@ Read and Write
 --------------
 
 VTK provides classes for reading and writing images to disk. These are somewhat
-superseded by `Pillow`_ (Python image library) which does the same thing. But
-these methods are included anyway just in case you don't want to use Pillow.
+superseded by `PIL` (the Python Image Library) which does the same thing. But
+these methods are here anyway whether you need them or not.
 
 -------------------------
 
@@ -136,8 +137,6 @@ trim_image
 
 
 .. _vtkImageData: https://vtk.org/doc/nightly/html/classvtkImageData.html#details
-
-.. _imshow: https://matplotlib.org/api/_as_gen/matplotlib.pyplot.imshow.html
 
 .. _Pillow: https://pillow.readthedocs.io/en/stable/
 

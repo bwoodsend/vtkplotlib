@@ -31,22 +31,22 @@ from vtkplotlib.plots.BasePlot import Base2DPlot
 
 
 class ScalarBar(Base2DPlot):
-    """Create a scalar bar. Also goes by the alias `colorbar`.
+    """Create a scalar bar. Also goes by the alias `color_bar`.
 
     :param plot: The plot with scalars to draw a scalarbar for.
 
-    :param title: , defaults to ''.
-    :type title: str, optional
+    :param title: An optional heading for the scalar bar.
+    :type title: str
 
-    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+    :param fig: The figure to plot into, use `None` for no figure, defaults to the output of `vtkplotlib.gcf()`.
+    :type fig: :class:`~vtkplotlib.figure` or :class:`~vtkplotlib.QtFigure`
 
     :return: The scalarbar object.
-    :rtype: vtkplotlib.plots.ScalarBar.ScalarBar
+    :rtype: `vtkplotlib.scalar_bar`
 
 
     The **plot** argument can be the output of any ``vtkplotlib.***`` command that takes
-    `scalars` as an argument.
+    **scalars** as an argument.
 
     """
 

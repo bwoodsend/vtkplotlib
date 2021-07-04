@@ -26,19 +26,19 @@
 Colors
 ======
 
-The :mod:`vtkplotlib.colors` module provides methods for:
+The `vtkplotlib.colors` module provides methods for:
 
 - Converting the various color types and matplotlib's named colors to RGB(A)
-  using :meth:`as_rgb_a`.
+  using `as_rgb_a()`.
 - Creating and converting colormaps (usually abbreviated to cmap) to VTK's
-  equivalent ``vtkLookupTable`` class.
+  equivalent `vtkLookupTable`_ class.
 - Texture mapping.
 
 For the most part, these methods are used implicitly whenever you set the
 **color** or **cmap** arguments of any of vtkplotlib's classes/methods/attributes.
 But if you're doing something unusual then these may help.
 
-.. note:: This submodule was introduced in `v1.3.0`.
+.. versionadded:: v1.3.0
 
 ------------------------------------------------
 
@@ -49,6 +49,13 @@ as_rgb_a
 ^^^^^^^^
 
 .. autofunction:: vtkplotlib.colors.as_rgb_a
+
+
+.. data:: vtkplotlib.colors.mpl_colors
+
+    A dictionary containing all *named* colors known to `vtkplotlib`.
+
+
 
 ---------------------------------------------
 
@@ -91,7 +98,7 @@ Any vtkplotlib method that takes  **cmap** argument can utilise a colormap.
     plot.scalar_range = ...
 
 Note that in Python 2.7 you can't use ``...`` except when indexing. Use
-``Ellipsis`` instead.
+`Ellipsis` instead.
 
 
 ---------------------------------------------
@@ -115,7 +122,7 @@ cmap_from_list
 vtkLookupTable
 ^^^^^^^^^^^^^^
 
-VTK's ``vtkLookupTable`` provides some useful functionality that you can't access
+VTK's `vtkLookupTable`_ provides some useful functionality that you can't access
 any other way. Assuming you have a lookup table called ``table`` you can use the
 following:
 
@@ -148,7 +155,7 @@ Texture Maps
 ------------
 
 Texture maps are like colormaps but two dimensional. i.e Rather than feeding it
-a scalar and getting a color, you give it an `x` and `y` coordinate and get a
+a scalar and getting a color, you give it an *x* and *y* coordinate and get a
 color. Texture maps allow you to color surfaces realistically to look like fur or
 grass or brickwork by using a texture map containing a 2D image of that texture.
 
@@ -185,21 +192,22 @@ def as_rgb_a(color=None, opacity=None):
 
     The **color** argument can be:
 
-    #. A string named color such as "r" or "red". This uses matplotlib's
+    #. A string named color such as ``'r'`` or ``'red'``. This uses matplotlib's
        named color libraries. For a full list of available colors see the dicts
-       `BASE_COLORS`, `CSS4_COLORS` and `XKCD_COLORS` from `matplotlib.colors` or
-       `vtkplotlib.colors.mpl_colors.keys()`.
+       ``BASE_COLORS``, ``CSS4_COLORS`` and ``XKCD_COLORS`` from
+       `matplotlib.colors` or `vtkplotlib.colors.mpl_colors`.
 
-    #. A tuple or list of `3` or `4` scalars representing (r, g, b) or
-       (r, g, b, alpha). r, g, b, alpha can be from `0` to `1` or from `0` to
-       `255` (inclusive).
+    #.  A tuple or list of 3 or 4` scalars representing ``(red, green, blue)``
+        or ``(red, green, blue, alpha)``. ``red``, ``green``, ``blue`` and
+        ``alpha`` can be from 0.0 to 1.0 or from 0 to 255 (inclusive).
 
-    #. An html hex string in the form "#RRGGBB" or "#RRGGBBAA" where ``"RR"``,
-       ``"GG"``, ``"BB"`` and ``"AA"`` are hexadecimal numbers from `00` to `FF`.
+    #.  An html hex string in the form ``'#RRGGBB'`` or ``'#RRGGBBAA'`` where
+        ``'RR'``, ``'GG'``, ``'BB'`` and ``'AA'`` are hexadecimal numbers from
+        ``00`` to ``FF`` (0 to 255).
 
-    #. A ``PyQt5.QtGui.QColor()``.
+    #.  A `PyQt5.QtGui.QColor`.
 
-    The **opacity** argument should be a scalar like those for the (r, g, b)
+    The **opacity** argument should be a scalar like those for the ``(r, g, b)``
     from form 2 above values.
 
     If an opacity if specified in both arguments then **opacity** argument
@@ -296,13 +304,13 @@ def normalise(colors, axis=None):
     """Scale and translate RBG(A) values so that they are all between 0 and 1.
 
     :param colors: Array of colors.
-    :type colors: np.ndarray
+    :type colors: numpy.ndarray
 
-    :param axis: Axis to reduce over, normally either ``-1`` or ``None`` are sensible, defaults to ``None``.
-    :type axis: int, optional
+    :param axis: Axis to reduce over, normally either ``-1`` or `None` are sensible, defaults to `None`.
+    :type axis: int
 
     :return: Normalised colors.
-    :rtype: np.ndarray
+    :rtype: numpy.ndarray
 
     The output should have the properties ``np.min(out, axis) == 0`` and
     ``np.max(out, axis) == 1``.
@@ -333,18 +341,18 @@ class TextureMap(object):
     .. warning::
 
         This is still very much under development and requires a bit of
-        monkey-wrenching to use. Currently only ``vpl.surface`` and
-        ``vpl.PolyData`` have any support for it.
+        monkey-wrenching to use. Currently only `vtkplotlib.surface` and
+        `vtkplotlib.PolyData` have any support for it.
 
 
     :param array: The image data. It is converted to an array if it isn't one already.
-    :type array: filename, np.ndarray with shape (m, n, 3 or 4), PIL Image
+    :type array: str or os.PathLike or numpy.ndarray or PIL.Image.Image
 
     :param interpolate: Allow interpolation between pixels, defaults to False.
-    :type interpolate: bool, optional
+    :type interpolate: bool
 
     :return: A callable texturemap object.
-    :rtype: :class:`vtkplotlib.TextureMap`
+    :rtype: vtkplotlib.colors.TextureMap
 
 
     The TextureMap object can be called to look up the color at a coordinate(s).
@@ -367,8 +375,8 @@ class TextureMap(object):
 
     Typically texture-maps are found in some 3D file formats but integrating
     those is still under development. Texture-maps also play very well with
-    parametric plots, namely ``vpl.surface`` using the 2 independent variables
-    as the texture coordinates.
+    parametric plots, namely `vtkplotlib.surface` using the 2 independent
+    variables as the texture coordinates.
 
     .. code-block:: python
 
@@ -491,14 +499,14 @@ _temp = []
 
 def as_vtk_cmap(cmap, cache=True):
     """Colormaps are generally converted implicitly from any valid format to a
-    ``vtk.vtkLookupTable`` using this method. `Any valid format` is defined as
+    `vtkLookupTable`_ using this method. *Any valid format* is defined as
     the following:
 
     #. A string matplotlib colormap name such as ``'RdYlGn'``.
-    #. Anything out of the ``matplotlib.cm`` package.
-    #. A list of named colors such as ``["red", "white", "blue"]``. See
-       :meth:`cmap_from_list` for more details and flexibility.
-    #. An ``(n, 3)`` or ``(n, 4)`` numpy array of RGB(A) int or float values.
+    #. Anything out of the `matplotlib.cm` package.
+    #. A list of named colors such as ``['red', 'white', 'blue']``. See
+       `cmap_from_list` for more details and flexibility.
+    #. An ``(n, 3)`` or ``(n, 4)`` `numpy.array` of RGB(A) int or float values.
     #. A callable that takes an array of scalars and returns an array of form **4**.
 
     Unless specified otherwise using ``cache=False``, named colormaps of form
@@ -568,26 +576,26 @@ def as_vtk_cmap(cmap, cache=True):
 
 def cmap_from_list(colors, opacities=None, scalars=None, resolution=None):
     """Create a colormap from a list of colors. Unlike matplotlib's
-    ``ListedColormap``, this method will interpolate between the input
-    **colors** to give a smooth map.
+    `matplotlib.colors.ListedColormap`, this method will interpolate between
+    the input **colors** to give a smooth map.
 
-    :param colors: A list colors.
-    :type colors: list of valid colors as defined by :meth:`as_rgb_a`
+    :param colors: A list of valid colors as defined by `as_rgb_a()`.
+    :type colors: list
 
-    :param opacities: Translucency or translucencies, defaults to ``None``.
-    :type opacities: Scalar from 0 to 1 or array-like of scalars, optional
+    :param opacities: Translucency or translucencies from 0.0 to 1.0.
+    :type opacities: float or numpy.ndarray
 
     :param scalars: Control scalars to correspond exact colors from **color**, defaults to ``np.arange(len(colors))``.
-    :type scalars: array-like with same length as **colors**, optional
+    :type scalars: numpy.ndarray
 
     :param resolution: Number of colors in output, defaults to ``(len(colors) - 1) * 255 + 1``.
-    :type resolution: int, optional
+    :type resolution: int
 
-    :return: An array of RGBA values.
-    :rtype: ``np.ndarray`` with shape ``(n, 4)`` and dtype ``np.uint8``
+    :return: An ``(n, 4)`` ``uint8`` array of RGBA values.
+    :rtype: numpy.ndarray
 
-    The output can be fed either to :meth:`as_vtk_cmap` or passed directly as a
-    **cmap** argument to any vtkplotlib method that takes one.
+    The output can be fed either to `as_vtk_cmap()` or passed directly as a
+    **cmap** argument to any `vtkplotlib` method that takes one.
 
     """
     from vtkplotlib.plots.BasePlot import _iter_scalar

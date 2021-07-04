@@ -103,29 +103,27 @@ def scatter(points, color=None, opacity=None, radius=1., use_cursors=False,
     """Scatter plot using little spheres or cursor objects.
 
     :param points: The point(s) to place the marker(s) at.
-    :type points: np.array with ``points.shape[-1] == 3``
+    :type points: numpy.ndarray
 
     :param color: The color of the markers, can be singular or per marker, defaults to white.
-    :type color: str, 3-tuple, 4-tuple, np.array with same shape as **points**, optional
+    :type color: str or tuple or numpy.ndarray
 
-    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
-    :type opacity: float, np.array, optional
+    :param opacity: The translucency of the plot. Ranges from ``0.0`` (invisible) to ``1.0`` (solid).
+    :type opacity: float or numpy.ndarray
 
-    :param radius: The radius of each marker, defaults to 1.0.
-    :type radius: float, np.array, optional
+    :param radius: The radius of each marker.
+    :type radius: float or numpy.ndarray
 
     :param use_cursors: If false use spheres, if true use cursors, defaults to False.
-    :type use_cursors: bool, optional
+    :type use_cursors: bool
 
-    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+    :param fig: The figure to plot into, use `None` for no figure, defaults to the output of `vtkplotlib.gcf()`.
+    :type fig: :class:`~vtkplotlib.figure` or :class:`~vtkplotlib.QtFigure`
 
-    :param label: Give the plot a label to use in legends, defaults to None.
-    :type label: str, optional
+    :param label: Give the plot a label to use in a `legend`.
+    :type label: str
 
-    :return: The marker or an array of markers.
-    :rtype: :class:`vtkplotlib.plots.Scatter.Sphere` or :class:`vtkplotlib.plots.Scatter.Cursor` or ``np.ndarray`` or spheres or cursors.
-
+    :return: The marker or a `numpy.ndarray` of markers.
 
     Coloring by directly with scalars is not supported for scatter but you can
     do it using:

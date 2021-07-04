@@ -161,7 +161,7 @@ Line plots:
     import numpy as np
 
     # Create some kind of wiggly shape
-    # use ``vpl.zip_axes`` to combine (x, y, z) axes
+    # use ``vpl.zip_axes()`` to combine (x, y, z) axes
     t = np.linspace(0, 2 * np.pi, 300)
     points = vpl.zip_axes(np.cos(2 * t),
                           np.sin(3 * t),
@@ -196,7 +196,7 @@ the first.
 Mesh plots:
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: vtkplotlib.plots.MeshPlot.MeshPlot
+.. autofunction:: vtkplotlib.mesh_plot
     :noindex:
 
 

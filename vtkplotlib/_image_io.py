@@ -43,24 +43,24 @@ def read(path, raw_bytes=None, format=None, convert_to_array=True):
     """Read an image from a file using one of VTK's ``vtkFormatReader`` classes
     where ``Format`` is replaced by JPEG, PNG, BMP or TIFF.
 
-    :param path: Filename or file handle or ``None`` if using the **raw_bytes** argument.
+    :param path: Filename or file handle or `None` if using the **raw_bytes** argument.
     :type path: str, os.PathLike, io.BytesIO
 
-    :param raw_bytes: Image compressed binary data, defaults to ``None``.
-    :type raw_bytes: bytes, optional
+    :param raw_bytes: Image compressed binary data.
+    :type raw_bytes: bytes
 
-    :param format: Image format extension (e.g. jpg), not needed if format can be determined from **path**, defaults to ``None``.
-    :type format: str, optional
+    :param format: Image format extension (e.g. jpg). This should never be needed.
+    :type format: str
 
-    :param convert_to_array: If true, convert to numpy, otherwise leave as vtkImageData, defaults to ``True``.
-    :type convert_to_array: bool, optional
+    :param convert_to_array: If true, convert to `numpy.ndarray`, otherwise leave as vtkImageData_.
+    :type convert_to_array: bool
 
     :return: Read image.
-    :rtype: np.ndarray or `vtkImageData`_
+    :rtype: `numpy.ndarray` or `vtkImageData`_
 
     The file format can be determined automatically from the **path** suffix or the beginning
     of **raw_bytes**. **format** can be any of JPEG, PNG, TIFF, BMP. It is case
-    insensitive, tolerant to preceding '.'s e.g. ``format=".jpg"`` and
+    insensitive, tolerant to preceding ``'.'`` e.g. ``format=".jpg"`` and
     understands the aliases JPG \u21d4 JPEG and TIF \u21d4 TIFF.
 
     The following demonstrates how to use pseudo file objects to avoid temporary
@@ -70,7 +70,7 @@ def read(path, raw_bytes=None, format=None, convert_to_array=True):
 
         import vtkplotlib as vpl
 
-        # Link you're image url here
+        # Link your image url here
         url = "https://raw.githubusercontent.com/bwoodsend/vtkplotlib/master/vtkplotlib/data/icons/Right.jpg"
 
         # You can make the url request with either:
@@ -81,7 +81,7 @@ def read(path, raw_bytes=None, format=None, convert_to_array=True):
         # import requests
         # raw_bytes = requests.get(url).content
 
-        # Pass the bytes to :meth:`read` using:
+        # Pass the bytes to `read()` using:
         image = vpl.image_io.read(path=None, raw_bytes=raw_bytes)
 
         # Visualize using matplotlib.
@@ -190,22 +190,22 @@ def write(arr, path, format=None, quality=95):
     """Write an image from a file using one of VTK's ``vtkFormatWriter`` classes
     where ``Format`` is replaced by JPEG or PNG.
 
-    :param arr: **arr** can be a `vtkImageData`_ or a numpy array.
-    :type arr: np.ndarray
+    :param arr: An image array.
+    :type arr: `numpy.ndarray` or `vtkImageData`_
 
     :param path: File path to write to.
-    :type path: str, os.Pathlike, io.BytesIO,
+    :type path: str or os.PathLike or io.BytesIO
 
-    :param format: Image format extension (e.g. jpg), not needed if format can be determined from **path**, defaults to ``None``.
-    :type format: str, optional
+    :param format: Image format extension (e.g. jpg), not needed if format can be determined from **path**.
+    :type format: str
 
-    :param quality: Lossy compression quality, only applicable to JPEGs, defaults to 95.
-    :type quality: int from 0 to 100, optional
+    :param quality: Lossy compression quality (only applicable to JPEGs) between 0 to 100.
+    :type quality: int
 
-    :return: The raw image binary if ``path is None``, ``NotImplemented`` if the filetype is unknown. Otherwise no return value.
+    :return: The raw image binary if ``path is None``, `NotImplemented` if the filetype is unknown. Otherwise no return value.
     :rtype: bytes
 
-    See :meth:`read` for more information.
+    See `read` for more information.
 
     .. note::
 
@@ -247,7 +247,7 @@ def write(arr, path, format=None, quality=95):
 def vtkimagedata_to_array(image_data):
     """Convert a vtkImageData to numpy array.
 
-    .. seealso:: :meth:`vtkimagedata_from_array` for the reverse.
+    .. seealso:: `vtkimagedata_from_array` for the reverse.
 
     """
     points = vtk_to_numpy(image_data.GetPointData().GetScalars())
@@ -265,11 +265,11 @@ def vtkimagedata_to_array(image_data):
 def vtkimagedata_from_array(arr, image_data=None):
     """Convert a numpy array to a vtkImageData.
 
-    :param arr: Array of colors.
-    :type arr: np.ndarray with dtype ``np.uint8``
+    :param arr: An ``uint8`` array of colors.
+    :type arr: numpy.ndarray
 
-    :param image_data: An image data to write into, a new one is created if not specified, defaults to ``None``.
-    :type image_data: `vtkImageData`_, optional
+    :param image_data: An image data to write into, a new one is created if not specified.
+    :type image_data: `vtkImageData`_
 
     :return: A VTK image.
     :rtype: `vtkImageData`_
@@ -278,9 +278,9 @@ def vtkimagedata_from_array(arr, image_data=None):
     ``(m, n, 1)`` for greyscale, ``(m, n, 3)`` for RGB, or ``(m, n, 4)`` for
     RGBA.
 
-    .. seealso:: :meth:`vtkimagedata_to_array` for the reverse.
+    .. seealso:: `vtkimagedata_to_array` for the reverse.
 
-    .. seealso:: :meth:`as_vtkimagedata` for converting from other types.
+    .. seealso:: `as_vtkimagedata` for converting from other types.
 
     """
     assert arr.dtype == np.uint8
@@ -308,20 +308,20 @@ def trim_image(arr, background_color, crop_padding):
     background.
 
     :param arr: An image array.
-    :type arr: 3D np.ndarray
+    :type arr: numpy.ndarray
 
     :param background_color: The color of the portions to crop away.
-    :type background_color: Strictly an (r, g, b) tuple.
+    :type background_color: tuple
 
-    :param crop_padding: Space to leave, in pixels if int, or relative to image size if float.
+    :param crop_padding: Space to leave, in pixels if `int`, or relative to image size if `float`.
     :type crop_padding: int or float
 
-    :return: Smaller image array.
-    :rtype: 3D np.ndarray
+    :return: A smaller image array.
+    :rtype: numpy.ndarray
 
 
     If you don't want your files smaller you can instead use
-    :meth:`vtkplotlib.zoom`.
+    `vtkplotlib.zoom_to_contents`.
 
     """
     if (crop_padding is None) or crop_padding == 0:

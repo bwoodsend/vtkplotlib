@@ -35,25 +35,25 @@ class Text(Base2DPlot):
     position / orientation).
 
     :param text_str: The text, converts to string if not one already.
-    :type text_str: str, object
+    :type text_str: str or object
 
     :param position: The ``(x, y)`` position in pixels on the screen, defaults to ``(0, 0)`` (left, bottom).
-    :type position: 2-tuple of ints, optional
+    :type position: tuple
 
     :param fontsize: Text height (ignoring tails) in pixels, defaults to 18.
-    :type fontsize: int, optional
+    :type fontsize: int
 
     :param color: The color of the text, defaults to white.
-    :type color: str, 3-tuple, 4-tuple, optional
+    :type color: str or tuple or numpy.ndarray
 
-    :param opacity: The translucency of the plot, from `0` invisible to `1` solid, defaults to `1`.
-    :type opacity: float, optional
+    :param opacity: The translucency of the plot. Ranges from ``0.0`` (invisible) to ``1.0`` (solid).
+    :type opacity: float
 
-    :param fig: The figure to plot into, can be None, defaults to :meth:`vtkplotlib.gcf`.
-    :type fig: :class:`vtkplotlib.figure`, :class:`vtkplotlib.QtFigure`, optional
+    :param fig: The figure to plot into, use `None` for no figure, defaults to the output of `vtkplotlib.gcf()`.
+    :type fig: :class:`~vtkplotlib.figure` or :class:`~vtkplotlib.QtFigure`
 
     :return: The text plot object.
-    :rtype: vtkplotlib.plots.Text.Text
+    :rtype: `vtkplotlib.text`
 
 
     The text doesn't resize or reposition itself when the window is resized.
