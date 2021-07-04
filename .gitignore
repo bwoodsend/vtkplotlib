@@ -108,8 +108,5 @@ spellcheck.txt
 # Test data
 vtkplotlib/data/test-data.json
 
-# version file
-vtkplotlib/__version__.py
-
 # PyCharm project
 .idea/
