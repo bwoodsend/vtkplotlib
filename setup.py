@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jun 19 19:00:26 2019
-
-@author: Brénainn
 """
 
 from setuptools import setup, find_packages
@@ -27,7 +24,7 @@ setup(name='vtkplotlib',
       url='https://vtkplotlib.readthedocs.io/en/latest/index.html',
       author='Brénainn Woodsend',
       author_email='bwoodsend@gmail.com',
-      license='GNU version 3.0',
+      license='MIT',
       packages=find_packages(exclude=("tests",)),
       include_package_data=True,
       install_requires=[
