@@ -83,7 +83,7 @@ class QtFigure2(QtFigure):
         if view_params is None:
             self.view_buttons = ViewButtons.default(self)
         else:
-            self.view_buttons = ViewButtons(names, view_params, self,
+            self.view_buttons = ViewButtons(self, names, view_params,
                                             icons=icons)
 
         self.menu.addLayout(self.view_buttons.to_layout())
