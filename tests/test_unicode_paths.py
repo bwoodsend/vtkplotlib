@@ -26,6 +26,7 @@ if sys.version_info >= (3, 6):
                  .tobytes().decode("utf-32")) # yapf: disable
 
 import itertools
+
 PATHS = [
     TEST_DIR / Path(*i)
     for i in itertools.combinations_with_replacement(NAMES, 2)

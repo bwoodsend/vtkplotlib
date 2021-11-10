@@ -1,8 +1,7 @@
-Sphinx==4.0.2
-sphinx-copybutton==0.3.0
-sphinx-rtd-theme==0.5.0
-sphinxcontrib-websupport==1.1.0
-PyQt5==5.15.4
-m2r2==0.2.7
-docutils==0.16.0
+docutils==0.16
 https://github.com/bwoodsend/friendly-octo-waffle/archive/refs/heads/master.zip
+Sphinx==4.0.2
+sphinx-copybutton==0.3.3
+sphinxcontrib-websupport==1.1.0
+sphinx-rtd-theme==0.5.0
+sphinx-autodoc-typehints==1.11.1

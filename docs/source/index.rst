@@ -26,10 +26,8 @@ Welcome to vtkplotlib's documentation!
 
 
 
-Indices and tables
-==================
+.. toctree::
+    :caption: About
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    history
 

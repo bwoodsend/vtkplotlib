@@ -20,6 +20,7 @@ from vtkplotlib import colors as vpl_colors
 _numpy_to_vtk = numpy_to_vtk
 
 import sys
+
 PYTHON_2 = sys.version[0] == '2'
 
 
@@ -307,6 +308,7 @@ class PolyData(object):
         vpl.show()
 
     """
+
     def __init__(self, vtk_polydata=None, mapper=None):
         self.vtk_polydata = vtk_polydata or vtk.vtkPolyData()
         self.mapper = mapper or vtk.vtkPolyDataMapper()
