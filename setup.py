@@ -33,8 +33,12 @@ setup(
     extras_require={
         "test_minimal": ["pytest"],
         "test_full": [
-            "pytest", "PyQt5" if sys.version_info.major >= 3 else "python_qt5",
-            "numpy-stl", "namegenerator", "PILLOW"
+            "pytest",
+            "PyQt5; python_version >= '3'",
+            "python_qt5; python_version < '3'",
+            "numpy-stl",
+            "namegenerator",
+            "pillow",
         ],
     },
     entry_points={
