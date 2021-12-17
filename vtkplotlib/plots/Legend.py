@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 """
-from __future__ import print_function
-from builtins import super
-from future.utils import string_types
 
 import numpy as np
 from vtkplotlib._get_vtk import vtk
@@ -236,7 +233,7 @@ class Legend(Base2DPlot):
         self._check_length(index)
 
         # isinstance check is only needed in case symbol is a numpy array.
-        if isinstance(symbol, string_types) and symbol == "box":
+        if isinstance(symbol, str) and symbol == "box":
             legendBox = vtk.vtkCubeSource()
             legendBox.Update()
             symbol = legendBox.GetOutput()

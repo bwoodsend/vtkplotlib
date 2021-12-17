@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 """Test the contents of the vtkplotlib.interactive module."""
 
-from __future__ import print_function, unicode_literals, with_statement
-from builtins import super
-
 import numpy as np
 import os, sys
-from pathlib2 import Path
+from pathlib import Path
 
 import pytest
 import vtkplotlib as vpl

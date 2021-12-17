@@ -9,12 +9,10 @@ This module provides PathHandler - a context manager which handles this when
 using VTK's file reader/writer classes.
 """
 
-from __future__ import print_function
-
 import numpy as np
 import sys
 import os
-from pathlib2 import Path
+from pathlib import Path
 # I believe it's just a Windows issue. Other OSs are more practical and use UTF-8.
 # The codepage is different for different regions. This snippet should say
 # what encoding to use.
@@ -34,9 +32,6 @@ if __name__ == "__main__":
     _print = print
 else:
     _print = lambda *x: None
-
-if sys.version_info[0] <= 2:
-    FileNotFoundError = IOError
 
 
 class PathHandler(object):

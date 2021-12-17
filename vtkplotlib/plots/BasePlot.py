@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from builtins import super
-from future import utils
-
 from vtkplotlib._get_vtk import vtk
 import numpy as np
 
 from vtkplotlib.figures import gcf
 from vtkplotlib.colors import as_rgb_a
-from vtkplotlib import nuts_and_bolts
 from vtkplotlib.plots.polydata import PolyData
 from vtkplotlib.nuts_and_bolts import init_when_called
 
@@ -201,7 +197,7 @@ def _iter_colors(colors, shape):
     if colors is None:
         return (None for i in range(size))
 
-    if isinstance(colors, (tuple, list) + utils.string_types):
+    if isinstance(colors, (tuple, list, str)):
         return (colors for i in range(size))
 
     colors = np.asarray(colors)

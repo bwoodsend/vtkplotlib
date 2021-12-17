@@ -5,7 +5,7 @@
 import numpy as np
 import sys
 import os
-from pathlib2 import Path
+from pathlib import Path
 
 import collections
 

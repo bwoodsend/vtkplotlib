@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pylab as plt
 import sys
 import os
-from pathlib2 import Path
+from pathlib import Path
 
 from vtkplotlib._get_vtk import vtk, numpy_to_vtk
 

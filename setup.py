@@ -4,15 +4,16 @@
 
 from setuptools import setup, find_packages
 import runpy
-from pathlib import Path
+from os.path import dirname, join
 
-HERE = Path(__file__).resolve().parent
+HERE = dirname(__file__)
 
-long_description = (HERE / 'README.md').read_text("utf-8")
+with open(join(HERE, 'README.md'), "rb") as f:
+    long_description = f.read().decode("utf-8")
 
 setup(
     name='vtkplotlib',
-    version=runpy.run_path(HERE / "vtkplotlib/_version.py")["__version__"],
+    version=runpy.run_path(join(HERE, "vtkplotlib/_version.py"))["__version__"],
     description='High level 3D graphics and plotting powered by VTK',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -25,17 +26,14 @@ setup(
     install_requires=[
         "vtk",
         "numpy",
-        "pathlib2",
         "matplotlib",
-        "future",
     ],
     zip_safe=False,
     extras_require={
         "test_minimal": ["pytest"],
         "test_full": [
             "pytest",
-            "PyQt5; python_version >= '3'",
-            "python_qt5; python_version < '3'",
+            "PyQt5",
             "numpy-stl",
             "namegenerator",
             "pillow",
@@ -44,4 +42,5 @@ setup(
     entry_points={
         "pyinstaller40": ["hook-dirs = vtkplotlib.data:_get_hooks_dir"]
     },
+    python_requires=">=3.6",
 )

@@ -4,7 +4,6 @@ there will be a lot of irrelevant functions."""
 
 import numpy as np
 import os, sys, io
-from future.utils import native_str
 
 
 def set_to_array(s, dtype=float):
@@ -98,7 +97,7 @@ def isinstance_no_import(x, module_name, type_name):
 def isinstance_PathLike(x, allow_buffers=False):
     """Test if **x** is any of the types that could contain a filename or, if
     **allow_buffers**, a pseudo file."""
-    return isinstance(x, native_str) \
+    return isinstance(x, str) \
         or (hasattr(os, "PathLike") and isinstance(x, os.PathLike)) \
         or isinstance_no_import(x, "pathlib", "Path") \
         or isinstance_no_import(x, "pathlib2", "Path") \

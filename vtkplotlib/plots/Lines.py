@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from builtins import super
-
 import numpy as np
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot

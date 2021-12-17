@@ -2,16 +2,11 @@
 """
 """
 
-from __future__ import print_function
-
 import sys as _sys
 import re as _re
 import numpy as np
 
-if _sys.version_info >= (3, 3, 0):
-    from collections.abc import Mapping
-else:
-    from collections import Mapping
+from collections.abc import Mapping
 
 from vtkplotlib._get_vtk import vtk
 

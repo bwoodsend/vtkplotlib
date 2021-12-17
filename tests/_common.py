@@ -3,12 +3,9 @@
 Shared variables/markers for testing.
 """
 
-from builtins import super
-import future.utils
-
 import os
 import numpy as np
-from pathlib2 import Path
+from pathlib import Path
 
 import pytest
 
@@ -120,18 +117,12 @@ class AutoChecker(object):
     def save(self):
         import json
         text = json.dumps(self.data, indent=2)
-        if future.utils.PY2:
-            self.path.write_bytes(text)
-        else:
-            self.path.write_text(text)
+        self.path.write_text(text)
 
     def load(self):
         import json
         if self.path.exists():
-            if future.utils.PY2:
-                text = self.path.read_bytes()
-            else:
-                text = self.path.read_text()
+            text = self.path.read_text()
             self.data = json.loads(text)
         else:
             self.data = {}

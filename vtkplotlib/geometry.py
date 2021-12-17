@@ -3,7 +3,6 @@
 Anything geometry related goes in here. I use this file for multiple projects
 so there will be unused functions in here.
 """
-from __future__ import division
 
 import numpy as np
 

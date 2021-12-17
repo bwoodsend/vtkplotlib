@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from pathlib2 import Path
+from pathlib import Path
 
 # vtkplotlib isn't zip safe and I have no intention of trying to make it so.
 # Hence, using __file__ instead of (super slow) pkg_resources is fine.

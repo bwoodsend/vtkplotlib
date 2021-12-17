@@ -1,17 +1,12 @@
 # -*- coding: utf-8 -*-
 
 # I would avoid looking in here - it's chaos.
-from __future__ import nested_scopes, division
 
 import numpy as np
-import os
-from pathlib2 import Path
 import operator
 
-from matplotlib.cm import get_cmap
 from vtkplotlib._get_vtk import (vtk, numpy_to_vtk, numpy_to_vtkIdTypeArray,
                                  vtk_to_numpy, get_vtk_to_numpy_typemap)
-import itertools
 
 ID_ARRAY_DTYPE = get_vtk_to_numpy_typemap()[vtk.VTK_ID_TYPE]
 
@@ -19,15 +14,10 @@ from vtkplotlib import colors as vpl_colors
 
 _numpy_to_vtk = numpy_to_vtk
 
-import sys
-
-PYTHON_2 = sys.version[0] == '2'
-
 
 def numpy_to_vtk(num_array, deep=0, array_type=None):
     assert deep or num_array.flags.contiguous
-    # I'm not sure it's python 2 that's the problem
-    return _numpy_to_vtk(num_array, deep or PYTHON_2, array_type)
+    return _numpy_to_vtk(num_array, deep, array_type)
 
 
 def cell_array_handler_property(name, doc=""):

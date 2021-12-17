@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import traceback
-from builtins import super
 
 
 class ErrorObserver(object):

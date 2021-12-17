@@ -2,9 +2,6 @@
 """
 """
 
-from __future__ import print_function, unicode_literals, with_statement
-from builtins import super
-
 from vtkplotlib.interactive import pick, call_super_callback
 
 

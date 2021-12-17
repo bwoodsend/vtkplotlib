@@ -40,7 +40,6 @@ class TestDocs(TestCase):
         import sys
 
         # python 2 compatibility
-        from builtins import super
 
         class FigureAndButton(QtWidgets.QWidget):
 

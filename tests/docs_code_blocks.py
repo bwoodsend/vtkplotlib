@@ -5,9 +5,6 @@ reinvention of the wheel but I can only find doc-testing for interactive console
 style code examples.
 """
 
-from __future__ import print_function, with_statement
-from builtins import super
-
 import re
 import types
 import itertools

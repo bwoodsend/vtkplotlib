@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from builtins import super
-
 import numpy as np
 import sys
-from pathlib2 import Path
-
-if sys.version_info.major >= 3:
-    from itertools import zip_longest
-else:
-    from itertools import izip_longest as zip_longest
+from pathlib import Path
+from itertools import zip_longest
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 

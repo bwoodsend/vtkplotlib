@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from builtins import super
-
 from vtkplotlib._get_vtk import vtk
 import numpy as np
-from pathlib2 import Path
+from pathlib import Path
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot
 from vtkplotlib.plots.Lines import Lines

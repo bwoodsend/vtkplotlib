@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from builtins import super
-
 from vtkplotlib._get_vtk import vtk
 import numpy as np
 import os
 import sys
-from pathlib2 import Path
+from pathlib import Path
 
 from vtkplotlib.figures.BaseFigure import BaseFigure, nuts_and_bolts, vtk
 

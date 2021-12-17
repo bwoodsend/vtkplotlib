@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import division
-from builtins import super
-
 import numpy as np
-from pathlib2 import Path
+from pathlib import Path
 
 from vtkplotlib._get_vtk import vtk
 

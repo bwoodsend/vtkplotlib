@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from builtins import super
-
 import numpy as np
 import sys
 import os
-from pathlib2 import Path
+from pathlib import Path
 
 from vtkplotlib.plots.BasePlot import ConstructedPlot
 from vtkplotlib import nuts_and_bolts

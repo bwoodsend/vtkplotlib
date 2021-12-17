@@ -10,10 +10,8 @@
 
 .. _numpy: http://numpy.org/
 .. _matplotlib: http://matplotlib.org/
-.. _pathlib2: https://pypi.org/project/pathlib2/
 .. _vtk: https://pypi.org/project/vtk/
 .. _PyQt5: https://pypi.org/project/PyQt5/
 .. _numpy-stl: https://pypi.org/project/numpy-stl/
-.. _future: https://pypi.org/project/future/
 .. _PyInstaller: https://www.pyinstaller.org/
 .. _namegenerator: https://pypi.org/project/namegenerator/

@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 """
-from __future__ import print_function, unicode_literals, with_statement
-from builtins import super
 
 import numpy as np
-import os, sys
-from pathlib2 import Path
+import os
+from pathlib import Path
 
 import pytest
 import vtkplotlib as vpl
@@ -14,16 +12,9 @@ from vtkplotlib.unicode_paths import PathHandler
 
 from tests._common import TEST_DIR
 
-NAMES = ["name"]
-
-if sys.version_info[0] <= 2:
-    FileNotFoundError = IOError
-
-# Proper Python unicode support came in version 3.6.
-if sys.version_info >= (3, 6):
-    NAMES.append("Ñ mé")
-    NAMES.append(np.arange(0x100, 0xd800, 0x500,np.int32)
-                 .tobytes().decode("utf-32")) # yapf: disable
+NAMES = ["name", "Ñ mé"]
+NAMES.append(np.arange(0x100, 0xd800, 0x500,np.int32)
+             .tobytes().decode("utf-32")) # yapf: disable
 
 import itertools
 

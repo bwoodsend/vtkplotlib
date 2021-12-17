@@ -1,8 +1,6 @@
 #encoding: utf-8
 """Test the oddities."""
 
-from __future__ import division
-
 import vtkplotlib as vpl
 
 from tests._common import requires_interaction

@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from builtins import super
-
 import numpy as np
 import sys
 import abc
@@ -13,10 +10,7 @@ from vtkplotlib import _vtk_errors, nuts_and_bolts
 
 
 def abstract_property(func):
-    if sys.version_info > (3, 3):
-        return property(abc.abstractmethod(func))
-    else:
-        return abc.abstractproperty(func)
+    return property(abc.abstractmethod(func))
 
 
 def _abc_assert_not_abstract_method(name, method):

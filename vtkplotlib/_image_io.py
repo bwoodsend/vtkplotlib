@@ -7,7 +7,7 @@ import os
 import io
 
 import numpy as np
-from pathlib2 import Path
+from pathlib import Path
 
 from vtkplotlib._get_vtk import (vtk, vtk_to_numpy, numpy_to_vtk, numpy_support,
                                  VTK_VERSION_INFO)
@@ -420,10 +420,7 @@ def _hex_to_byte(string):
     if string == "??":
         return b"."
     value = int(string, 16)
-    if sys.version_info.major >= 3:
-        return value.to_bytes(1, "little")
-    else:
-        return chr(value)
+    return value.to_bytes(1, "little")
 
 
 def _code_to_regex(code):

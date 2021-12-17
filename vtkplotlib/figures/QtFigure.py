@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
 import numpy as np
 import sys
 from vtkplotlib._get_vtk import vtk, QVTKRenderWindowInteractor
@@ -100,9 +98,6 @@ class QtFigure(BaseFigure, QWidget):
         from PyQt5 import QtWidgets
         import numpy as np
         import sys
-
-        # python 2 compatibility
-        from builtins import super
 
 
         class FigureAndButton(QtWidgets.QWidget):

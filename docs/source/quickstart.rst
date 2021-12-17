@@ -12,9 +12,9 @@ Introduction
 
     from urllib.parse import quote
     "https://img.shields.io/badge/" + quote("python- {}-blue.svg".format(\
-                " | ".join(["2.7", "3.5", "3.6", "3.7", "3.8", "PyInstaller"])))
+                " | ".join(["3.6", "3.7", "3.8", "3.9", "PyInstaller"])))
 
-.. image:: https://img.shields.io/badge/python-%202.7%20%7C%203.5%20%7C%203.6%20%7C%203.7%20%7C%203.8%20%7C%20PyInstaller-blue.svg
+.. image::  https://img.shields.io/badge/python-%203.6%20%7C%203.7%20%7C%203.8%20%7C%203.9%20%7C%20PyInstaller-blue.svg
 
 
 A simple library to make 3D graphics using easy. Built on top of VTK. Whilst
@@ -38,16 +38,11 @@ Requirements for installing:
 ------------------------------------------------------------------------------
 
  - `numpy`_
- - `pathlib2`_
  - `matplotlib`_
  - `vtk`_
- - `future`_
 
-It can take VTK a few weeks to release to PyPi for a new Python version so
-using the absolute latest Python is not recommended. There is no VTK version for
-Windows users with python 2.7 on PyPi. But you can get a .whl from
-`here <https://www.lfd.uci.edu/~gohlke/pythonlibs/#vtk>`_.
-
+Please note that new minor versions of Python can't be supported until VTK
+supports them.
 
 
 Installation:
@@ -74,11 +69,9 @@ Some features require you to install the following:
 
 .. _numpy: http://numpy.org/
 .. _matplotlib: http://matplotlib.org/
-.. _pathlib2: https://pypi.org/project/pathlib2/
 .. _vtk: https://pypi.org/project/vtk/
 .. _PyQt5: https://pypi.org/project/PyQt5/
 .. _numpy-stl: https://pypi.org/project/numpy-stl/
-.. _future: https://pypi.org/project/future/
 .. _PyInstaller: https://www.pyinstaller.org/
 .. _namegenerator: https://pypi.org/project/namegenerator/
 
