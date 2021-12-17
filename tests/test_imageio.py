@@ -124,5 +124,5 @@ def test_write(fmt, pseudo_file):
     written = pillow_open(file)
 
     assert written.shape == original.shape
-    error = np.abs(written - original.astype(np.float)).mean()
+    error = np.abs(written - original.astype(float)).mean()
     assert error < 1
