@@ -1,0 +1,3 @@
+* Restore compatibility with Python 2.7.
+
+* Elimiate importing ``pkg_resources`` which has a very slow startup time.

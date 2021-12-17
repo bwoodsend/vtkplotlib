@@ -1,0 +1,21 @@
+* Catch VTK file reading errors and raise them as Python exceptions, replacing
+  the pop-up error dialogs VTK uses by default.
+
+* `QtFigure` now supports being re-shown.
+
+* Fix spurious VTK error dialogs from messy garbage collection of figures.
+
+* Allow a `pathlib.Path` to be used in functions where a filename is expected.
+
+* Support TIFF and bitmap image formats using VTK's image reading/writing
+  machinery.
+
+* Add patchy support for `io.BytesIO` image files. This is heavily dependent
+  on VTK allows it.
+
+* Add a `zoom_to_contents` method.
+
+* Add support for off screen rendering (screenshotting without drawing a
+  window).
+
+* Fix the **label** parameter to `quiver` and `arrow` having no effect.

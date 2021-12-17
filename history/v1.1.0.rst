@@ -1,0 +1,25 @@
+* Made a clumsy mistake in screenshot_fig. Forgot that the window needs to be
+  open for it to work. Updated now and added to its test so it doesn't slip by
+  again
+
+* Catch and raise an exception raise if unable to open a given image type.
+
+* Add a figure history (`vtkplotlib.figure_history`) to store the most
+  recent figure(s).
+
+* Allow cursors (given by `vtkplotlib.scatter` with ``use_cursors=True``) to
+  be resized.
+
+* Alias `zip_axes` and `unzip_axes` to the top level package.
+
+*  Fix non-Qt figures not being re `show` able.
+
+* Add a `PolyData` wrapper class for VTK's ``vtkPolyData`` allowing easy
+  construction of custom mesh-like objects.
+
+* Encourage a `sys.stdout` flush before starting the interactive renderer.
+  This reduces (but does not fix) a race condition between VTK's event loop
+  and IPython's console if a figure is shown soon after a `print` statement.
+
+* Add support for non ASCII characters in paths which VTK doesn't handle by
+  default.

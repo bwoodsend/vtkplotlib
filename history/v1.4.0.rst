@@ -1,0 +1,25 @@
+* Speed up initialisation by replacing loading of matplotlib's colors with a
+  literal `dict`.
+
+* Fix the ``text`` property to `text` returning `None`.
+
+* Fix the **colors** attribute of `surface` mishandling 2D array of
+  scalars.
+
+* Fix `TypeError` tripped by ``as_vtk_cmap("string", False)``.
+
+* Create the `interactive` submodule with the alias `i`.
+
+* Fix `legend`\ 's ``key: entry`` mapping being reset.
+
+* Fix ``legend.set_entry(array)`` calling bool on an array
+
+* Fix VTK version dependent `image_io.read` for TIFF, BMP and PNG.
+
+* Move the tests module outside of the distributed `vtkplotlib` package.
+
+* Fix unicode support for ``VTK>=9.0.0``.
+
+* Add cursor tracker to fancy `QtFigure2`.
+
+* Fix handling of a `PolyData` containing NaNs in a `legend`.

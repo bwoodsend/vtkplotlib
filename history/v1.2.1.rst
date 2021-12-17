@@ -1,0 +1,4 @@
+* Take advantage of the new modular structure of ``VTK >= 8.2.0`` so that
+  `vtkplotlib` only imports the parts of VTK that it needs. This makes
+  ``import vtkplotlib`` faster and PyInstaller applications smaller. Older
+  versions of VTK are still supported and behave unchanged.

@@ -21,7 +21,6 @@ Welcome to vtkplotlib's documentation!
     Images
     Interactive
     Extras
-    Contributing
 
 
 
@@ -29,5 +28,5 @@ Welcome to vtkplotlib's documentation!
 .. toctree::
     :caption: About
 
+    Contributing
     history
-

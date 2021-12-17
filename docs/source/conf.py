@@ -92,23 +92,18 @@ with open("rst_prolog.txt") as f:
 
 # Build the changelog from per-release fragments.
 histories = sorted(
-    Path("../../history").resolve().glob("*.rst"),
-    key=lambda x: tuple(map(int, x.stem.split("."))), reverse=True)
+    Path("../../history").resolve().glob("v*.rst"), reverse=True,
+    key=lambda x: tuple(map(int, x.stem.strip("v").split("."))))  # yapf:disable
 
 history = """\
 =========
 Changelog
 =========
 
-.. role:: red
-    :class: in-red
-
 Release history for `vtkplotlib`.
-Breaking changes are :red:`highlighted in red`.
 
-""" + "\n".join(f"v{i.stem}\n-{'-' * len(i.stem)}\n\n"
-                f".. rst-class:: spacious\n\n"
-                f"{indent(i.read_text(), '    ')}" for i in histories)
+""" + "\n".join(
+    f"{i.stem}\n{'-' * len(i.stem)}\n\n" + i.read_text() for i in histories)
 
 history_path = Path("history.rst")
 if (not history_path.exists()) or history_path.read_text() != history:

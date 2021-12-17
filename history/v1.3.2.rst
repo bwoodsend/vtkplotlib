@@ -1,0 +1,1 @@
+* Fix the **off_screen** argument to `save_fig` having no effect.

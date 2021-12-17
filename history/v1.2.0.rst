@@ -1,0 +1,9 @@
+* Add a `vtkplotlib.legend` whose contents are determined by a new ``label``
+  parameter to each `vtkplotlib` plot command.
+
+* Add colormaps support to `mesh_plot`
+
+* Add an option to `save_fig` and `screenshot_fig` to automatically crop
+  away blank regions of the image.
+
+* Add a ``quick_show()`` method to all plots.

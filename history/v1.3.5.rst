@@ -1,0 +1,2 @@
+* Import new VTK==9.0.0 dependencies explicitly to make them more PyInstaller
+  friendly.
