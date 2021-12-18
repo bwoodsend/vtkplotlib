@@ -4,6 +4,16 @@ Changelog
 
 Release history for `vtkplotlib`.
 
+v1.5.0
+------
+
+* Switch project license to MIT.
+
+* Drop support for Python 2.7 and 3.5.
+
+* Fix `vtkplotlib.QtFigure2`\ ``().add_preset_views()`` with non-default
+  arguments.
+
 v1.4.1
 ------
 
