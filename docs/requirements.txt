@@ -1,5 +1,6 @@
 docutils==0.16
 https://github.com/bwoodsend/friendly-octo-waffle/archive/refs/heads/master.zip
+m2r2==0.2.8
 Sphinx==4.0.2
 sphinx-copybutton==0.3.3
 sphinxcontrib-websupport==1.1.0
