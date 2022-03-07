@@ -2,5 +2,6 @@ include README.md
 include LICENSE.txt
 include vtkplotlib/data/icons/*.jpg
 include vtkplotlib/data/icons/*.png
+include vtkplotlib/__PyInstaller/hook-*.py
 recursive-include vtkplotlib/data/models *
 
