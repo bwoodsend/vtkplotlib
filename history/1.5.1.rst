@@ -1,0 +1,1 @@
+* Fix the PyInstaller hook not being collected by setuptools.
