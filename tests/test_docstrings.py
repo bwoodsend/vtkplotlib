@@ -4,6 +4,8 @@
 
 from unittest import TestCase, skipUnless
 
+import pytest
+
 from vtkplotlib import PyQt5_AVAILABLE, NUMPY_STL_AVAILABLE
 
 if PyQt5_AVAILABLE:
@@ -11,6 +13,8 @@ if PyQt5_AVAILABLE:
 import vtkplotlib as vpl
 
 from tests._common import checker, VTKPLOTLIB_WINDOWLESS_TEST
+
+pytestmark = pytest.mark.order(12)
 
 
 class TestDocs(TestCase):

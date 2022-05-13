@@ -12,6 +12,8 @@ from vtkplotlib.unicode_paths import PathHandler
 
 from tests._common import TEST_DIR
 
+pytestmark = pytest.mark.order(1)
+
 NAMES = ["name", "Ñ mé"]
 NAMES.append(np.arange(0x100, 0xd800, 0x500,np.int32)
              .tobytes().decode("utf-32")) # yapf: disable

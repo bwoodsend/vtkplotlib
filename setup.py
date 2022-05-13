@@ -30,9 +30,10 @@ setup(
     ],
     zip_safe=False,
     extras_require={
-        "test_minimal": ["pytest"],
+        "test_minimal": ["pytest", "pytest-order"],
         "test_full": [
             "pytest",
+            "pytest-order",
             "PyQt5",
             "numpy-stl",
             "namegenerator",

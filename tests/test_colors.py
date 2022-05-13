@@ -13,6 +13,8 @@ from matplotlib import cm
 
 from tests._common import checker
 
+pytestmark = pytest.mark.order(0)
+
 # Target output. Everything below should normalise to this.
 RGB, A = (np.array([0.00392157, 1., 0.02745098]), .5)
 

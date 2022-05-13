@@ -12,6 +12,8 @@ from tests._common import checker, TEST_DIR
 
 import io
 
+pytestmark = pytest.mark.order(2)
+
 
 def test_trim_image():
 

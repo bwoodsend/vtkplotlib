@@ -8,6 +8,8 @@ import pytest
 
 from tests._common import checker, numpy_stl
 
+pytestmark = pytest.mark.order(8)
+
 
 @checker()
 def test_arrow():

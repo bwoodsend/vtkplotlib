@@ -12,7 +12,10 @@ import vtkplotlib as vpl
 
 from tests._common import checker, VTKPLOTLIB_WINDOWLESS_TEST
 
-pytestmark = pytest.mark.skipif(not vpl.PyQt5_AVAILABLE, reason="Requires Qt")
+pytestmark = [
+    pytest.mark.skipif(not vpl.PyQt5_AVAILABLE, reason="Requires Qt"),
+    pytest.mark.order(11),
+]
 
 
 @checker()

@@ -10,6 +10,8 @@ import vtkplotlib as vpl
 
 from tests._common import checker
 
+pytestmark = pytest.mark.order(9)
+
 
 @checker()
 def test_legend():

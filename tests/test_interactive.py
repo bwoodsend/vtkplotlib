@@ -10,6 +10,8 @@ import vtkplotlib as vpl
 
 from tests._common import checker
 
+pytestmark = pytest.mark.order(10)
+
 
 @pytest.mark.parametrize("invoker", [vpl.gcf().style, vpl.gcf().iren])
 @pytest.mark.parametrize("command", vpl.i.vtkCommands)

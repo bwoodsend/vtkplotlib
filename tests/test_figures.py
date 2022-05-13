@@ -14,6 +14,8 @@ from tests._common import checker, requires_interaction, TEST_DIR
 
 from tests._common import VTKPLOTLIB_WINDOWLESS_TEST
 
+pytestmark = pytest.mark.order(3)
+
 
 def test_abstract():
     with pytest.raises(Exception):

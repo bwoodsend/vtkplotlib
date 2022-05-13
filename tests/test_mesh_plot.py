@@ -12,6 +12,8 @@ from tests._common import checker, numpy_stl
 
 path = vpl.data.get_rabbit_stl()
 
+pytestmark = pytest.mark.order(7)
+
 
 def test_type_normalise():
     mesh = numpy_stl().Mesh.from_file(path)

@@ -10,6 +10,8 @@ import vtkplotlib as vpl
 
 from tests._common import checker, VTKPLOTLIB_WINDOWLESS_TEST
 
+pytestmark = pytest.mark.order(5)
+
 
 @checker()
 def test(*spam):
