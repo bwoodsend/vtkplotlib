@@ -43,6 +43,7 @@ class BaseFigure(object):
         self.plots = set()
 
         self.background_color = "light grey"
+        self.background_opacity = None
 
     #################  Create core VTK components  ############################
 
@@ -76,6 +77,7 @@ class BaseFigure(object):
 
     def _connect_renderer(self):
         self.renWin.AddRenderer(self.renderer)
+        self.renWin.SetAlphaBitPlanes(1)
         self.style.SetCurrentRenderer(self.renderer)
         _vtk_errors.handler.attach(self.renderer)
 
@@ -169,7 +171,24 @@ class BaseFigure(object):
         if color is not None:
             self.renderer.SetBackground(*color)
         if opacity is not None:
-            self.renderer.SetBackgroundAlpha(opacity)
+            self.background_opacity = opacity
+
+    @property
+    def background_opacity(self):
+        """The translucency of the background.
+
+        Note that this only has an effect when using `screenshot_fig` or
+        `save_fig` - VTK does not support transparent windows. Users of
+        `save_fig` should also note that JPEG images do not support opacity.
+
+        """
+        return self.renderer.GetBackgroundAlpha()
+
+    @background_opacity.setter
+    def background_opacity(self, x):
+        if x is None:
+            x = 1.0
+        self.renderer.SetBackgroundAlpha(x)
 
     #########  figure_manager.py methods  #####################################
 

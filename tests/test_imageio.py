@@ -30,8 +30,8 @@ def test_trim_image():
     background_color = np.asarray(fig.background_color) * 255
 
     # Check that no non-background coloured pixels have been lost.
-    assert (arr != background_color).any(-1).sum() \
-           == (trimmed != background_color).any(-1).sum()
+    assert (arr[:, :, :3] != background_color).any(-1).sum() \
+           == (trimmed[:, :, :3] != background_color).any(-1).sum()
 
     return trimmed
 
@@ -119,3 +119,14 @@ def test_write(fmt, pseudo_file):
     assert written.shape == original.shape
     error = np.abs(written - original.astype(float)).mean()
     assert error < 1
+
+
+def read_write_opacity():
+    """Test reading and writing an image with translucent parts."""
+    image = np.zeros((6, 8, 4), dtype=np.uint8)
+    image[1, 3] = [100, 200, 255, 89]
+
+    file = io.BytesIO()
+    vpl.image_io.write(image, file, "PNG")
+    assert (pillow_open(io.BytesIO(file.getvalue())) == image).all()
+    assert (vpl.image_io.read(io.BytesIO(file.getvalue())) == image).all()

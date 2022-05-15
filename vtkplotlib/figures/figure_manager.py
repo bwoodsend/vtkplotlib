@@ -277,6 +277,7 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None,
     # screenshot code:
     win_to_image_filter = vtk.vtkWindowToImageFilter()
     win_to_image_filter.SetInput(fig.renWin)
+    win_to_image_filter.SetInputBufferTypeToRGBA()
 
     # Normalise and set user inputs for magnification.
 
