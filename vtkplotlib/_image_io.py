@@ -237,7 +237,7 @@ def vtkimagedata_to_array(image_data):
     # Additionally vtk uses cartesian coordinates in images which isn't the
     # norm - hence the axes swapping and mirroring.
     shape = (shape[1], shape[0], image_data.GetNumberOfScalarComponents())
-    return points.reshape(shape)[::-1]
+    return np.ascontiguousarray(points.reshape(shape)[::-1])
 
 
 def vtkimagedata_from_array(arr, image_data=None):
@@ -309,7 +309,7 @@ def trim_image(arr, background_color, crop_padding):
     if background_color.dtype.kind == "f" and arr.dtype.kind == "u":
         background_color = (background_color * 255).astype(arr.dtype)
 
-    mask = (arr == background_color).all(-1)
+    mask = (arr[:, :, :len(background_color)] == background_color).all(-1)
 
     if isinstance(crop_padding, float):
         crop_padding = int(crop_padding * min(mask.shape))

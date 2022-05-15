@@ -268,6 +268,11 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None,
 
         For QtFigures **off_screen** is ignored.
 
+    .. versionchanged:: v2.0.0
+
+        The shape of the returned array went from ``(m, n, 3)`` to ``(m, n, 4)``
+        so as to respect opacity.
+
     """
     fig = gcf_check(fig, "screenshot_fig")
 
@@ -277,6 +282,7 @@ def screenshot_fig(magnification=1, pixels=None, trim_pad_width=None,
     # screenshot code:
     win_to_image_filter = vtk.vtkWindowToImageFilter()
     win_to_image_filter.SetInput(fig.renWin)
+    win_to_image_filter.SetInputBufferTypeToRGBA()
 
     # Normalise and set user inputs for magnification.
 
@@ -340,6 +346,13 @@ def save_fig(path, magnification=1, pixels=None, trim_pad_width=None,
     The available file formats are determined by matplotlib's choice of
     backend. For JPEG, you will likely need to install PILLOW. JPEG has
     considerably better file size than PNG.
+
+    .. versionchanged:: v2.0.0
+
+        If saving to a format which supports opacity and
+        ``fig.background_opacity`` has been set to a value less than one, then
+        the saved image will respect the opacity of the background and any
+        translucent plots.
 
     """
     array = screenshot_fig(magnification=magnification, pixels=pixels, fig=fig,

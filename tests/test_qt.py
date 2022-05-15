@@ -73,7 +73,7 @@ def test_qfigure2():
         assert not plot.visible
 
     assert np.allclose(vpl.screenshot_fig(fig=fig),
-                       np.array(255) * fig.background_color, atol=1.)
+                       np.array(255) * (*fig.background_color, 1), atol=1.)
 
     for plot in fig.plot_table.rows:
         fig.plot_table.rows[plot].text.released.emit()

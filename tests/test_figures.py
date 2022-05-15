@@ -66,7 +66,11 @@ def test_save():
     assert path.exists()
 
     array = vpl.screenshot_fig(magnification=2)
-    assert array.shape == tuple(i * 2 for i in vpl.gcf().render_size) + (3,)
+    assert array.shape == tuple(i * 2 for i in vpl.gcf().render_size) + (4,)
+    assert (array[:, :, 3] == 255).all()
+
+    vpl.gcf().background_opacity = 0
+    assert (vpl.screenshot_fig()[:, :, 3] == 0).mean() > .8
 
     shape = tuple(i * j for (i, j) in zip(vpl.gcf().render_size, (2, 3)))
     vpl.screenshot_fig(pixels=shape).shape
