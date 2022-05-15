@@ -47,17 +47,13 @@ def test_conversions():
     assert np.array_equal(arr, arr2)
 
 
-needs_pillow = pytest.importorskip("PIL")
-
-
 def _setup_test_image(fmt):
     source = Path(vpl.data.ICONS["Right"])
     name = source.stem + "." + vpl._image_io._normalise_format(None, fmt)
     dest = TEST_DIR / name
 
     if not dest.exists():
-        from PIL import Image
-        Image.open(str(source)).save(str(dest))
+        pytest.importorskip("PIL.Image").open(str(source)).save(str(dest))
 
     return dest
 
@@ -77,8 +73,7 @@ for (fmt, modes) in vpl.image_io.BUFFERABLE_FORMAT_MODES:
 def pillow_open(path):
     if not isinstance(path, io.IOBase):
         path = str(path)
-    from PIL.Image import open
-    return np.array(open(path))
+    return np.array(pytest.importorskip("PIL.Image").open(path))
 
 
 @pytest.mark.parametrize("fmt, pseudo_file", pseudos["r"] + non_pseudos)
