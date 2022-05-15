@@ -78,6 +78,16 @@ def test_save():
     return array
 
 
+def test_screenshot_then_show():
+    """Verify that a screenshot followed by a show doesn't somehow lead to a
+    segfault.
+    """
+    vpl.figure()
+    vpl.quick_test_plot()
+    vpl.screenshot_fig()
+    vpl.show()
+
+
 @checker()
 def test_view():
     vpl.auto_figure(True)

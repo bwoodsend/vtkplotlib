@@ -74,6 +74,8 @@ class Figure(BaseFigure):
 
     def _prep_for_screenshot(self, off_screen=False):
         BaseFigure._prep_for_screenshot(self, off_screen)
+        if not off_screen:
+            self.show(block=False)
         self.renWin.SetOffScreenRendering(off_screen)
         self.render()
 
