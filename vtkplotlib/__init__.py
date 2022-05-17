@@ -65,7 +65,5 @@ from .nuts_and_bolts import zip_axes, unzip_axes
 from .colors import TextureMap
 from ._get_vtk import vtk
 
-from .__version__ import __version__
-
 # Explicitly importing these can improve IDE autocompletion.
 from . import _interactive, _image_io
