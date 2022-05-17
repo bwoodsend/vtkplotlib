@@ -1,4 +1,4 @@
 /* Custom `.. rst-class:: in-red` blocks. */
-.in-red {
+.in-red, .red {
   color: darkred;
 }

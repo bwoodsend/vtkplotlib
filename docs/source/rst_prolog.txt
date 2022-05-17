@@ -6,6 +6,8 @@
     :language: python
     :class: highlight
 
+.. role:: red
+
 .. py:currentmodule:: vtkplotlib
 
 .. _numpy: http://numpy.org/

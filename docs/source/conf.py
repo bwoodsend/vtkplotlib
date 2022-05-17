@@ -32,7 +32,7 @@ import vtkplotlib
 # -- General configuration ---------------------------------------------------
 
 project = 'vtkplotlib'
-copyright = "2019-2021, Brénainn Woodsend"
+copyright = "2019-2022, Brénainn Woodsend"
 author = "Brénainn Woodsend"
 
 # The version info for the project you're documenting, acts as replacement

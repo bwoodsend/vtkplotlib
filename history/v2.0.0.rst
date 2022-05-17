@@ -1,0 +1,11 @@
+* Add support for opaque background colors (settable via
+  :py:`vpl.gcf().background_opactity = x`). Note that this is for screenshots
+  only (e.g. using `screenshot_fig` or `save_fig`). VTK does not support
+  tranparent windows so this has no effect on interactive render windows.
+
+* :red:`BREAKING`: `vtkplotlib.screenshot_fig` now returns a
+  :py:`(height, width, 4)` array instead of a :py:`(height, width, 3)` array.
+  This fourth entry symbolises opacity.
+
+* Fix a segfault when `screenshot_fig` then `show` is called on the same
+  `figure`.
