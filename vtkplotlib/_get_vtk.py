@@ -4,21 +4,8 @@
 import os
 
 try:
-    from PyQt5 import QtWidgets, QtGui, QtCore
-    PyQt5_AVAILABLE = True
-    del QtWidgets, QtCore, QtGui
-except ImportError:
-    PyQt5_AVAILABLE = False
-
-try:
     from vtkplotlib import _vtk as vtk
     from vtkmodules.util import numpy_support
-    if PyQt5_AVAILABLE:
-        from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-
-        # QVTKRenderWindowInteractor raises an error if this isn't loaded.
-        from vtkmodules.vtkRenderingOpenGL2 import vtkOpenGLRenderer
-
     from vtkmodules import vtkRenderingGL2PSOpenGL2
 
 except ImportError:
@@ -26,8 +13,6 @@ except ImportError:
         raise
     import vtk
     from vtk.util import numpy_support
-    if PyQt5_AVAILABLE:
-        from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 if vtk.VTK_MAJOR_VERSION >= 9:
     from vtkmodules import (

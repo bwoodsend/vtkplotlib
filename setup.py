@@ -34,7 +34,7 @@ setup(
         "test_full": [
             "pytest",
             "pytest-order",
-            "PyQt5",
+            "PyQt6",
             "numpy-stl",
             "namegenerator",
             "pillow",

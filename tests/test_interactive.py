@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
 """Test the contents of the vtkplotlib.interactive module."""
 
-import numpy as np
-import os, sys
-from pathlib import Path
-
 import pytest
 import vtkplotlib as vpl
-
-from tests._common import checker
 
 pytestmark = pytest.mark.order(10)
 

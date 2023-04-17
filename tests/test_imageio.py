@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import vtkplotlib as vpl
 
-from tests._common import checker, TEST_DIR
+from tests._common import TEST_DIR
 
 import io
 

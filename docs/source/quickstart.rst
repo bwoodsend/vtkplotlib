@@ -30,7 +30,7 @@ Key features
 * Clean and easy to install.
 * Takes advantage of VTK's lesser known numpy support so that data can be efficiently copied by reference between numpy and VTK making it much faster than most of the VTK examples you'll find online.
 * Has direct support for STL plotting.
-* Can be embedded seamlessly into `PyQt5`_ applications.
+* Can be embedded seamlessly into `PyQt6`_ (or PyQt5, PySide2 or PySide6) applications.
 * Is freezable with `PyInstaller`_.
 
 
@@ -63,14 +63,14 @@ Optional requirements:
 Some features require you to install the following:
 
  - `numpy-stl`_ or any other STL library if you want to plot STL files. `numpy-stl`_ is my STL library of choice.
- - `PyQt5`_ if you want to include your plots in a larger Qt GUI.
+ - `PyQt6`_ if you want to include your plots in a larger Qt GUI.
  - `namegenerator`_ for fun.
 
 
 .. _numpy: http://numpy.org/
 .. _matplotlib: http://matplotlib.org/
 .. _vtk: https://pypi.org/project/vtk/
-.. _PyQt5: https://pypi.org/project/PyQt5/
+.. _PyQt6: https://pypi.org/project/PyQt6/
 .. _numpy-stl: https://pypi.org/project/numpy-stl/
 .. _PyInstaller: https://www.pyinstaller.org/
 .. _namegenerator: https://pypi.org/project/namegenerator/

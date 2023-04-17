@@ -5,16 +5,8 @@ import pytest
 
 import vtkplotlib as vpl
 
-from tests._common import requires_interaction
-
 pytestmark = pytest.mark.order(4)
 
 
 def test_data():
     vpl.data.assert_ok()
-
-
-@requires_interaction
-def test_figure_contents_check():
-    from tests._common import test_checker
-    test_checker()

@@ -37,7 +37,7 @@ Events in VTK
 =============
 
 Interaction in VTK follows a similar model to those of GUI frameworks such as
-`PyQt5`_ or `wx`, or web frameworks. For the benefit of those who aren't
+`PyQt6`_ or `wx`, or web frameworks. For the benefit of those who aren't
 familiar with either, you define a *callback* function which may take some kind
 of *event* information object as an argument:
 
@@ -175,7 +175,7 @@ behaviour of rotating the camera doesn't. By adding a
 callback to *LeftButtonPressEvent* we have inadvertently knocked out the
 pre-existing behaviour, which was ``fig.style.OnLeftButtonDown()``.
 
-The typical way around this in other event driven frameworks like `PyQt5`_ is
+The typical way around this in other event driven frameworks like `PyQt6`_ is
 overloading methods and inheriting the previous behaviour. e.g.
 
 .. code-block:: python

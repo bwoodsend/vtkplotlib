@@ -13,14 +13,3 @@ from .figure_manager import (
     view,
     zoom_to_contents,
 )
-
-try:
-    from PyQt5 import QtWidgets, QtGui, QtCore
-    PyQt5_AVAILABLE = True
-    del QtWidgets, QtCore, QtGui
-except ImportError:
-    PyQt5_AVAILABLE = False
-
-if PyQt5_AVAILABLE:
-    from .QtFigure import QtFigure
-    from .QtGuiFigure import QtFigure2

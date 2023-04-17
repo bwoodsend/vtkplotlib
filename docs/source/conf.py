@@ -159,7 +159,7 @@ intersphinx_mapping = {
     'python': ('http://docs.python.org/3', None),
     'numpy': ('https://numpy.org/doc/stable/', None),
     'scipy': ('https://docs.scipy.org/doc/scipy/', None),
-    'PyQt5': ('https://www.riverbankcomputing.com/static/Docs/PyQt5/', None),
+    'PyQt6': ('https://www.riverbankcomputing.com/static/Docs/PyQt6/', None),
     'wxPython': ('https://docs.wxpython.org/', None),
     'matplotib': ('https://matplotlib.org', None),
     'pillow': ('https://pillow.readthedocs.io/en/stable/', None),
@@ -169,7 +169,7 @@ intersphinx_mapping = {
 def setup(app):
     # type: (Sphinx) -> None
 
-    # PyQt5 has all its cross reference targets in a special :sip: domain which
+    # PyQt6 has all its cross reference targets in a special :sip: domain which
     # needs to be registered to be used. Don't ask me how this works. It's
     # mostly guess work and copy/paste from sphinx.domains.c.CDomain.
 

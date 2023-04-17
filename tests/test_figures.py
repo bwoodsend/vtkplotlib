@@ -10,9 +10,7 @@ from pathlib import Path
 import pytest
 import vtkplotlib as vpl
 
-from tests._common import checker, requires_interaction, TEST_DIR
-
-from tests._common import VTKPLOTLIB_WINDOWLESS_TEST
+from tests._common import TEST_DIR
 
 pytestmark = pytest.mark.order(3)
 
@@ -53,7 +51,6 @@ def test_figure_io():
     vpl.close()
 
 
-@checker()
 def test_save():
     plots = vpl.scatter(np.random.uniform(-10, 10, (30, 3)))
 
@@ -92,7 +89,6 @@ def test_screenshot_then_show():
     vpl.show()
 
 
-@checker()
 def test_view():
     vpl.auto_figure(True)
     vpl.close()
@@ -110,7 +106,6 @@ def test_view():
     vpl.show(block=False)
 
 
-@requires_interaction
 def test_multi_figures():
     vpl.close()
 
@@ -148,7 +143,6 @@ def test_add_remove():
     vpl.close(fig)
 
 
-@checker()
 def test_zoom():
     vpl.scatter(np.random.uniform(-20, 20, (30, 3)), color="r")
     vpl.show(block=False)

@@ -155,7 +155,7 @@ normalise
 
 import numpy as np
 from matplotlib import colors, cm
-from vtkplotlib._get_vtk import vtk, numpy_to_vtk, vtk_to_numpy
+from vtkplotlib._get_vtk import vtk, numpy_to_vtk
 
 from vtkplotlib._matplotlib_colors import matplotlib_colors as mpl_colors
 
@@ -179,7 +179,7 @@ def as_rgb_a(color=None, opacity=None):
         ``'RR'``, ``'GG'``, ``'BB'`` and ``'AA'`` are hexadecimal numbers from
         ``00`` to ``FF`` (0 to 255).
 
-    #.  A `PyQt5.QtGui.QColor`.
+    #.  A ``QtGui.QColor``.
 
     The **opacity** argument should be a scalar like those for the ``(r, g, b)``
     from form 2 above values.
@@ -208,8 +208,9 @@ def as_rgb_a(color=None, opacity=None):
 
         # QColors
         from vtkplotlib.nuts_and_bolts import isinstance_no_import
-        if isinstance_no_import(color, "PyQt5.QtGui", "QColor"):
-            return as_rgb_a(color.getRgbF(), opacity)
+        for variant in ("PyQt6", "PyQt5", "PySide6", "PySide2"):
+            if isinstance_no_import(color, variant + ".QtGui", "QColor"):
+                return as_rgb_a(color.getRgbF(), opacity)
 
         color = np.asarray(color)
         if color.dtype.kind in "ui" and color.max() > 1:

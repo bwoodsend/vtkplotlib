@@ -6,19 +6,17 @@ import vtkplotlib as vpl
 
 import pytest
 
-from tests._common import checker, numpy_stl
+from tests._common import numpy_stl
 
 pytestmark = pytest.mark.order(8)
 
 
-@checker()
 def test_arrow():
     points = np.random.uniform(-10, 10, (2, 3))
     vpl.scatter(points)
     vpl.arrow(*points, color="g")
 
 
-@checker()
 def test_quiver():
     t = np.linspace(0, 2 * np.pi)
     points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
@@ -28,14 +26,12 @@ def test_quiver():
     assert arrows.shape == t.shape
 
 
-@checker()
 def test_plot():
     t = np.arange(0, 1, .1) * 2 * np.pi
     points = np.array([np.cos(t), np.sin(t), np.cos(t) * np.sin(t)]).T
     vpl.plot(points, color="r", line_width=3, join_ends=True)
 
 
-@checker()
 def test_mesh():
     import time
 
@@ -57,7 +53,6 @@ def test_mesh():
         time.sleep(.01)
 
 
-@checker()
 def test_text():
     text = vpl.text("spaghetti", (100, 150), color="g")
     assert text.text == "spaghetti"
@@ -67,7 +62,6 @@ def test_text():
     assert text.actor.GetInput() == text.text == "not spaghetti"
 
 
-@checker()
 def test_surface():
     thi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 100),
                              np.linspace(0, np.pi, 50))
@@ -79,7 +73,6 @@ def test_surface():
     vpl.surface(x, y, z, scalars=x.ravel())
 
 
-@checker()
 def test_scatter():
     points = np.random.uniform(-10, 10, (30, 3))
 
@@ -91,7 +84,6 @@ def test_scatter():
     self.point += np.array([10, 0, 0])
 
 
-@checker()
 def test_annotate():
     point = np.array([1, 2, 3])
     vpl.scatter(point)

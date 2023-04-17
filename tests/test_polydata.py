@@ -3,17 +3,12 @@
 """
 
 import numpy as np
-import os, sys
 
 import pytest
-import vtkplotlib as vpl
-
-from tests._common import checker, VTKPLOTLIB_WINDOWLESS_TEST
 
 pytestmark = pytest.mark.order(5)
 
 
-@checker()
 def test(*spam):
     import vtkplotlib as vpl
     import numpy as np
@@ -31,16 +26,10 @@ def test(*spam):
 
     self.point_colors = point_colors
 
-    if not VTKPLOTLIB_WINDOWLESS_TEST:
-        self.quick_show()
-    else:
-        self.to_plot(fig=None)
+    self.quick_show()
 
     self.polygons, self.lines = self.lines, self.polygons
-    if not VTKPLOTLIB_WINDOWLESS_TEST:
-        self.quick_show()
-    else:
-        self.to_plot(fig=None)
+    self.quick_show()
 
     del self.lines
     del self.polygons

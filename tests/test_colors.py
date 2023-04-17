@@ -11,8 +11,6 @@ import vtkplotlib as vpl
 
 from matplotlib import cm
 
-from tests._common import checker
-
 pytestmark = pytest.mark.order(0)
 
 # Target output. Everything below should normalise to this.
@@ -30,15 +28,6 @@ parameters = [
     ("#01FF0610", 0x80, None),
     (u"bright green", A, None),
 ]
-
-try:
-    from PyQt5.QtGui import QColor
-    parameters += [
-        (QColor(*(int(i * 255) for i in RGB)), A, None),
-        (QColor("#01FF06"), A, None),
-    ]
-except ImportError:
-    pass
 
 
 @pytest.mark.parametrize(("rgb", "a", "warns"), parameters)

@@ -3,6 +3,7 @@
 """
 
 from vtkplotlib.interactive import pick, call_super_callback
+from vtkplotlib.figures.QtFigure import QtWidgets
 
 
 class CursorTracker(object):
@@ -14,7 +15,6 @@ class CursorTracker(object):
         self.set_no_cursor()
 
     def init_labels(self):
-        from PyQt5 import QtWidgets
         self.text_labels = [QtWidgets.QLabel(i) for i in "Cursor X Y Z".split()]
         self.coord_labels = [QtWidgets.QLabel() for i in range(3)]
 
@@ -22,7 +22,7 @@ class CursorTracker(object):
         self.labels = [self.text_labels[0]]
         [self.labels.extend(i)
          for i in zip(self.text_labels[1:], self.coord_labels)]
-        [label.setFrameStyle(QtWidgets.QFrame.Panel | QtWidgets.QFrame.Sunken)
+        [label.setFrameStyle(QtWidgets.QFrame.Shape.Panel | QtWidgets.QFrame.Shadow.Sunken)
          for label in self.coord_labels]
         # yapf:enable
 

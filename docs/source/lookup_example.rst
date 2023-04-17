@@ -67,4 +67,4 @@ Or, for time-critical applications, using a KDTree from either
 Note that having a ``MouseMoveEvent`` which modifies the contents of a figure and
 therefore requires ``fig.update()`` to be called for every such event requires a
 lot of processing power. A better option is to use an output outside of the
-renderer such as a `PyQt5.QtWidgets.QLabel`.
+renderer such as a `PyQt6.QtWidgets.QLabel`.

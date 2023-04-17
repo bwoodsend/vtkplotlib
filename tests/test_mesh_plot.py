@@ -2,13 +2,11 @@
 """Test mesh plotting."""
 
 import numpy as np
-import os, sys
-from pathlib import Path
 
 import pytest
 import vtkplotlib as vpl
 
-from tests._common import checker, numpy_stl
+from tests._common import numpy_stl
 
 path = vpl.data.get_rabbit_stl()
 
@@ -37,7 +35,6 @@ def test_type_normalise():
     vpl.close()
 
 
-@checker()
 def test_edge_scalars():
 
     fig = vpl.gcf()

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from ._version import __version__, __version_info__
 from ._history import figure_history
 
@@ -14,12 +13,8 @@ from .figures import (
     save_fig,
     screenshot_fig,
     close,
-    PyQt5_AVAILABLE,
     zoom_to_contents,
 )
-
-if PyQt5_AVAILABLE:
-    from .figures import QtFigure, QtFigure2
 
 from .plots.Arrow import arrow, quiver
 from .plots.Lines import Lines as plot
@@ -67,3 +62,14 @@ from ._get_vtk import vtk
 
 # Explicitly importing these can improve IDE autocompletion.
 from . import _interactive, _image_io
+
+
+def __getattr__(name):
+    global QtFigure, QtFigure2
+    if name in ("QtFigure", "QtFigure2"):
+        from .figures.QtFigure import QtFigure
+        from .figures.QtGuiFigure import QtFigure2
+    try:
+        return globals()[name]
+    except KeyError:
+        raise AttributeError(name) from None

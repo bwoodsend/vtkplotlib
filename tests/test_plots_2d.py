@@ -8,12 +8,9 @@ import os, sys
 import pytest
 import vtkplotlib as vpl
 
-from tests._common import checker
-
 pytestmark = pytest.mark.order(9)
 
 
-@checker()
 def test_legend():
     import vtkplotlib as vpl
 
@@ -75,7 +72,6 @@ def test_legend():
     self.add_plots(vpl.gcf().plots)
 
 
-@checker()
 def test_scalar_bar():
     plot = vpl.mesh_plot(vpl.data.get_rabbit_stl())
     plot.scalars = (plot.vertices / 5) % 1

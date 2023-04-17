@@ -5,20 +5,13 @@
 import time
 
 import numpy as np
-import os, sys
 
 import pytest
 import vtkplotlib as vpl
 
-from tests._common import checker, VTKPLOTLIB_WINDOWLESS_TEST
-
-pytestmark = [
-    pytest.mark.skipif(not vpl.PyQt5_AVAILABLE, reason="Requires Qt"),
-    pytest.mark.order(11),
-]
+pytestmark = pytest.mark.order(11)
 
 
-@checker()
 def test_qfigure():
     vpl.QtFigure._abc_assert_no_abstract_methods()
 
@@ -34,7 +27,7 @@ def test_qfigure():
     self.show(block=False)
     self.close()
 
-    self.showMaximized(block=not VTKPLOTLIB_WINDOWLESS_TEST)
+    self.showMaximized()
     out = vpl.screenshot_fig(fig=self)
     vpl.close(fig=self)
 
@@ -42,7 +35,6 @@ def test_qfigure():
     return out
 
 
-@checker()
 def test_qfigure2():
     fig = vpl.QtFigure2("a QWidget figure")
     fig.setWindowTitle(fig.window_name)
@@ -61,8 +53,7 @@ def test_qfigure2():
         fig.qapp.processEvents()
         time.sleep(.1)
 
-    if not VTKPLOTLIB_WINDOWLESS_TEST:
-        fig.screenshot_button.released.emit()
+    fig.screenshot_button.released.emit()
     fig.show_plot_table_button.released.emit()
 
     fig.show(block=False)

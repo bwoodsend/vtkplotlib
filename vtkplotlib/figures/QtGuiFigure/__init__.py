@@ -5,15 +5,14 @@ import sys
 from pathlib import Path
 from itertools import zip_longest
 
-from PyQt5 import QtWidgets, QtGui, QtCore
-
 from vtkplotlib.figures import QtFigure, save_fig, view
+from vtkplotlib.figures.QtFigure import QtWidgets, QtGui, QtCore
 from vtkplotlib.data import ICONS_FOLDER
 
 SCREENSHOT_ICON_PATH = ICONS_FOLDER / "screenshot.png"
 
 
-class QtFigure2(QtFigure):
+class QtFigure2(QtFigure.QtFigure):
     """This is intended to be used as/for a more sophisticated GUI when one is needed.
     By providing some common features here, hopefully this can speed up the
     tedious process of building a GUI. Any contributions here would be very
@@ -147,8 +146,8 @@ class Button(QtWidgets.QPushButton):
         self.setIconSize(QtCore.QSize(40, 40))
 
         p = self.sizePolicy()
-        p.setHorizontalPolicy(p.Minimum)
-        p.setVerticalPolicy(p.Minimum)
+        p.setHorizontalPolicy(p.Policy.Minimum)
+        p.setVerticalPolicy(p.Policy.Minimum)
         self.setSizePolicy(p)
 
         if icon is not None:
@@ -273,7 +272,7 @@ class PlotTable(QtWidgets.QWidget):
 
     def __init__(self, figure):
         super().__init__()
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(QtCore.Qt.WindowType.WindowStaysOnTopHint)
         self.figure = figure
         self.plots = self.figure.plots
         self.rows = dict()
@@ -323,13 +322,15 @@ class PlotTableRow(object):
         self.text.released.connect(self.toggle_visible)
 
     def chk_box_change_cb(self):
-        state = bool(self.visible_checkbox.checkState())
-
-        self.plot.visible = bool(state)
+        CheckState = getattr(QtCore.Qt, "CheckState", QtCore.Qt)
+        if self.visible_checkbox.checkState() == CheckState.Unchecked:
+            self.plot.visible = 0
+        else:
+            self.plot.visible = 1
         self.plot.fig.update()
 
     def toggle_visible(self):
-        self.visible_checkbox.setChecked(not self.visible_checkbox.checkState())
+        self.visible_checkbox.toggle()
 
     def add_to_grid(self, grid):
         grid.addWidget(self.visible_checkbox, self.row_num, 0)
@@ -337,9 +338,10 @@ class PlotTableRow(object):
 
 
 class QLabel_alterada(QtWidgets.QLabel):
-    released = QtCore.pyqtSignal()
+    released = (getattr(QtCore, "Signal", None) or QtCore.pyqtSignal)()
 
     def mouseReleaseEvent(self, ev):
+        print(ev)
         self.released.emit()
 
 
@@ -378,5 +380,5 @@ if __name__ == "__main__":
 ##    row = table.rows[plot]
 #
 #    self.show()
-##    app.exec_()
+##    app.exec()
 #

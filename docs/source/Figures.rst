@@ -8,7 +8,7 @@ This section outlines:
 * General figure management.
 * Functions for controlling the camera position.
 * Screenshotting the figure contents to a frozen image (file).
-* Embedding a figure into PyQt5_.
+* Embedding a figure into PyQt6_.
 
 Overview
 --------

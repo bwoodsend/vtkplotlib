@@ -1,13 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import numpy as np
 import sys
-from vtkplotlib._get_vtk import vtk, QVTKRenderWindowInteractor
+import importlib
 
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout
+try:
+    from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor, PyQtImpl
+    # QVTKRenderWindowInteractor raises an error if this isn't loaded.
+    from vtkmodules.vtkRenderingOpenGL2 import vtkOpenGLRenderer
+except:
+    from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor, PyQtImpl
+
+QtWidgets = importlib.import_module(PyQtImpl + ".QtWidgets")
+QtGui = importlib.import_module(PyQtImpl + ".QtGui")
+QtCore = importlib.import_module(PyQtImpl + ".QtCore")
+
 from vtkplotlib.figures.BaseFigure import BaseFigure
 from vtkplotlib import nuts_and_bolts
-from vtkplotlib._vtk_errors import handler, silencer
 
 if __name__ == "__main__":
     debug = print
@@ -15,17 +23,16 @@ else:
     debug = lambda *x: None
 
 
-class QtFigure(BaseFigure, QWidget):
-    """The VTK render window in a `PyQt5.QtWidgets.QWidget`.
+class QtFigure(BaseFigure, QtWidgets.QWidget):
+    """The VTK render window in a `PyQt6.QtWidgets.QWidget`.
     This can be embedded into a GUI the same way all other
-    `PyQt5.QtWidgets.QWidget`\\ s are used.
+    `PyQt6.QtWidgets.QWidget`\\ s are used.
 
     :param name: The window title of the figure, only applicable is **parent** is None, defaults to 'qt vtk figure'.
     :type name: str
 
     :param parent: Parent window, defaults to None.
-    :type parent: :sip:class:`PyQt5.QtWidgets.QWidget`
-
+    :type parent: :sip:class:`PyQt6.QtWidgets.QWidget`
 
     .. note::
 
@@ -34,14 +41,13 @@ class QtFigure(BaseFigure, QWidget):
         straight in, Qt is not one of them. Preferably familiarise yourself
         with some basic Qt before coming here.
 
-
-    This class inherits both from `PyQt5.QtWidgets.QWidget` and a
+    This class inherits both from `PyQt6.QtWidgets.QWidget` and a
     vtkplotlib base figure class. Therefore it can be used exactly the same as
-    you would normally use either a `PyQt5.QtWidgets.QWidget` or a
+    you would normally use either a `PyQt6.QtWidgets.QWidget` or a
     `vtkplotlib.figure`.
 
     Care must be taken when using Qt to ensure you have **exactly one**
-    `PyQt5.QtWidgets.QApplication`. To make this class quicker to use
+    `PyQt6.QtWidgets.QApplication`. To make this class quicker to use
     the qapp is created automatically but is wrapped in a
 
     .. code-block:: python
@@ -51,20 +57,18 @@ class QtFigure(BaseFigure, QWidget):
         else:
             self.qapp = QApplication.instance()
 
-    This prevents multiple `PyQt5.QtWidgets.QApplication` instances
+    This prevents multiple `PyQt6.QtWidgets.QApplication` instances
     from being created (which causes an instant crash) whilst also preventing a
-    `PyQt5.QtWidgets.QWidget` from being created without a qapp
+    `PyQt6.QtWidgets.QWidget` from being created without a qapp
     (which also causes a crash).
 
-
-    On :func:`show()`, :sip:method:`qapp.exec_()
-    <PyQt5.QtWidgets.QApplication.exec_>` is called automatically if
+    On :func:`show()`, :sip:method:`qapp.exec()
+    <PyQt6.QtWidgets.QApplication.exec>` is called automatically if
     ``figure.parent() is None`` (unless specified otherwise).
 
     If the figure is part of a larger window then ``larger_window.show()``
     must also explicitly show the figure. It won't begin interactive mode until
-    `PyQt5.QtWidgets.QApplication.exec_` is called.
-
+    `PyQt6.QtWidgets.QApplication.exec` is called.
 
     If the figure is not to be part of a larger window then it behaves exactly
     like a regular figure. You just need to explicitly create it first.
@@ -82,10 +86,9 @@ class QtFigure(BaseFigure, QWidget):
 
         vpl.quick_test_plot()
 
-        # Automatically calls ``qapp.exec_()``. If you don't want it to then
+        # Automatically calls ``qapp.exec()``. If you don't want it to then
         # use ``vpl.show(False)``.
         vpl.show()
-
 
     However this isn't particularly helpful. A more realistic example would
     require the figure be part of a larger window. In this case, treat the
@@ -94,10 +97,11 @@ class QtFigure(BaseFigure, QWidget):
 
     .. code-block:: python
 
-        import vtkplotlib as vpl
-        from PyQt5 import QtWidgets
-        import numpy as np
         import sys
+
+        import numpy as np
+        from PyQt6 import QtWidgets
+        import vtkplotlib as vpl
 
 
         class FigureAndButton(QtWidgets.QWidget):
@@ -119,7 +123,6 @@ class QtFigure(BaseFigure, QWidget):
                 vbox.addWidget(self.figure)
                 vbox.addWidget(self.button)
 
-
             def button_pressed_cb(self):
                 \"""Plot commands can be called in callbacks. The current working
                 figure is still self.figure and will remain so until a new
@@ -139,12 +142,10 @@ class QtFigure(BaseFigure, QWidget):
                 # Without this the figure will not redraw unless you click on it.
                 self.figure.update()
 
-
             def show(self):
                 # The order of these two are interchangeable.
                 super().show()
                 self.figure.show()
-
 
             def closeEvent(self, event):
                 \"""This isn't essential. VTK, OpenGL, Qt and Python's garbage
@@ -156,16 +157,19 @@ class QtFigure(BaseFigure, QWidget):
                 self.figure.closeEvent(event)
 
 
-
-
         qapp = QtWidgets.QApplication.instance() or QtWidgets.QApplication(sys.argv)
 
         window = FigureAndButton()
         window.show()
-        qapp.exec_()
+        qapp.exec()
 
+    .. note:: `QtFigure`\\ s are not reshow-able if the figure has a parent.
 
-    .. note::  `QtFigure`\\ s are not reshow-able if the figure has a parent.
+    .. note::
+
+        VTK automatically selects the Qt variant (``PyQt6``, ``PyQt5``,
+        ``PySide6`` or ``PySide2``) based on what has already been imported. To
+        use a different Qt variant, import it *before* importing `vtkplotlib`.
 
     .. seealso:: `vtkplotlib.QtFigure2` is an extension of this to provide some standard GUI elements, ready-made.
 
@@ -173,11 +177,12 @@ class QtFigure(BaseFigure, QWidget):
 
     def __init__(self, name="qt vtk figure", parent=None):
 
-        self.qapp = QApplication.instance() or QApplication(sys.argv)
-        QWidget.__init__(self, parent)
+        self.qapp = QtWidgets.QApplication.instance() or QtWidgets.QApplication(
+            sys.argv)
+        QtWidgets.QWidget.__init__(self, parent)
         BaseFigure.__init__(self, name)
 
-        self.vl = QVBoxLayout()
+        self.vl = QtWidgets.QVBoxLayout()
         self.setLayout(self.vl)
 
         self._vtkWidget = QVTKRenderWindowInteractor(self)
@@ -189,7 +194,7 @@ class QtFigure(BaseFigure, QWidget):
     def _re_init(self):
         debug("re init")
         name = self.window_name
-        QWidget.__init__(self, self.parent())
+        QtWidgets.QWidget.__init__(self, self.parent())
         self.window_name = name
         self.setLayout(self.vl)
         self.setWindowTitle(self.window_name)
@@ -221,7 +226,8 @@ class QtFigure(BaseFigure, QWidget):
         ``show()``.
         """
 
-        QWidget_show = getattr(QWidget, QWidget_show_name, QWidget.show)
+        QWidget_show = getattr(QtWidgets.QWidget, QWidget_show_name,
+                               QtWidgets.QWidget.show)
 
         def show(self, block=None):
             if not hasattr(self, "vtkWidget"):
@@ -238,7 +244,7 @@ class QtFigure(BaseFigure, QWidget):
                 block = self.parent() is None
             if block:
                 self._flush_stdout()
-                self.qapp.exec_()
+                self.qapp.exec()
             BaseFigure.show(self, block)
 
         show.__name__ = QWidget_show.__name__
@@ -270,7 +276,7 @@ class QtFigure(BaseFigure, QWidget):
 
     def update(self):
         BaseFigure.update(self)
-        QWidget.update(self)
+        QtWidgets.QWidget.update(self)
         self.qapp.processEvents()
 
 #    def close(self):
@@ -298,7 +304,8 @@ class QtFigure(BaseFigure, QWidget):
     def closeEvent(self, event):
         self.on_close()
 
-    window_name = property(QWidget.windowTitle, QWidget.setWindowTitle)
+    window_name = property(QtWidgets.QWidget.windowTitle,
+                           QtWidgets.QWidget.setWindowTitle)
 
     def __del__(self):
         try:
@@ -314,7 +321,7 @@ class QtFigure(BaseFigure, QWidget):
         self.show(block=False)
 
     def close(self):
-        QWidget.close(self)
+        QtWidgets.QWidget.close(self)
         # closeEvent seems to be called anyway but call this just to be sure.
         self.on_close()
         BaseFigure.close(self)

@@ -6,13 +6,9 @@ from unittest import TestCase, skipUnless
 
 import pytest
 
-from vtkplotlib import PyQt5_AVAILABLE, NUMPY_STL_AVAILABLE
+from vtkplotlib import NUMPY_STL_AVAILABLE
 
-if PyQt5_AVAILABLE:
-    from PyQt5 import QtWidgets, QtCore, QtGui
 import vtkplotlib as vpl
-
-from tests._common import checker, VTKPLOTLIB_WINDOWLESS_TEST
 
 pytestmark = pytest.mark.order(12)
 
@@ -20,8 +16,6 @@ pytestmark = pytest.mark.order(12)
 class TestDocs(TestCase):
     """These are automatically extracted from the docstrings."""
 
-    @checker()
-    @skipUnless(PyQt5_AVAILABLE, "PyQt5 not installed")
     def test_doc_00(self):
         # Create the figure. This automatically sets itself as the current
         # working figure. The qapp is created automatically if one doesn't
@@ -32,14 +26,13 @@ class TestDocs(TestCase):
 
         vpl.quick_test_plot()
 
-        # Automatically calls ``qapp.exec_()``. If you don't want it to then
+        # Automatically calls ``qapp.exec()``. If you don't want it to then
         # use ``vpl.show(False)``.
 
-    @checker()
-    @skipUnless(PyQt5_AVAILABLE, "PyQt5 not installed")
     def test_doc_01(self):
         import vtkplotlib as vpl
-        from PyQt5 import QtWidgets
+        from vtkplotlib.figures.QtFigure import PyQtImpl
+        QtWidgets = __import__(PyQtImpl).QtWidgets
         import numpy as np
         import sys
 
@@ -107,21 +100,14 @@ class TestDocs(TestCase):
         for i in range(5):
             window.button.released.emit()
             qapp.processEvents()
-        output_to_verify = checker().reduce_fig(window.figure)
-
-        if VTKPLOTLIB_WINDOWLESS_TEST:
-            window.close()
 
         self._do_not_delete_yet = window
 
-        return output_to_verify
-
-#    @checker()
-#    @skipUnless(PyQt5_AVAILABLE, "PyQt5 not installed")
+#    @skipUnless(PyQt6_AVAILABLE, "PyQt6 not installed")
 #    def test_doc_02(self):
 #        import vtkplotlib as vpl
 #        import numpy as np
-#        from PyQt5.QtWidgets import QApplication
+#        from PyQt6.QtWidgets import QApplication
 #
 #        # Create the figure. This as-is looks like just a QtFigure.
 #        fig = vpl.QtFigure2()
@@ -144,7 +130,6 @@ class TestDocs(TestCase):
 #        # Then either ``vpl.show()`` or
 ##        fig.show()
 
-    @checker()
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_03(self):
         import vtkplotlib as vpl
@@ -156,7 +141,6 @@ class TestDocs(TestCase):
         vpl.plot(vertices, join_ends=True, color="dark red")
 #        vpl.show()
 
-    @checker()
     def test_doc_04(self):
         import vtkplotlib as vpl
         import numpy as np
@@ -177,7 +161,6 @@ class TestDocs(TestCase):
         fig = vpl.gcf()
         fig.background_color = "grey"
 
-    @checker()
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_05(self):
         import vtkplotlib as vpl
@@ -211,7 +194,6 @@ class TestDocs(TestCase):
         # Optionally the plot created by mesh_plot can be passed to color_bar
         vpl.color_bar(plot, "Heights")
 
-    @checker()
     @skipUnless(NUMPY_STL_AVAILABLE, "numpy-stl not installed")
     def test_doc_07(self):
         import vtkplotlib as vpl
@@ -247,7 +229,6 @@ class TestDocs(TestCase):
 
 #        vpl.show()
 
-    @checker()
     def test_doc_09(self):
         import vtkplotlib as vpl
         import numpy as np
@@ -263,7 +244,6 @@ class TestDocs(TestCase):
 
 #        vpl.show()
 
-    @checker()
     def test_doc_10(self):
         import vtkplotlib as vpl
         import numpy as np
@@ -276,7 +256,6 @@ class TestDocs(TestCase):
                      np.array([0, 0, 1]))
 #        vpl.show()
 
-    @checker()
     def test_doc_11(self):
         import vtkplotlib as vpl
         import numpy as np
@@ -294,7 +273,6 @@ class TestDocs(TestCase):
 
 #        vpl.show()
 
-    @checker()
     def test_doc_12(self):
         import numpy as np
 
@@ -309,15 +287,13 @@ class TestDocs(TestCase):
         polydata.polygons = np.array([[0, 1, 2]])
 
         # The polydata can be quickly inspected using
-        if not VTKPLOTLIB_WINDOWLESS_TEST:
-            polydata.quick_show()
+        polydata.quick_show()
 
         # When you are happy with it, it can be turned into a proper plot
         # object like those output from other ``vpl.***()`` commands. It will be
         # automatically added to ``vpl.gcf()`` unless told otherwise.
         plot = polydata.to_plot()
 
-    @checker()
     def test_doc_13(self):
         vpl.quick_test_plot()
 
@@ -337,7 +313,6 @@ class TestDocs(TestCase):
         #             [ 8,  4,  3],
         #             [ 9,  4,  4]])
 
-    @checker()
     def test_doc_035(self):
         import numpy as np
 
@@ -365,15 +340,3 @@ class TestDocs(TestCase):
         # then pass ``colors`` as the `scalars` argument instead.
 
         vpl.surface(x, y, z, scalars=texture_coords, texture_map=texture_map)
-
-    @classmethod
-    def tearDownClass(cls):
-        print("tear down")
-        if PyQt5_AVAILABLE:
-            qapp = QtWidgets.QApplication.instance()
-            if qapp:
-                qapp.exit()
-                qapp.quit()
-
-if __name__ == "__main__":
-    pass

@@ -13,7 +13,7 @@
 .. _numpy: http://numpy.org/
 .. _matplotlib: http://matplotlib.org/
 .. _vtk: https://pypi.org/project/vtk/
-.. _PyQt5: https://pypi.org/project/PyQt5/
+.. _PyQt6: https://pypi.org/project/PyQt6/
 .. _numpy-stl: https://pypi.org/project/numpy-stl/
 .. _PyInstaller: https://www.pyinstaller.org/
 .. _namegenerator: https://pypi.org/project/namegenerator/

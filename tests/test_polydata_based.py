@@ -3,17 +3,13 @@
 """
 
 import numpy as np
-import os, sys
 
 import pytest
 import vtkplotlib as vpl
 
-from tests._common import checker
-
 pytestmark = pytest.mark.order(6)
 
 
-@checker()
 def test_plot():
     t = np.arange(0, 1, .001) * 2 * np.pi
     vertices = np.array(
@@ -35,7 +31,6 @@ def test_plot():
     fig.background_color = "grey"
 
 
-@checker()
 def test_polygon():
 
     t = np.arange(0, 1, .1) * 2 * np.pi
@@ -46,7 +41,6 @@ def test_polygon():
     globals().update(locals())
 
 
-@checker()
 def test_texture():
 
     phi, theta = np.meshgrid(np.linspace(0, 2 * np.pi, 1024),
