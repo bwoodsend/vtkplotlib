@@ -1,0 +1,2 @@
+* Support ``PyQt6``, ``PySide2`` or ``PySide6`` derived `QtFigure` as well as
+  ``PyQt5``.
