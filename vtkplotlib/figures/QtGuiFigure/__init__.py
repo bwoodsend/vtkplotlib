@@ -156,7 +156,7 @@ class Button(QtWidgets.QPushButton):
             self.setText(name)
 
     def default_callback(self):
-        print("QButton", repr(self.text()), "was triggered")
+        raise NotImplementedError
 
 
 def as_qicon(obj):
@@ -341,7 +341,6 @@ class QLabel_alterada(QtWidgets.QLabel):
     released = (getattr(QtCore, "Signal", None) or QtCore.pyqtSignal)()
 
     def mouseReleaseEvent(self, ev):
-        print(ev)
         self.released.emit()
 
 

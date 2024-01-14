@@ -334,8 +334,6 @@ class MeshPlot(ConstructedPlot):
             # If shape not changed, indices should be identical.
             return
 
-
-#        print("rewrite indices")
         self.shape = vectors.shape
 
         if len(vectors) < self.shape[0] and self._last_used_default_indices:
