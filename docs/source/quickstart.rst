@@ -34,6 +34,32 @@ Key features
 * Is freezable with `PyInstaller`_.
 
 
+.. warning:: Sort-of abondoned project!
+
+    I hate maintaining this project. This is the most popular project I've ever
+    conceived yet it is also the one I wish never to have to work on again. VTK
+    with it's infuriating API, memory leaks and tendency to segfault with no
+    discernible patterns (I have tests which if ran in isolation, work fine, but
+    segfault if ran one after another but don't segfault if ran in a different
+    order) make even trivial updates an exercise in grinding teeth and resisting
+    the urge to throw something.
+
+    If anyone discovers a **non-VTK derived** 3D rendering library which sets up
+    the lighting for you and doesn't require you to write your own trackball
+    then `please let me know
+    <https://github.com/bwoodsend/vtkplotlib/issues/new>`_. Until then, I will
+    reluctantly continue to address issues with lower cost to benefit ratios
+    since I do still need this library for some of my other projects.
+
+    There are other VTK derivative libraries (``mayavi``, ``pyvista``,
+    ``vedo``). They are all useless to me since the first thing they all do is
+    load the entirety of the ``vtk`` package (``vtkplotlib`` only loads the bits
+    it uses and only when it needs them) ballooning the end user application
+    size and startup time spectacularly. If your code is never going to leave
+    your own computer and you therefore don't care about either of those factors
+    then you're probably better off using one of those libraries instead.
+
+
 Requirements for installing:
 ------------------------------------------------------------------------------
 
